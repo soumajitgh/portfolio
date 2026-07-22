@@ -1,3 +1,5 @@
+'use client'
+
 import { ArrowUpRight, CircleDot } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,14 +31,24 @@ export function HomeBlogPosts({ posts }: { posts: HomeBlogPost[] }) {
   return (
     <div
       aria-label="Featured blog posts"
-      className="scrollbar-thin flex h-full snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 pr-[12vw] md:grid md:grid-cols-3 md:overflow-visible md:pb-0 md:pr-0"
-      role="list"
+      className="scrollbar-thin mobile-scrollbar-hidden flex h-full touch-pan-x snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pr-[12%] md:grid md:grid-cols-3 md:overflow-visible md:pr-0"
+      onKeyDown={(event) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+        event.preventDefault()
+        event.currentTarget.scrollBy({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 'auto'
+            : 'smooth',
+          left: (event.key === 'ArrowLeft' ? -1 : 1) * event.currentTarget.clientWidth * 0.88,
+        })
+      }}
+      role="region"
+      tabIndex={0}
     >
       {posts.slice(0, 3).map((post) => (
         <Card
-          className="group h-full w-[min(82vw,22rem)] shrink-0 snap-start gap-4 p-5 transition-colors hover:border-terminal-blue/60 hover:bg-accent/20 focus-within:border-terminal-blue/60 md:w-auto"
+          className="group relative h-full w-[88%] max-w-[22rem] shrink-0 snap-start gap-4 p-5 transition-colors hover:border-terminal-blue/60 hover:bg-accent/20 focus-within:border-terminal-blue/60 md:w-auto md:max-w-none"
           key={post.id}
-          role="listitem"
         >
           <div className="flex items-center justify-between gap-3 font-mono text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-2 text-terminal-green">
@@ -45,9 +57,9 @@ export function HomeBlogPosts({ posts }: { posts: HomeBlogPost[] }) {
             <span>{post.readingMinutes} min read</span>
           </div>
           <div className="min-w-0">
-            <h2 className="font-mono text-base font-semibold tracking-[-0.025em] sm:text-lg">
+            <h2 className="font-mono text-[0.9375rem] font-semibold tracking-[-0.025em] sm:text-lg">
               <Link
-                className="rounded-sm outline-none group-hover:text-terminal-blue focus-visible:ring-2 focus-visible:ring-ring"
+                className="rounded-sm after:absolute after:inset-0 outline-none group-hover:text-terminal-blue focus-visible:ring-2 focus-visible:ring-ring"
                 href={`/blog/${post.slug}`}
               >
                 {post.title}

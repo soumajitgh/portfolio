@@ -84,7 +84,7 @@ export function StarButton({
   }
 
   return (
-    <div className="relative inline-flex">
+    <div className="relative inline-flex max-w-full flex-col items-end">
       <Button
         aria-label={`${state.starred ? 'Remove star from' : 'Star'} ${subject}. ${state.count} stars`}
         aria-pressed={state.starred}
@@ -101,7 +101,7 @@ export function StarButton({
         <span className="text-muted-foreground">{state.count}</span>
       </Button>
       {turnstileConfigured || error ? (
-        <div className="absolute right-0 top-full z-30 mt-2 w-[min(18rem,calc(100vw-3rem))] text-right">
+        <div className="absolute right-0 top-full z-30 mt-2 w-[min(18rem,calc(100vw-2rem))] text-right max-sm:static">
           {turnstileConfigured ? (
             <Turnstile
               action="star"

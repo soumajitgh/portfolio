@@ -4,12 +4,13 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { CopyLinkButton } from '@/components/copy-link-button'
+import { TableOfContents } from '@/components/blog/table-of-contents'
 import { BlogPostBody } from '@/components/rich-text'
-import { SiteHeader } from '@/components/site-header'
 import { StarButton } from '@/components/star-button'
 import { Badge } from '@/components/ui/badge'
 import { formatBlogDate, wasMeaningfullyUpdated } from '@/lib/blog-content'
 import { getBlogNeighbors, getPublishedBlogPost } from '@/lib/blog-data'
+import { extractRichTextHeadings } from '@/lib/rich-text-headings'
 
 export const revalidate = 300
 
@@ -52,6 +53,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   if (!post) notFound()
 
   const { newer, older } = await getBlogNeighbors(post.id)
+  const headings = extractRichTextHeadings(post.body)
   const showUpdated = wasMeaningfullyUpdated(post.publishedAt, post.updatedAt)
   const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   const canonicalURL = `${siteURL}/blog/${post.slug}`
@@ -73,10 +75,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
 
   return (
-    <div className="min-h-dvh">
-      <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl px-6 py-10 md:px-10 md:py-14">
-        <nav aria-label="Breadcrumb" className="font-mono text-xs text-muted-foreground sm:text-sm">
+    <div className="min-h-[calc(100dvh-4rem)]">
+      <main className="page-container py-8 sm:py-10 md:py-14">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex min-w-0 flex-wrap font-mono text-xs text-muted-foreground sm:text-sm"
+        >
           <Link className="hover:text-primary" href="/blog">
             ~/blog
           </Link>
@@ -91,19 +95,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <p className="font-mono text-sm text-terminal-green">
                   $ cat issue-{post.issueNumber}.md
                 </p>
-                <h1 className="mt-5 text-3xl font-semibold leading-tight md:text-5xl">
+                <h1 className="detail-title mt-5 break-words font-semibold">
                   {post.title}{' '}
                   <span className="whitespace-nowrap text-muted-foreground">
                     #{post.issueNumber}
                   </span>
                 </h1>
                 {post.excerpt ? (
-                  <p className="mt-5 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
+                  <p className="detail-lede mt-5 max-w-3xl text-muted-foreground lg:text-lg">
                     {post.excerpt}
                   </p>
                 ) : null}
               </div>
-              <div className="flex flex-wrap items-start gap-3 lg:justify-end">
+              <div className="flex min-w-0 flex-wrap items-start gap-3 lg:justify-end">
                 <CopyLinkButton />
                 <StarButton resource="blog" slug={post.slug} />
               </div>
@@ -128,6 +132,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             ) : null}
           </header>
+
+          <TableOfContents headings={headings} />
 
           <div className="mt-10 w-full">
             <BlogPostBody data={post.body} />

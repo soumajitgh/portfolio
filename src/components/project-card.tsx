@@ -29,7 +29,7 @@ export function ProjectCard({
     <Card
       className={cn(
         'group relative h-full overflow-hidden transition-colors hover:border-primary/55 hover:bg-accent/25',
-        compact && 'min-w-[82vw] py-4 sm:min-w-[24rem] lg:min-w-[27rem]',
+        compact && 'w-full min-w-0 max-w-none gap-4 py-4',
       )}
     >
       {project.coverImage?.url && !compact && (
@@ -38,12 +38,12 @@ export function ProjectCard({
             alt={project.coverImage.alt}
             className="object-cover transition-transform duration-300 group-hover:scale-[1.015] motion-reduce:transition-none"
             fill
-            sizes="(max-width: 768px) 90vw, 42vw"
+            sizes="(max-width: 639px) calc(100vw - 2rem), (max-width: 1023px) calc(50vw - 2.5rem), 34rem"
             src={project.coverImage.url}
           />
         </div>
       )}
-      <CardHeader className={compact ? 'px-5' : undefined}>
+      <CardHeader className={compact ? 'px-4 sm:px-5' : undefined}>
         <div className="mb-2 flex items-center justify-between gap-4 font-mono text-[11px] text-terminal-yellow">
           <span>
             {String(index + 1).padStart(2, '0')} / {formatLabel(project.category).toUpperCase()}
@@ -69,11 +69,20 @@ export function ProjectCard({
           {project.shortDescription}
         </CardDescription>
       </CardHeader>
-      <CardContent className={cn('mt-auto flex flex-wrap items-center gap-2', compact && 'px-5')}>
-        {project.topics?.slice(0, compact ? 3 : 5).map((topic) => (
+      <CardContent
+        className={cn(
+          'mt-auto flex flex-wrap items-center gap-2',
+          compact && 'gap-1.5 px-4 sm:px-5',
+        )}
+      >
+        {project.topics?.slice(0, compact ? 3 : undefined).map((topic) => (
           <Badge
             asChild
-            className={cn('relative z-10', accentClasses[project.accent || 'blue'])}
+            className={cn(
+              'relative z-10',
+              accentClasses[project.accent || 'blue'],
+              compact && 'min-h-9 max-w-full truncate px-2 md:min-h-0',
+            )}
             key={topic.slug}
             variant="outline"
           >

@@ -1,10 +1,7 @@
-import { SiteHeader } from '@/components/site-header'
-
 export default function ProjectsLoading() {
   return (
-    <div className="min-h-dvh">
-      <SiteHeader />
-      <main className="mx-auto max-w-6xl animate-pulse px-6 py-16 md:px-10">
+    <div className="min-h-[calc(100dvh-4rem)]">
+      <main aria-busy="true" className="page-container animate-pulse py-12 md:py-16">
         <div className="h-4 w-64 rounded bg-muted" />
         <div className="mt-5 h-12 w-80 max-w-full rounded bg-muted" />
         <div className="mt-12 grid gap-5 md:grid-cols-2">

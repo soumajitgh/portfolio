@@ -82,7 +82,7 @@ const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
           alt={media.alt}
           height={height}
           loading="lazy"
-          sizes="(min-width: 1024px) 72ch, calc(100vw - 3rem)"
+          sizes="(min-width: 1024px) 72ch, calc(100vw - 2rem)"
           src={src}
           width={width}
         />

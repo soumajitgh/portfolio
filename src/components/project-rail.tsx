@@ -29,9 +29,12 @@ export function ProjectRail({ projects }: { projects: ProjectCardData[] }) {
   }, [updateControls])
 
   function move(direction: -1 | 1) {
-    railRef.current?.scrollBy({
+    const rail = railRef.current
+    if (!rail) return
+    const firstCard = rail.firstElementChild as HTMLElement | null
+    rail.scrollBy({
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-      left: direction * Math.max(railRef.current.clientWidth * 0.82, 320),
+      left: direction * ((firstCard?.offsetWidth || rail.clientWidth * 0.88) + 16),
     })
   }
 
@@ -69,9 +72,20 @@ export function ProjectRail({ projects }: { projects: ProjectCardData[] }) {
       </div>
       <div
         aria-label="Featured projects"
-        className="scrollbar-thin flex h-full snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 pr-[12vw]"
+        className="scrollbar-thin mobile-scrollbar-hidden flex h-full touch-pan-x snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pr-[12%] md:pb-3"
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowLeft') {
+            event.preventDefault()
+            move(-1)
+          }
+          if (event.key === 'ArrowRight') {
+            event.preventDefault()
+            move(1)
+          }
+        }}
         onScroll={updateControls}
         onWheel={(event) => {
+          if (window.innerWidth < 768 || !window.matchMedia('(pointer: fine)').matches) return
           if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return
           event.currentTarget.scrollLeft += event.deltaY
         }}
@@ -80,7 +94,7 @@ export function ProjectRail({ projects }: { projects: ProjectCardData[] }) {
         tabIndex={0}
       >
         {projects.map((project, index) => (
-          <div className="h-full snap-start" key={project.id}>
+          <div className="h-full w-[88%] shrink-0 snap-start sm:w-96 lg:w-[27rem]" key={project.id}>
             <ProjectCard compact index={index} project={project} />
           </div>
         ))}

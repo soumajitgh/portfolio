@@ -10,7 +10,6 @@ import {
 } from 'react-icons/fa6'
 
 import { ContactForm } from '@/components/contact-form'
-import { SiteHeader } from '@/components/site-header'
 import { Card } from '@/components/ui/card'
 import { getPortfolioSettings } from '@/lib/portfolio-data'
 
@@ -50,14 +49,13 @@ export default async function ContactPage() {
   const contact = settings.contact
 
   return (
-    <div className="min-h-dvh">
-      <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl px-6 py-12 md:px-10 md:py-16">
+    <div className="min-h-[calc(100dvh-4rem)]">
+      <main className="page-container py-10 sm:py-12 md:py-16">
         <p className="font-mono text-sm text-terminal-green">
           soumajit@portfolio:<span className="text-terminal-blue">~</span>$ open ./contact
         </p>
-        <h1 className="mt-4 text-3xl font-semibold md:text-5xl">Start a conversation.</h1>
-        <p className="mt-4 max-w-2xl text-muted-foreground">
+        <h1 className="page-title mt-4 font-semibold">Start a conversation.</h1>
+        <p className="page-lede mt-4 max-w-2xl text-muted-foreground">
           {contact?.intro ||
             'Have a backend, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.'}
         </p>
@@ -76,10 +74,10 @@ export default async function ContactPage() {
             <Card className="gap-4 px-5 py-5">
               <h2 className="text-sm font-semibold text-terminal-cyan">./direct</h2>
               <a
-                className="flex items-start gap-3 break-all font-mono text-xs text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex min-h-11 items-center gap-3 break-all font-mono text-xs text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 href={`mailto:${contact?.email || 'soumojitghosh02@gmail.com'}`}
               >
-                <Mail className="mt-0.5 size-4 shrink-0 text-terminal-green" aria-hidden="true" />
+                <Mail className="size-4 shrink-0 text-terminal-green" aria-hidden="true" />
                 {contact?.email || 'soumojitghosh02@gmail.com'}
               </a>
             </Card>
@@ -91,7 +89,7 @@ export default async function ContactPage() {
                   {contact.socials.map((social) => (
                     <li key={social.id || social.url}>
                       <a
-                        className="flex items-center justify-between rounded-md border border-border px-3 py-2 font-mono text-xs transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="flex min-h-11 items-center justify-between rounded-md border border-border px-3 py-2 font-mono text-xs transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         href={social.url}
                         rel="noopener noreferrer"
                         target="_blank"

@@ -1,6 +1,9 @@
 import React from 'react'
 import { GeistSans } from 'geist/font/sans'
 import type { Metadata } from 'next'
+
+import { AppShell } from '@/components/app-shell'
+
 import './globals.css'
 
 const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -30,7 +33,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html className="dark" lang="en">
       <body className={GeistSans.variable}>
-        <main>{children}</main>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   )

@@ -108,12 +108,15 @@
     @apply bg-background;
     color-scheme: dark;
     scroll-behavior: smooth;
+    overflow-x: clip;
   }
 
   body {
-    @apply bg-background font-sans text-base leading-[1.7] text-foreground antialiased;
+    @apply bg-background font-sans leading-[1.7] text-foreground antialiased;
+    font-size: 0.9375rem;
     min-height: 100vh;
     letter-spacing: -0.01em;
+    overflow-x: clip;
   }
 
   h1,
@@ -145,14 +148,63 @@
 }
 
 @layer components {
+  .page-title {
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  .page-lede {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .detail-title {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+    line-height: 1.12;
+  }
+
+  .detail-lede {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .page-container {
+    margin-inline: auto;
+    max-width: 72rem;
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    width: 100%;
+  }
+
+  .skip-link {
+    background: var(--primary);
+    border-radius: var(--radius);
+    color: var(--primary-foreground);
+    font-family: var(--font-mono);
+    left: max(1rem, env(safe-area-inset-left));
+    padding: 0.65rem 1rem;
+    position: fixed;
+    top: -5rem;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    top: max(0.5rem, env(safe-area-inset-top));
+  }
+
   .landing-shell {
-    height: 100dvh;
+    height: calc(100dvh - 4rem);
     overflow: hidden;
   }
 
   .landing-main {
     display: grid;
-    height: calc(100dvh - 4rem);
+    height: 100%;
     grid-template-rows: minmax(0, 1fr) auto;
     padding-bottom: clamp(0.75rem, 2dvh, 1.25rem);
   }
@@ -225,6 +277,7 @@
     color: var(--terminal-cyan);
     font-size: 0.875em;
     padding: 0.12rem 0.35rem;
+    overflow-wrap: anywhere;
   }
   .readme pre {
     overflow-x: auto;
@@ -296,6 +349,7 @@
     max-width: 100%;
     overflow-x: auto;
     border-collapse: collapse;
+    overscroll-behavior-inline: contain;
   }
   .readme th,
   .readme td {
@@ -310,8 +364,8 @@
   }
 
   .article-prose {
-    font-size: clamp(1.0625rem, 0.95rem + 0.25vw, 1.125rem);
-    line-height: 1.78;
+    font-size: 1rem;
+    line-height: 1.75;
   }
 
   .article-prose > * + * {
@@ -411,7 +465,7 @@
     border-radius: 0.25rem;
     display: inline-flex;
     gap: 0.4rem;
-    min-height: 2rem;
+    min-height: 2.75rem;
     padding-inline: 0.55rem;
   }
 
@@ -437,21 +491,96 @@
   }
 }
 
-@media (max-width: 639px), (max-height: 680px) {
+@media (min-width: 640px) {
+  body {
+    font-size: 1rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .page-lede,
+  .detail-lede {
+    font-size: 1rem;
+  }
+
+  .detail-title {
+    font-size: 2.25rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .article-prose {
+    font-size: clamp(1.0625rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.78;
+  }
+
+  .page-container {
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-title,
+  .detail-title {
+    font-size: 3rem;
+  }
+
+  .page-container {
+    padding-left: max(2.5rem, env(safe-area-inset-left));
+    padding-right: max(2.5rem, env(safe-area-inset-right));
+  }
+}
+
+@media (max-width: 767px), (max-height: 680px) {
   .landing-shell {
     height: auto;
-    min-height: 100dvh;
-    overflow-y: auto;
+    min-height: calc(100dvh - 4rem);
+    overflow: visible;
   }
 
   .landing-main {
     height: auto;
     min-height: calc(100dvh - 4rem);
     grid-template-rows: auto auto;
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   }
 
   .portfolio-panel {
-    min-height: 15.5rem;
+    min-height: 26rem;
+  }
+
+  .mobile-scrollbar-hidden {
+    scrollbar-width: none;
+  }
+
+  .mobile-scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  .article-prose h2,
+  .article-prose h3,
+  .article-prose h4 {
+    overflow-wrap: anywhere;
+  }
+
+  .article-prose h2 > a::before,
+  .article-prose h3 > a::before,
+  .article-prose h4 > a::before {
+    margin-left: 0;
+    padding-right: 0.3em;
+  }
+
+  .article-prose h2 {
+    font-size: clamp(1.45rem, 7vw, 1.75rem);
+  }
+
+  .article-prose h3 {
+    font-size: clamp(1.25rem, 6vw, 1.4rem);
   }
 }
 
