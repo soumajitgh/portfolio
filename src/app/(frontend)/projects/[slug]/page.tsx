@@ -7,6 +7,7 @@ import { ProjectCard } from '@/components/project-card'
 import { ProjectDetailSidebar } from '@/components/projects/project-detail-sidebar'
 import { ProjectMedia } from '@/components/projects/project-media'
 import { ProjectOverview } from '@/components/rich-text'
+import { ShareButton } from '@/components/share-button'
 import { StarButton } from '@/components/star-button'
 import { Badge } from '@/components/ui/badge'
 import { formatLabel } from '@/lib/content'
@@ -90,7 +91,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 {project.projectYear || new Date(project.publishedAt as string).getFullYear()}
               </span>
             )}
-            <div className="ml-auto">
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-3">
+              <ShareButton text={project.shortDescription} title={project.title} />
               <StarButton slug={project.slug} />
             </div>
           </div>
