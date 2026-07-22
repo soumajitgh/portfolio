@@ -1,7 +1,7 @@
 import { cache } from 'react'
 import { getPayload, type Where } from 'payload'
 
-import type { Media, PortfolioSetting, Project } from '@/payload-types'
+import type { BlogPost, Media, PortfolioSetting, Project } from '@/payload-types'
 import config from '@/payload.config'
 
 export type ProjectCardData = Pick<
@@ -24,10 +24,16 @@ export type ProjectCardData = Pick<
 }
 
 export type PortfolioHomeData = {
+  blogPosts: HomeBlogPost[]
   projects: ProjectCardData[]
   settings: PortfolioSetting
   stack: StackTopic[]
 }
+
+export type HomeBlogPost = Pick<
+  BlogPost,
+  'excerpt' | 'id' | 'issueNumber' | 'labels' | 'publishedAt' | 'readingMinutes' | 'slug' | 'title'
+>
 
 export type StackTopic = {
   count: number
@@ -147,7 +153,42 @@ export const getPortfolioHome = cache(async (): Promise<PortfolioHomeData> => {
     (a, b) => b.count - a.count || a.name.localeCompare(b.name),
   )
 
-  return { projects: await addStarCounts(projectDocs), settings, stack }
+  const blogSelect = {
+    excerpt: true,
+    issueNumber: true,
+    labels: true,
+    publishedAt: true,
+    readingMinutes: true,
+    slug: true,
+    title: true,
+  } as const
+  const publishedBlogCondition: Where = { _status: { equals: 'published' } }
+  const featuredBlogPosts = await payload.find({
+    collection: 'blog-posts',
+    depth: 0,
+    limit: 3,
+    overrideAccess: false,
+    select: blogSelect,
+    sort: ['-publishedAt', '-issueNumber'],
+    where: {
+      and: [publishedBlogCondition, { featured: { equals: true } }],
+    },
+  })
+  const blogPosts = featuredBlogPosts.docs.length
+    ? featuredBlogPosts.docs
+    : (
+        await payload.find({
+          collection: 'blog-posts',
+          depth: 0,
+          limit: 3,
+          overrideAccess: false,
+          select: blogSelect,
+          sort: ['-publishedAt', '-issueNumber'],
+          where: publishedBlogCondition,
+        })
+      ).docs
+
+  return { blogPosts, projects: await addStarCounts(projectDocs), settings, stack }
 })
 
 export const getPortfolioSettings = cache(async () => {

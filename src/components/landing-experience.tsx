@@ -4,6 +4,7 @@ import { ArrowUpRight, Download, Pin, PinOff } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 
+import { HomeBlogPosts } from '@/components/home-blog-posts'
 import { ProjectRail } from '@/components/project-rail'
 import { SiteHeader } from '@/components/site-header'
 import { Button } from '@/components/ui/button'
@@ -13,6 +14,7 @@ import { cn } from '@/lib/utils'
 
 const panels = [
   { id: 'projects', label: 'Projects' },
+  { id: 'blog', label: 'Blog' },
   { id: 'stack', label: 'Stack' },
 ] as const
 
@@ -41,7 +43,7 @@ function Action({
 
 const pinnedPanelKey = 'portfolio:pinned-panel'
 
-export function LandingExperience({ projects, settings, stack }: PortfolioHomeData) {
+export function LandingExperience({ blogPosts, projects, settings, stack }: PortfolioHomeData) {
   const [activePanel, setActivePanel] = useState<PanelID>('projects')
   const [isPaused, setIsPaused] = useState(false)
   const [isDocumentHidden, setIsDocumentHidden] = useState(false)
@@ -66,7 +68,7 @@ export function LandingExperience({ projects, settings, stack }: PortfolioHomeDa
 
   useEffect(() => {
     const stored = window.localStorage.getItem(pinnedPanelKey)
-    if (stored !== 'projects' && stored !== 'stack') return
+    if (stored !== 'projects' && stored !== 'blog' && stored !== 'stack') return
 
     const timer = window.setTimeout(() => {
       setPinnedPanel(stored)
@@ -117,7 +119,7 @@ export function LandingExperience({ projects, settings, stack }: PortfolioHomeDa
           <p className="mb-[clamp(.75rem,2dvh,1.25rem)] font-mono text-xs text-terminal-green sm:text-sm">
             {settings.heroCommand}
           </p>
-          <h1 className="max-w-4xl font-mono text-[clamp(2.15rem,6.5dvh,4rem)] font-semibold leading-[1.03] tracking-[-0.04em] text-balance">
+          <h1 className="max-w-4xl whitespace-pre-line font-mono text-[clamp(2.15rem,6.5dvh,4rem)] font-semibold leading-[1.03] tracking-[-0.04em] text-balance">
             {settings.heroHeadline}
           </h1>
           <p className="mt-[clamp(.75rem,2.2dvh,1.5rem)] max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7 lg:text-lg">
@@ -204,6 +206,7 @@ export function LandingExperience({ projects, settings, stack }: PortfolioHomeDa
                 role="tabpanel"
               >
                 {panel.id === 'projects' && <ProjectRail projects={projects} />}
+                {panel.id === 'blog' && <HomeBlogPosts posts={blogPosts} />}
                 {panel.id === 'stack' && (
                   <Card className="h-full gap-4 overflow-auto px-5 py-5 sm:px-6">
                     <div className="flex items-center justify-between gap-4 font-mono text-xs">

@@ -38,8 +38,21 @@ export const PortfolioSettings: GlobalConfig = {
       required: true,
       defaultValue: 'soumajit@portfolio:~$ whoami',
     },
-    { name: 'heroHeadline', type: 'text', required: true },
-    { name: 'heroDescription', type: 'textarea', required: true, maxLength: 320 },
+    {
+      name: 'heroHeadline',
+      type: 'textarea',
+      required: true,
+      maxLength: 120,
+      defaultValue: 'Your request\nhas been handled.',
+    },
+    {
+      name: 'heroDescription',
+      type: 'textarea',
+      required: true,
+      maxLength: 320,
+      defaultValue:
+        'Designing fast, reliable backend systems with clean boundaries and production-grade attention to detail.',
+    },
     { name: 'primaryAction', type: 'group', fields: actionFields },
     { name: 'secondaryAction', type: 'group', fields: actionFields },
     {

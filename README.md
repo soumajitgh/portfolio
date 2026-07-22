@@ -60,6 +60,9 @@ pnpm payload migrate     # apply database migrations
 pnpm seed                # seed development portfolio content
 ```
 
+Database schema pushing is disabled. Run `pnpm payload migrate` after pulling schema changes;
+this keeps Payload's schema, database indexes, and the atomic blog issue counter in sync.
+
 ## Docker
 
 `docker compose up` starts the application with the local directory mounted into the container. The compose setup uses the same SQLite configuration as local development and does not require a separate database service.

@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
+import { BlogPosts } from './collections/BlogPosts'
+import { BlogStars } from './collections/BlogStars'
 import { Media } from './collections/Media'
 import { Projects } from './collections/Projects'
 import { ProjectStars } from './collections/ProjectStars'
@@ -34,7 +36,7 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Media, Projects, ProjectStars],
+  collections: [Users, Media, Projects, BlogPosts, ProjectStars, BlogStars],
   email: resendAdapter({
     apiKey: process.env.RESEND_API_KEY || '',
     defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev',
@@ -52,9 +54,14 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: sqliteAdapter({
+    busyTimeout: 5000,
     client: {
       url: process.env.DATABASE_URL || '',
     },
+    // Migrations include database-level constraints and the atomic blog counter,
+    // so automatic development pushes must not compete with them at startup.
+    push: false,
+    wal: true,
   }),
   sharp,
   plugins: [

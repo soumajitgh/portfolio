@@ -8,17 +8,26 @@ import { Turnstile } from '@/components/turnstile'
 import { cn } from '@/lib/utils'
 
 type StarState = { count: number; starred: boolean }
+const turnstileConfigured = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
 
-export function StarButton({ slug }: { slug: string }) {
+export function StarButton({
+  resource = 'projects',
+  slug,
+}: {
+  resource?: 'blog' | 'projects'
+  slug: string
+}) {
   const [state, setState] = useState<StarState>({ count: 0, starred: false })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [turnstileToken, setTurnstileToken] = useState('')
   const [turnstileResetKey, setTurnstileResetKey] = useState(0)
+  const endpoint = `/api/${resource}/${slug}/star`
+  const subject = resource === 'blog' ? 'blog post' : 'project'
 
   useEffect(() => {
     let active = true
-    fetch(`/api/projects/${slug}/star`, { credentials: 'same-origin' })
+    fetch(endpoint, { credentials: 'same-origin' })
       .then((response) => {
         if (!response.ok) throw new Error('Unable to load stars')
         return response.json() as Promise<StarState>
@@ -38,7 +47,7 @@ export function StarButton({ slug }: { slug: string }) {
     return () => {
       active = false
     }
-  }, [slug])
+  }, [endpoint])
 
   async function toggle() {
     if (loading) return
@@ -56,7 +65,7 @@ export function StarButton({ slug }: { slug: string }) {
     setError('')
 
     try {
-      const response = await fetch(`/api/projects/${slug}/star`, {
+      const response = await fetch(endpoint, {
         body: JSON.stringify({ turnstileToken }),
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
@@ -75,12 +84,13 @@ export function StarButton({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="relative inline-flex">
       <Button
-        aria-label={`${state.starred ? 'Remove star from' : 'Star'} project. ${state.count} stars`}
+        aria-label={`${state.starred ? 'Remove star from' : 'Star'} ${subject}. ${state.count} stars`}
         aria-pressed={state.starred}
-        disabled={loading}
+        disabled={loading || !turnstileConfigured}
         onClick={toggle}
+        title={turnstileConfigured ? undefined : 'Bot protection is not configured'}
         variant="outline"
       >
         <Star
@@ -90,15 +100,25 @@ export function StarButton({ slug }: { slug: string }) {
         {loading ? '...' : state.starred ? './starred' : './star'}
         <span className="text-muted-foreground">{state.count}</span>
       </Button>
-      <Turnstile
-        action="star"
-        className="max-w-[18rem]"
-        onTokenChange={setTurnstileToken}
-        resetKey={turnstileResetKey}
-      />
-      <span aria-live="polite" className="min-h-4 font-mono text-[11px] text-terminal-red">
-        {error}
-      </span>
+      {turnstileConfigured || error ? (
+        <div className="absolute right-0 top-full z-30 mt-2 w-[min(18rem,calc(100vw-3rem))] text-right">
+          {turnstileConfigured ? (
+            <Turnstile
+              action="star"
+              onTokenChange={setTurnstileToken}
+              resetKey={turnstileResetKey}
+            />
+          ) : null}
+          {error ? (
+            <span
+              aria-live="polite"
+              className="block rounded border border-destructive/30 bg-background/95 px-2 py-1 font-mono text-[11px] text-terminal-red shadow-sm"
+            >
+              {error}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   )
 }

@@ -12,10 +12,12 @@ import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-tsx'
+import Image from 'next/image'
 import React from 'react'
 
-import type { Project } from '@/payload-types'
+import { CodeBlockWithCopy } from '@/components/code-block'
 import { slugify } from '@/lib/content'
+import type { BlogPost, Media, Project } from '@/payload-types'
 
 function nodeText(node: unknown): string {
   if (!node || typeof node !== 'object') return ''
@@ -58,19 +60,42 @@ const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
         (node as unknown as { fields?: { code?: string; language?: string } }).fields || {}
       const language = fields.language?.toLowerCase() || 'text'
       const grammar = Prism.languages[language] || Prism.languages.plain
-      const highlighted = Prism.highlight(fields.code || '', grammar, language)
-      return (
-        <pre data-language={language}>
-          <code
-            className={`language-${language}`}
-            dangerouslySetInnerHTML={{ __html: highlighted }}
-          />
-        </pre>
-      )
+      const code = fields.code || ''
+      const highlighted = Prism.highlight(code, grammar, language)
+      return <CodeBlockWithCopy code={code} highlighted={highlighted} language={language} />
     },
+  },
+  upload: ({ node }) => {
+    const value = node.value
+    if (!value || typeof value !== 'object') return null
+
+    const media = value as Media
+    const responsive = media.sizes?.large
+    const src = responsive?.url || media.url
+    const width = responsive?.width || media.width
+    const height = responsive?.height || media.height
+    if (!src || !width || !height || !media.mimeType?.startsWith('image/')) return null
+
+    return (
+      <figure className="article-media">
+        <Image
+          alt={media.alt}
+          height={height}
+          loading="lazy"
+          sizes="(min-width: 1024px) 72ch, calc(100vw - 3rem)"
+          src={src}
+          width={width}
+        />
+        {media.caption ? <figcaption>{media.caption}</figcaption> : null}
+      </figure>
+    )
   },
 })
 
 export function ProjectOverview({ data }: { data: Project['overview'] }) {
   return <RichText className="readme" converters={converters} data={data} />
+}
+
+export function BlogPostBody({ data }: { data: BlogPost['body'] }) {
+  return <RichText className="readme article-prose" converters={converters} data={data} />
 }

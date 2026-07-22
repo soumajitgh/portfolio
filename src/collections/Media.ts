@@ -19,5 +19,15 @@ export const Media: CollectionConfig = {
   upload: {
     focalPoint: true,
     mimeTypes: ['image/*', 'application/pdf'],
+    imageSizes: [
+      {
+        name: 'small',
+        width: 640,
+      },
+      {
+        name: 'large',
+        width: 1280,
+      },
+    ],
   },
 }

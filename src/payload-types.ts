@@ -70,7 +70,9 @@ export interface Config {
     users: User;
     media: Media;
     projects: Project;
+    'blog-posts': BlogPost;
     'project-stars': ProjectStar;
+    'blog-stars': BlogStar;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -81,7 +83,9 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     'project-stars': ProjectStarsSelect<false> | ProjectStarsSelect<true>;
+    'blog-stars': BlogStarsSelect<false> | BlogStarsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -170,6 +174,24 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    small?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    large?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -234,11 +256,78 @@ export interface Project {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-posts".
+ */
+export interface BlogPost {
+  id: number;
+  title: string;
+  /**
+   * Generated from the title. Once published, changing it requires redirect support.
+   */
+  slug: string;
+  /**
+   * Permanently assigned from the atomic blog counter.
+   */
+  issueNumber: number;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Optional. When empty, a summary is generated from the article body.
+   */
+  excerpt?: string | null;
+  labels?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  searchText?: string | null;
+  readingMinutes: number;
+  publishedAt?: string | null;
+  /**
+   * Show this post in the home page Blog tab.
+   */
+  featured?: boolean | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "project-stars".
  */
 export interface ProjectStar {
   id: number;
   project: number | Project;
+  visitorHash: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-stars".
+ */
+export interface BlogStar {
+  id: number;
+  blogPost: number | BlogPost;
   visitorHash: string;
   updatedAt: string;
   createdAt: string;
@@ -280,8 +369,16 @@ export interface PayloadLockedDocument {
         value: number | Project;
       } | null)
     | ({
+        relationTo: 'blog-posts';
+        value: number | BlogPost;
+      } | null)
+    | ({
         relationTo: 'project-stars';
         value: number | ProjectStar;
+      } | null)
+    | ({
+        relationTo: 'blog-stars';
+        value: number | BlogStar;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -366,6 +463,30 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        small?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -415,10 +536,51 @@ export interface ProjectsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-posts_select".
+ */
+export interface BlogPostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  issueNumber?: T;
+  body?: T;
+  excerpt?: T;
+  labels?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  searchText?: T;
+  readingMinutes?: T;
+  publishedAt?: T;
+  featured?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "project-stars_select".
  */
 export interface ProjectStarsSelect<T extends boolean = true> {
   project?: T;
+  visitorHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-stars_select".
+ */
+export interface BlogStarsSelect<T extends boolean = true> {
+  blogPost?: T;
   visitorHash?: T;
   updatedAt?: T;
   createdAt?: T;
