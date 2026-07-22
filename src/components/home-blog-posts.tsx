@@ -57,10 +57,10 @@ export function HomeBlogPosts({ posts }: { posts: HomeBlogPost[] }) {
             <span>{post.readingMinutes} min read</span>
           </div>
           <div className="min-w-0">
-            <h2 className="font-mono text-[0.9375rem] font-semibold tracking-[-0.025em] sm:text-lg">
+            <h2 className="font-mono text-sm font-semibold tracking-[-0.025em] sm:text-lg">
               <Link
                 className="rounded-sm after:absolute after:inset-0 outline-none group-hover:text-terminal-blue focus-visible:ring-2 focus-visible:ring-ring"
-                href={`/blog/${post.slug}`}
+                href={`/blogs/${post.slug}`}
               >
                 {post.title}
               </Link>

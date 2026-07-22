@@ -109,7 +109,7 @@ export function PortfolioShowcase({ blogPosts, projects, settings, stack }: Port
   return (
     <section
       aria-label="Portfolio overview"
-      className="min-h-0 border-t border-border/60 pt-6 sm:border-t-0 sm:pt-0"
+      className="min-h-0 border-t border-border/60 pt-4 sm:border-t-0 sm:pt-0"
       id="portfolio"
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setIsPaused(false)
@@ -118,7 +118,7 @@ export function PortfolioShowcase({ blogPosts, projects, settings, stack }: Port
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="mb-3 flex items-end justify-between gap-4">
+      <div className="mb-2 flex items-end justify-between gap-4 sm:mb-3">
         <div className="scrollbar-thin mobile-scrollbar-hidden min-w-0 overflow-x-auto overscroll-x-contain">
           <div
             className="flex min-w-max items-center gap-2 font-mono text-xs sm:gap-1"
@@ -171,7 +171,7 @@ export function PortfolioShowcase({ blogPosts, projects, settings, stack }: Port
         </div>
       </div>
 
-      <div className="portfolio-panel relative h-[26rem] overflow-hidden sm:h-[clamp(15.5rem,36dvh,21rem)]">
+      <div className="portfolio-panel relative h-[19rem] overflow-hidden sm:h-[clamp(15.5rem,36dvh,21rem)]">
         {panels.map((panel) => (
           <div
             aria-labelledby={`tab-${panel.id}`}

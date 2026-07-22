@@ -14,17 +14,17 @@ export const revalidate = 300
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: '/blog',
+    canonical: '/blogs',
     types: { 'application/rss+xml': '/rss.xml' },
   },
   description: 'output: notes on backend systems, infrastructure, and developer tooling.',
   openGraph: {
     description: 'output: notes on backend systems, infrastructure, and developer tooling.',
-    title: 'soumajit in ~/blog',
+    title: 'soumajit in ~/blogs',
     type: 'website',
-    url: '/blog',
+    url: '/blogs',
   },
-  title: 'soumajit in ~/blog',
+  title: 'soumajit in ~/blogs',
 }
 
 type BlogSearchParams = {
@@ -55,11 +55,11 @@ export default async function BlogPage({
       <main className="page-container py-10 sm:py-12 md:py-16">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="font-mono text-sm text-terminal-green">
-              soumajit@portfolio:<span className="text-terminal-blue">~</span>$ ls ./blog
+            <p className="font-mono text-xs text-terminal-green sm:text-sm">
+              soumajit@portfolio:<span className="text-terminal-blue">~</span>$ ls ./blogs
             </p>
             <h1 className="page-title mt-4 font-semibold">Published issues</h1>
-            <p className="page-lede mt-4 max-w-2xl text-muted-foreground">
+            <p className="page-lede mt-3 max-w-2xl text-muted-foreground sm:mt-4">
               Engineering notes on reliable systems, practical tooling, and lessons learned in
               production.
             </p>
@@ -77,16 +77,19 @@ export default async function BlogPage({
             Blog issue index
           </h2>
           <div className="rounded-lg border border-border bg-card/40">
-            <div className="border-b border-border p-4 sm:p-5">
+            <div className="border-b border-border p-3 sm:p-5">
               <BlogSearch initialQuery={query} />
               {result.labels.length ? (
                 <nav
                   aria-label="Filter blog posts by label"
-                  className="scrollbar-thin -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
+                  className="scrollbar-thin mobile-scrollbar-hidden -mx-3 mt-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mt-4 sm:flex-wrap sm:px-0 sm:pb-2"
                 >
                   <Badge
                     asChild
-                    className={cn('shrink-0', !label && 'border-primary text-primary')}
+                    className={cn(
+                      'min-h-9 shrink-0 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs',
+                      !label && 'border-primary text-primary',
+                    )}
                     variant="outline"
                   >
                     <Link href={blogHref({ query })}>all</Link>
@@ -94,7 +97,10 @@ export default async function BlogPage({
                   {result.labels.map((item) => (
                     <Badge
                       asChild
-                      className={cn('shrink-0', label === item && 'border-primary text-primary')}
+                      className={cn(
+                        'min-h-9 shrink-0 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs',
+                        label === item && 'border-primary text-primary',
+                      )}
                       key={item}
                       variant="outline"
                     >
@@ -123,8 +129,8 @@ export default async function BlogPage({
             {!labelExists ? (
               <BlogEmptyState>
                 <p className="text-terminal-red">error: unknown label &quot;{label}&quot;</p>
-                <Link className="mt-2 inline-block text-primary hover:underline" href="/blog">
-                  retry with ./blog
+                <Link className="mt-2 inline-block text-primary hover:underline" href="/blogs">
+                  retry with ./blogs
                 </Link>
               </BlogEmptyState>
             ) : !result.requestedPageIsValid ? (
@@ -153,13 +159,13 @@ export default async function BlogPage({
                     <p className="mt-2 text-muted-foreground">
                       Try another term or clear the active labels.
                     </p>
-                    <Link className="mt-3 inline-block text-primary hover:underline" href="/blog">
+                    <Link className="mt-3 inline-block text-primary hover:underline" href="/blogs">
                       ./clear-filters
                     </Link>
                   </>
                 ) : (
                   <>
-                    <p>$ ls ./blog</p>
+                    <p>$ ls ./blogs</p>
                     <p className="mt-2 text-muted-foreground">directory is currently empty</p>
                   </>
                 )}

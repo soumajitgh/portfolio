@@ -51,30 +51,32 @@ export default async function ContactPage() {
   return (
     <div className="min-h-[calc(100dvh-4rem)]">
       <main className="page-container py-10 sm:py-12 md:py-16">
-        <p className="font-mono text-sm text-terminal-green">
+        <p className="font-mono text-xs text-terminal-green sm:text-sm">
           soumajit@portfolio:<span className="text-terminal-blue">~</span>$ open ./contact
         </p>
         <h1 className="page-title mt-4 font-semibold">Start a conversation.</h1>
-        <p className="page-lede mt-4 max-w-2xl text-muted-foreground">
+        <p className="page-lede mt-3 max-w-2xl text-muted-foreground sm:mt-4">
           {contact?.intro ||
             'Have a backend, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.'}
         </p>
 
-        <div className="mt-10 grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)]">
-          <Card className="gap-0 px-5 py-6 sm:px-6">
-            <div className="mb-6 border-b border-border pb-4 font-mono text-xs">
+        <div className="mt-8 grid items-start gap-5 sm:mt-10 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)] lg:gap-6">
+          <Card className="gap-0 px-4 py-5 sm:px-6">
+            <div className="mb-4 border-b border-border pb-3 font-mono text-[0.6875rem] sm:text-xs">
               <span className="text-terminal-purple">message</span>
               <span className="text-muted-foreground"> = {'{'}</span>
             </div>
             <ContactForm />
-            <p className="mt-6 font-mono text-xs text-muted-foreground">{'}'}</p>
+            <p className="mt-4 font-mono text-[0.6875rem] text-muted-foreground sm:text-xs">
+              {'}'}
+            </p>
           </Card>
 
-          <aside className="space-y-6">
-            <Card className="gap-4 px-5 py-5">
+          <aside className="space-y-5">
+            <Card className="gap-3 px-4 py-4 sm:px-5">
               <h2 className="text-sm font-semibold text-terminal-cyan">./direct</h2>
               <a
-                className="flex min-h-11 items-center gap-3 break-all font-mono text-xs text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex min-h-11 items-center gap-3 break-all font-mono text-[0.6875rem] text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-xs"
                 href={`mailto:${contact?.email || 'soumojitghosh02@gmail.com'}`}
               >
                 <Mail className="size-4 shrink-0 text-terminal-green" aria-hidden="true" />
@@ -82,14 +84,14 @@ export default async function ContactPage() {
               </a>
             </Card>
 
-            <Card className="gap-4 px-5 py-5">
+            <Card className="gap-3 px-4 py-4 sm:px-5">
               <h2 className="text-sm font-semibold text-terminal-cyan">./socials</h2>
               {contact?.socials?.length ? (
                 <ul className="space-y-2">
                   {contact.socials.map((social) => (
                     <li key={social.id || social.url}>
                       <a
-                        className="flex min-h-11 items-center justify-between rounded-md border border-border px-3 py-2 font-mono text-xs transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="flex min-h-11 items-center justify-between rounded-md border border-border px-3 py-2 font-mono text-[0.6875rem] transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-xs"
                         href={social.url}
                         rel="noopener noreferrer"
                         target="_blank"
@@ -106,7 +108,7 @@ export default async function ContactPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="font-mono text-xs text-muted-foreground">
+                <p className="font-mono text-[0.6875rem] text-muted-foreground sm:text-xs">
                   output: no social links configured
                 </p>
               )}

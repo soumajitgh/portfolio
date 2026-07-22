@@ -53,7 +53,7 @@ export function ProjectCard({
             {formatLabel(project.status)}
           </span>
         </div>
-        <CardTitle>
+        <CardTitle className="text-sm sm:text-lg">
           <Link
             className="after:absolute after:inset-0 focus-visible:outline-none"
             href={`/projects/${project.slug}`}
@@ -65,7 +65,12 @@ export function ProjectCard({
             />
           </Link>
         </CardTitle>
-        <CardDescription className={compact ? 'line-clamp-2' : 'line-clamp-3'}>
+        <CardDescription
+          className={cn(
+            'text-[0.8125rem] leading-5 sm:text-sm sm:leading-6',
+            compact ? 'line-clamp-2' : 'line-clamp-3',
+          )}
+        >
           {project.shortDescription}
         </CardDescription>
       </CardHeader>
@@ -81,7 +86,7 @@ export function ProjectCard({
             className={cn(
               'relative z-10',
               accentClasses[project.accent || 'blue'],
-              compact && 'min-h-9 max-w-full truncate px-2 md:min-h-0',
+              'min-h-9 max-w-full truncate px-2 text-[0.6875rem] sm:text-xs md:min-h-0',
             )}
             key={topic.slug}
             variant="outline"

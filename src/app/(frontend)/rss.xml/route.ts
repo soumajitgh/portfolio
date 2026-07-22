@@ -18,8 +18,8 @@ export async function GET() {
     .map(
       (post) => `<item>
   <title>${escapeXML(post.title)}</title>
-  <link>${siteURL}/blog/${encodeURIComponent(post.slug)}</link>
-  <guid isPermaLink="true">${siteURL}/blog/${encodeURIComponent(post.slug)}</guid>
+  <link>${siteURL}/blogs/${encodeURIComponent(post.slug)}</link>
+  <guid isPermaLink="true">${siteURL}/blogs/${encodeURIComponent(post.slug)}</guid>
   <description>${escapeXML(post.excerpt || '')}</description>
   ${post.publishedAt ? `<pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>` : ''}
   ${post.labels?.map((label) => `<category>${escapeXML(label.name)}</category>`).join('\n  ') || ''}
@@ -30,8 +30,8 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <title>soumajit in ~/blog</title>
-  <link>${siteURL}/blog</link>
+  <title>soumajit in ~/blogs</title>
+  <link>${siteURL}/blogs</link>
   <description>Notes on backend systems, infrastructure, and developer tooling.</description>
   <language>en</language>
   <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>

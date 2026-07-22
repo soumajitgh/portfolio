@@ -37,10 +37,10 @@ const normalizeLabels = (value: unknown) => {
 const invalidateBlogRoutes = (slugs: string[]) => {
   scheduleRevalidation([
     '/',
-    '/blog',
+    '/blogs',
     '/rss.xml',
     '/sitemap.xml',
-    ...slugs.map((slug) => `/blog/${slug}`),
+    ...slugs.map((slug) => `/blogs/${slug}`),
   ])
 }
 

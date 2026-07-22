@@ -111,8 +111,8 @@ async function verifyMutation(request: NextRequest) {
 }
 
 function revalidateBlogPost(slug: string) {
-  revalidatePath('/blog')
-  revalidatePath(`/blog/${slug}`)
+  revalidatePath('/blogs')
+  revalidatePath(`/blogs/${slug}`)
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {

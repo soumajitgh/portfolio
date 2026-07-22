@@ -149,23 +149,23 @@
 
 @layer components {
   .page-title {
-    font-size: 1.75rem;
-    line-height: 1.15;
+    font-size: 1.5rem;
+    line-height: 1.18;
   }
 
   .page-lede {
-    font-size: 0.9375rem;
-    line-height: 1.65;
+    font-size: 0.875rem;
+    line-height: 1.6;
   }
 
   .detail-title {
-    font-size: clamp(1.75rem, 8vw, 2.25rem);
-    line-height: 1.12;
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    line-height: 1.15;
   }
 
   .detail-lede {
-    font-size: 0.9375rem;
-    line-height: 1.65;
+    font-size: 0.875rem;
+    line-height: 1.6;
   }
 
   .section-title {
@@ -216,7 +216,7 @@
 
   .readme {
     color: var(--foreground);
-    font-size: 1rem;
+    font-size: 0.9375rem;
     line-height: 1.75;
     overflow-wrap: anywhere;
   }
@@ -239,6 +239,9 @@
   }
   .readme h3 {
     font-size: 1.2rem;
+  }
+  .readme h4 {
+    font-size: 1rem;
   }
   .readme > :first-child {
     margin-top: 0;
@@ -364,7 +367,6 @@
   }
 
   .article-prose {
-    font-size: 1rem;
     line-height: 1.75;
   }
 
@@ -382,18 +384,15 @@
   }
 
   .article-prose h2 {
-    font-size: 1.75rem;
     margin-top: 3rem;
   }
 
   .article-prose h3 {
-    font-size: 1.4rem;
     margin-top: 2.5rem;
   }
 
   .article-prose h4 {
     color: var(--terminal-cyan);
-    font-size: 1.1rem;
     margin-top: 2rem;
   }
 
@@ -503,6 +502,7 @@
   .page-lede,
   .detail-lede {
     font-size: 1rem;
+    line-height: 1.65;
   }
 
   .detail-title {
@@ -513,9 +513,8 @@
     font-size: 1.5rem;
   }
 
-  .article-prose {
-    font-size: clamp(1.0625rem, 0.95rem + 0.25vw, 1.125rem);
-    line-height: 1.78;
+  .readme {
+    font-size: 1rem;
   }
 
   .page-container {
@@ -536,22 +535,13 @@
   }
 }
 
-@media (max-width: 767px), (max-height: 680px) {
-  .landing-shell {
-    height: auto;
-    min-height: calc(100dvh - 4rem);
-    overflow: visible;
-  }
-
+@media (max-width: 767px) {
   .landing-main {
-    height: auto;
-    min-height: calc(100dvh - 4rem);
-    grid-template-rows: auto auto;
-    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
 
   .portfolio-panel {
-    min-height: 26rem;
+    min-height: 19rem;
   }
 
   .mobile-scrollbar-hidden {
@@ -574,13 +564,20 @@
     margin-left: 0;
     padding-right: 0.3em;
   }
+}
 
-  .article-prose h2 {
-    font-size: clamp(1.45rem, 7vw, 1.75rem);
+@media (max-width: 767px) and (max-height: 760px), (min-width: 768px) and (max-height: 680px) {
+  .landing-shell {
+    height: auto;
+    min-height: calc(100dvh - 4rem);
+    overflow: visible;
   }
 
-  .article-prose h3 {
-    font-size: clamp(1.25rem, 6vw, 1.4rem);
+  .landing-main {
+    height: auto;
+    min-height: calc(100dvh - 4rem);
+    grid-template-rows: auto auto;
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   }
 }
 

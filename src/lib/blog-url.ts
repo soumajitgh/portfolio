@@ -11,5 +11,5 @@ export function blogHref({
   if (query) params.set('q', query)
   if (label) params.set('label', label)
   if (page && page > 1) params.set('page', String(page))
-  return params.size ? `/blog?${params.toString()}` : '/blog'
+  return params.size ? `/blogs?${params.toString()}` : '/blogs'
 }

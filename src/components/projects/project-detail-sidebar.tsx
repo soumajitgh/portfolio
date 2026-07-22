@@ -18,7 +18,12 @@ export function ProjectDetailSidebar({ links, topics }: Pick<Project, 'links' | 
         {topics?.length ? (
           <div className="mt-4 flex flex-wrap gap-2">
             {topics.map((topic) => (
-              <Badge asChild className="text-terminal-purple" key={topic.slug} variant="outline">
+              <Badge
+                asChild
+                className="min-h-9 px-2 text-[0.6875rem] text-terminal-purple sm:min-h-0 sm:text-xs"
+                key={topic.slug}
+                variant="outline"
+              >
                 <Link href={`/projects?topic=${topic.slug}`}>{topic.name}</Link>
               </Badge>
             ))}

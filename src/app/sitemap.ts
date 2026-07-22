@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { changeFrequency: 'monthly', priority: 1, url: baseURL },
     { changeFrequency: 'weekly', priority: 0.9, url: `${baseURL}/projects` },
-    { changeFrequency: 'weekly', priority: 0.9, url: `${baseURL}/blog` },
+    { changeFrequency: 'weekly', priority: 0.9, url: `${baseURL}/blogs` },
     { changeFrequency: 'yearly', priority: 0.7, url: `${baseURL}/contact` },
     ...projects.map((project) => ({
       changeFrequency: 'monthly' as const,
@@ -25,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       lastModified: post.updatedAt,
       priority: 0.8,
-      url: `${baseURL}/blog/${post.slug}`,
+      url: `${baseURL}/blogs/${post.slug}`,
     })),
   ]
 }

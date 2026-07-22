@@ -23,11 +23,11 @@ export async function generateMetadata({
   const post = await getPublishedBlogPost(slug)
   if (!post) return { title: 'soumajit in ~/404' }
 
-  const title = post.seo?.title || `soumajit in ~/blog/${post.slug}`
+  const title = post.seo?.title || `soumajit in ~/blogs/${post.slug}`
   const description = post.seo?.description || post.excerpt || post.title
 
   return {
-    alternates: { canonical: `/blog/${post.slug}` },
+    alternates: { canonical: `/blogs/${post.slug}` },
     description,
     openGraph: {
       description,
@@ -36,7 +36,7 @@ export async function generateMetadata({
       tags: post.labels?.map((label) => label.name),
       title,
       type: 'article',
-      url: `/blog/${post.slug}`,
+      url: `/blogs/${post.slug}`,
     },
     title,
     twitter: {
@@ -56,7 +56,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const headings = extractRichTextHeadings(post.body)
   const showUpdated = wasMeaningfullyUpdated(post.publishedAt, post.updatedAt)
   const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  const canonicalURL = `${siteURL}/blog/${post.slug}`
+  const canonicalURL = `${siteURL}/blogs/${post.slug}`
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -79,10 +79,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <main className="page-container py-8 sm:py-10 md:py-14">
         <nav
           aria-label="Breadcrumb"
-          className="flex min-w-0 flex-wrap font-mono text-xs text-muted-foreground sm:text-sm"
+          className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1 font-mono text-[0.6875rem] leading-5 text-muted-foreground sm:text-sm"
         >
-          <Link className="hover:text-primary" href="/blog">
-            ~/blog
+          <Link className="hover:text-primary" href="/blogs">
+            ~/blogs
           </Link>
           <span>/</span>
           <span className="text-terminal-cyan">#{post.issueNumber}</span>
@@ -92,17 +92,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <header className="mt-6 border-b border-border pb-8">
             <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_auto]">
               <div className="min-w-0 max-w-4xl">
-                <p className="font-mono text-sm text-terminal-green">
+                <p className="font-mono text-xs text-terminal-green sm:text-sm">
                   $ cat issue-{post.issueNumber}.md
                 </p>
-                <h1 className="detail-title mt-5 break-words font-semibold">
+                <h1 className="detail-title mt-4 break-words font-semibold sm:mt-5">
                   {post.title}{' '}
                   <span className="whitespace-nowrap text-muted-foreground">
                     #{post.issueNumber}
                   </span>
                 </h1>
                 {post.excerpt ? (
-                  <p className="detail-lede mt-5 max-w-3xl text-muted-foreground lg:text-lg">
+                  <p className="detail-lede mt-4 max-w-3xl text-muted-foreground sm:mt-5 lg:text-lg">
                     {post.excerpt}
                   </p>
                 ) : null}
@@ -113,7 +113,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3 font-mono text-xs text-muted-foreground">
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[0.6875rem] text-muted-foreground sm:mt-6 sm:gap-y-3 sm:text-xs">
               <span>published {formatBlogDate(post.publishedAt)}</span>
               {showUpdated ? <span>updated {formatBlogDate(post.updatedAt)}</span> : null}
               <span className="inline-flex items-center gap-1.5">
@@ -125,8 +125,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {post.labels?.length ? (
               <div className="mt-5 flex flex-wrap gap-2" aria-label="Article labels">
                 {post.labels.map((label) => (
-                  <Badge asChild key={label.id || label.name} variant="outline">
-                    <Link href={`/blog?label=${encodeURIComponent(label.name)}`}>{label.name}</Link>
+                  <Badge
+                    asChild
+                    className="min-h-9 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs"
+                    key={label.id || label.name}
+                    variant="outline"
+                  >
+                    <Link href={`/blogs?label=${encodeURIComponent(label.name)}`}>
+                      {label.name}
+                    </Link>
                   </Badge>
                 ))}
               </div>
@@ -144,7 +151,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <span>
                 issue #{post.issueNumber} · published {formatBlogDate(post.publishedAt)}
               </span>
-              <Link className="text-primary hover:underline" href="/blog">
+              <Link className="text-primary hover:underline" href="/blogs">
                 ./all-posts
               </Link>
             </div>
@@ -157,7 +164,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {newer ? (
                   <Link
                     className="rounded-lg border border-border p-4 transition-colors hover:border-primary/60 hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    href={`/blog/${newer.slug}`}
+                    href={`/blogs/${newer.slug}`}
                   >
                     <span className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
                       <ArrowLeft aria-hidden="true" className="size-4" /> newer
@@ -172,7 +179,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {older ? (
                   <Link
                     className="rounded-lg border border-border p-4 text-right transition-colors hover:border-primary/60 hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    href={`/blog/${older.slug}`}
+                    href={`/blogs/${older.slug}`}
                   >
                     <span className="flex items-center justify-end gap-2 font-mono text-xs text-muted-foreground">
                       older <ArrowRight aria-hidden="true" className="size-4" />

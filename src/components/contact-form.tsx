@@ -57,12 +57,12 @@ export function ContactForm() {
   }
 
   const fieldClassName =
-    'mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm'
+    'mt-1.5 min-h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm'
 
   return (
-    <form className="space-y-5" onSubmit={submit}>
-      <div className="grid gap-5 sm:grid-cols-2">
-        <label className="block font-mono text-xs text-terminal-cyan">
+    <form className="space-y-4" onSubmit={submit}>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block font-mono text-[0.6875rem] text-terminal-cyan sm:text-xs">
           name
           <input
             autoComplete="name"
@@ -73,7 +73,7 @@ export function ContactForm() {
             required
           />
         </label>
-        <label className="block font-mono text-xs text-terminal-cyan">
+        <label className="block font-mono text-[0.6875rem] text-terminal-cyan sm:text-xs">
           email
           <input
             autoComplete="email"
@@ -86,10 +86,10 @@ export function ContactForm() {
           />
         </label>
       </div>
-      <label className="block font-mono text-xs text-terminal-cyan">
+      <label className="block font-mono text-[0.6875rem] text-terminal-cyan sm:text-xs">
         message
         <textarea
-          className={`${fieldClassName} min-h-40 resize-y leading-6`}
+          className={`${fieldClassName} min-h-32 resize-y leading-6`}
           maxLength={4000}
           name="message"
           placeholder="project context, constraints, and what you need help with"
@@ -106,14 +106,14 @@ export function ContactForm() {
         onTokenChange={setTurnstileToken}
         resetKey={turnstileResetKey}
       />
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <Button disabled={state === 'sending'} type="submit">
           <Send aria-hidden="true" />
           {state === 'sending' ? './sending...' : './send-message'}
         </Button>
         <p
           aria-live="polite"
-          className={`font-mono text-xs ${state === 'error' ? 'text-terminal-red' : 'text-terminal-green'}`}
+          className={`font-mono text-[0.6875rem] sm:text-xs ${state === 'error' ? 'text-terminal-red' : 'text-terminal-green'}`}
         >
           {message}
         </p>

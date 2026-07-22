@@ -60,7 +60,7 @@ export default async function ProjectsPage({
   return (
     <div className="min-h-[calc(100dvh-4rem)]">
       <main className="page-container py-10 sm:py-12 md:py-16">
-        <p className="font-mono text-sm text-terminal-green">
+        <p className="font-mono text-xs text-terminal-green sm:text-sm">
           soumajit@portfolio:<span className="text-terminal-blue">~</span>$ ls ./projects
         </p>
         <h1 className="page-title mt-4 font-semibold">Published projects</h1>
@@ -68,24 +68,30 @@ export default async function ProjectsPage({
           <p className="page-lede max-w-2xl text-muted-foreground">
             Backend systems, infrastructure, open-source work, and developer tools.
           </p>
-          <span aria-live="polite" className="font-mono text-sm text-terminal-yellow">
+          <span
+            aria-live="polite"
+            className="font-mono text-[0.6875rem] text-terminal-yellow sm:text-xs"
+          >
             {visibleProjects.length} {visibleProjects.length === 1 ? 'entry' : 'entries'}
           </span>
         </div>
 
         <section
           aria-label="Search and filter projects"
-          className="mt-8 rounded-lg border border-border bg-card/40 p-4 sm:p-5"
+          className="mt-8 rounded-lg border border-border bg-card/40 p-3 sm:p-5"
         >
           <ProjectSearch initialQuery={query} />
           {topics.length ? (
             <nav
               aria-label="Filter projects by topic"
-              className="scrollbar-thin -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+              className="scrollbar-thin mobile-scrollbar-hidden -mx-3 mt-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mt-4 sm:flex-wrap sm:overflow-visible sm:px-0"
             >
               <Badge
                 asChild
-                className={cn(!topic && 'border-primary text-primary')}
+                className={cn(
+                  'min-h-9 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs',
+                  !topic && 'border-primary text-primary',
+                )}
                 variant="outline"
               >
                 <Link href={projectsHref({ query })}>All</Link>
@@ -93,7 +99,10 @@ export default async function ProjectsPage({
               {topics.map((item) => (
                 <Badge
                   asChild
-                  className={cn(topic === item.slug && 'border-primary text-primary')}
+                  className={cn(
+                    'min-h-9 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs',
+                    topic === item.slug && 'border-primary text-primary',
+                  )}
                   key={item.slug}
                   variant="outline"
                 >

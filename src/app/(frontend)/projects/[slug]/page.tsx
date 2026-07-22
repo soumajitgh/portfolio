@@ -59,7 +59,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <main className="page-container py-8 sm:py-10 md:py-14">
         <nav
           aria-label="Breadcrumb"
-          className="flex min-w-0 flex-wrap font-mono text-xs text-muted-foreground sm:text-sm"
+          className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1 font-mono text-[0.6875rem] leading-5 text-muted-foreground sm:text-sm"
         >
           <Link className="hover:text-primary" href="/projects">
             ~/projects
@@ -67,7 +67,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <span>/</span>
           <span className="min-w-0 break-all text-terminal-cyan">{project.slug}</span>
         </nav>
-        <p className="mt-6 font-mono text-sm text-terminal-green">$ cat README.md</p>
+        <p className="mt-6 font-mono text-xs text-terminal-green sm:text-sm">$ cat README.md</p>
 
         <header className="mt-5 border-b border-border pb-8">
           <div className="max-w-4xl">

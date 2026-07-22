@@ -66,7 +66,7 @@ export function SearchField({
       />
       <input
         aria-busy={isPending}
-        className="terminal-input h-11 w-full rounded-md border border-input bg-card pl-10 pr-20 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 sm:text-sm"
+        className="terminal-input h-10 w-full rounded-md border border-input bg-card pl-9 pr-12 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 sm:h-11 sm:pl-10 sm:pr-20 sm:text-sm"
         onChange={(event) => setQuery(event.target.value)}
         placeholder={placeholder}
         ref={inputRef}
@@ -76,7 +76,7 @@ export function SearchField({
       {query ? (
         <button
           aria-label="Clear search"
-          className="absolute right-0 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute right-0 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:size-11"
           onClick={() => {
             setQuery('')
             inputRef.current?.focus()
