@@ -6,7 +6,6 @@ import {
   HeadingFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import { revalidatePath } from 'next/cache'
 import type { CollectionConfig } from 'payload'
 
 import { allocateBlogIssueNumber } from '@/lib/blog-issue-number'
@@ -17,6 +16,7 @@ import {
   normalizeBlogLabel,
   normalizeBlogSlug,
 } from '@/lib/blog-content'
+import { scheduleRevalidation } from '@/lib/revalidation'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
@@ -34,12 +34,14 @@ const normalizeLabels = (value: unknown) => {
   })
 }
 
-const invalidateBlogRoutes = (slug?: null | string) => {
-  revalidatePath('/')
-  revalidatePath('/blog')
-  revalidatePath('/rss.xml')
-  revalidatePath('/sitemap.xml')
-  if (slug) revalidatePath(`/blog/${slug}`)
+const invalidateBlogRoutes = (slugs: string[]) => {
+  scheduleRevalidation([
+    '/',
+    '/blog',
+    '/rss.xml',
+    '/sitemap.xml',
+    ...slugs.map((slug) => `/blog/${slug}`),
+  ])
 }
 
 export const BlogPosts: CollectionConfig = {
@@ -251,16 +253,24 @@ export const BlogPosts: CollectionConfig = {
     afterChange: [
       ({ context, doc, previousDoc }) => {
         if (context.disableRevalidate) return doc
-        invalidateBlogRoutes(doc.slug)
-        if (previousDoc?.slug && previousDoc.slug !== doc.slug)
-          invalidateBlogRoutes(previousDoc.slug)
+
+        const slugs: string[] = []
+        if (doc._status === 'published') slugs.push(doc.slug)
+        if (
+          previousDoc?._status === 'published' &&
+          (doc._status !== 'published' || previousDoc.slug !== doc.slug)
+        ) {
+          slugs.push(previousDoc.slug)
+        }
+        if (slugs.length) invalidateBlogRoutes(slugs)
+
         return doc
       },
     ],
     afterDelete: [
       ({ context, doc }) => {
-        if (context.disableRevalidate) return doc
-        invalidateBlogRoutes(doc.slug)
+        if (context.disableRevalidate || doc._status !== 'published') return doc
+        invalidateBlogRoutes([doc.slug])
         return doc
       },
     ],

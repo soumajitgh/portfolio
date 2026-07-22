@@ -1,4 +1,3 @@
-import { revalidatePath } from 'next/cache'
 import type { CollectionConfig } from 'payload'
 
 import {
@@ -8,6 +7,7 @@ import {
   slugify,
   validateWebURL,
 } from '@/lib/content'
+import { scheduleRevalidation } from '@/lib/revalidation'
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
@@ -69,21 +69,26 @@ export const Projects: CollectionConfig = {
     afterChange: [
       ({ context, doc, previousDoc }) => {
         if (context.disableRevalidate) return doc
-        revalidatePath('/')
-        revalidatePath('/projects')
-        if (doc.slug) revalidatePath(`/projects/${doc.slug}`)
-        if (previousDoc?.slug && previousDoc.slug !== doc.slug) {
-          revalidatePath(`/projects/${previousDoc.slug}`)
+
+        const paths: string[] = []
+        if (doc._status === 'published') {
+          paths.push('/', '/projects', `/projects/${doc.slug}`)
         }
+        if (
+          previousDoc?._status === 'published' &&
+          (doc._status !== 'published' || previousDoc.slug !== doc.slug)
+        ) {
+          paths.push('/', '/projects', `/projects/${previousDoc.slug}`)
+        }
+        scheduleRevalidation(paths)
+
         return doc
       },
     ],
     afterDelete: [
       ({ context, doc }) => {
-        if (context.disableRevalidate) return doc
-        revalidatePath('/')
-        revalidatePath('/projects')
-        if (doc?.slug) revalidatePath(`/projects/${doc.slug}`)
+        if (context.disableRevalidate || doc._status !== 'published') return doc
+        scheduleRevalidation(['/', '/projects', `/projects/${doc.slug}`])
         return doc
       },
     ],

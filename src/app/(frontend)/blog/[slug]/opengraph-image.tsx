@@ -1,40 +1,28 @@
-import { ImageResponse } from 'next/og'
+import { getBlogSocialPreview, getSocialPreviewIdentity } from '@/lib/social-preview-data'
+import { renderSocialPreview, socialPreviewSize } from '@/lib/social-preview'
 
-import { getPublishedBlogPost } from '@/lib/blog-data'
-
-export const alt = 'soumajit.dev blog article'
+export const alt = 'Technical blog article by Soumajit Ghosh'
 export const contentType = 'image/png'
-export const size = { height: 630, width: 1200 }
+export const revalidate = 300
+export const size = socialPreviewSize
 
 export default async function OpenGraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = await getPublishedBlogPost(slug)
+  const [identity, post] = await Promise.all([
+    getSocialPreviewIdentity(),
+    getBlogSocialPreview(slug),
+  ])
+  const publishedYear = post?.publishedAt
+    ? new Date(post.publishedAt).getUTCFullYear().toString()
+    : ''
 
-  return new ImageResponse(
-    <div
-      style={{
-        background: '#171a1f',
-        color: '#c8ccd4',
-        display: 'flex',
-        flexDirection: 'column',
-        fontFamily: 'monospace',
-        height: '100%',
-        justifyContent: 'space-between',
-        padding: '72px 84px',
-        width: '100%',
-      }}
-    >
-      <div style={{ color: '#56b6c2', display: 'flex', fontSize: 28 }}>
-        ~/blog/#{post?.issueNumber || '404'}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-        <div style={{ color: '#98c379', display: 'flex', fontSize: 25 }}>$ cat issue.md</div>
-        <div style={{ display: 'flex', fontSize: 58, fontWeight: 600, lineHeight: 1.12 }}>
-          {post?.title || 'issue not found'}
-        </div>
-      </div>
-      <div style={{ color: '#8b92a1', display: 'flex', fontSize: 25 }}>soumajit.dev</div>
-    </div>,
-    size,
-  )
+  return renderSocialPreview({
+    command: `~/blog/#${post?.issueNumber || '404'}`,
+    description: post?.excerpt || 'The requested issue is not publicly available.',
+    eyebrow: post ? `blog issue / #${post.issueNumber}` : 'blog issue / not-found',
+    identity,
+    meta: publishedYear ? [`published ${publishedYear}`] : [],
+    tags: post?.labels?.map((label) => label.name) || [],
+    title: post?.title || 'Issue not found',
+  })
 }

@@ -1,7 +1,7 @@
-import { revalidatePath } from 'next/cache'
 import type { GlobalConfig } from 'payload'
 
 import { skillCategories, validateWebURL } from '@/lib/content'
+import { scheduleRevalidation } from '@/lib/revalidation'
 
 const actionFields = [
   { name: 'label', type: 'text' as const, required: true },
@@ -25,8 +25,7 @@ export const PortfolioSettings: GlobalConfig = {
     afterChange: [
       ({ context, doc }) => {
         if (context.disableRevalidate) return doc
-        revalidatePath('/')
-        revalidatePath('/contact')
+        scheduleRevalidation(['/', '/contact'])
         return doc
       },
     ],

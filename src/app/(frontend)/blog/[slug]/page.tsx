@@ -9,7 +9,7 @@ import { SiteHeader } from '@/components/site-header'
 import { StarButton } from '@/components/star-button'
 import { Badge } from '@/components/ui/badge'
 import { formatBlogDate, wasMeaningfullyUpdated } from '@/lib/blog-content'
-import { getBlogNeighbors, getPublishedBlogPost, resolveBlogImage } from '@/lib/blog-data'
+import { getBlogNeighbors, getPublishedBlogPost } from '@/lib/blog-data'
 
 export const revalidate = 300
 
@@ -22,22 +22,14 @@ export async function generateMetadata({
   const post = await getPublishedBlogPost(slug)
   if (!post) return { title: 'soumajit in ~/404' }
 
-  const seoImage = resolveBlogImage(post.seo)
   const title = post.seo?.title || `soumajit in ~/blog/${post.slug}`
   const description = post.seo?.description || post.excerpt || post.title
-  const image = seoImage?.url
-    ? { alt: seoImage.alt, url: seoImage.url }
-    : {
-        alt: `${post.title}, issue #${post.issueNumber}`,
-        url: `/blog/${post.slug}/opengraph-image`,
-      }
 
   return {
     alternates: { canonical: `/blog/${post.slug}` },
     description,
     openGraph: {
       description,
-      images: [image],
       modifiedTime: post.updatedAt,
       publishedTime: post.publishedAt || undefined,
       tags: post.labels?.map((label) => label.name),
@@ -49,7 +41,6 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       description,
-      images: [image.url],
       title,
     },
   }

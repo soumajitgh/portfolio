@@ -1,7 +1,7 @@
 import { cache } from 'react'
 import { getPayload, type Where } from 'payload'
 
-import type { BlogPost, Media } from '@/payload-types'
+import type { BlogPost } from '@/payload-types'
 import config from '@/payload.config'
 
 export const BLOG_PAGE_SIZE = 12
@@ -190,8 +190,3 @@ export const getBlogFeedPosts = cache(async () => {
   })
   return result.docs
 })
-
-export const resolveBlogImage = (value?: BlogPost['seo']): Media | null => {
-  const image = value?.image
-  return image && typeof image === 'object' ? image : null
-}

@@ -26,8 +26,6 @@ export async function generateMetadata({
   const project = await getPublishedProject(slug)
   if (!project) return { title: 'soumajit in ~/404' }
 
-  const cover =
-    project.coverImage && typeof project.coverImage === 'object' ? project.coverImage : null
   const title = `soumajit in ~/projects/${project.slug}`
   const description = `README: ${project.shortDescription}`
   return {
@@ -35,7 +33,6 @@ export async function generateMetadata({
     description,
     openGraph: {
       description,
-      images: cover?.url ? [{ alt: cover.alt, url: cover.url }] : undefined,
       modifiedTime: project.updatedAt,
       publishedTime: project.publishedAt || undefined,
       title,
@@ -43,6 +40,11 @@ export async function generateMetadata({
       url: `/projects/${project.slug}`,
     },
     title,
+    twitter: {
+      card: 'summary_large_image',
+      description,
+      title,
+    },
   }
 }
 

@@ -9,6 +9,12 @@ const r2PublicURL = process.env.R2_PUBLIC_URL
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  outputFileTracingIncludes: {
+    '/*': [
+      './node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.ttf',
+      './node_modules/geist/dist/fonts/geist-mono/GeistMono-SemiBold.ttf',
+    ],
+  },
   images: {
     localPatterns: [
       {
