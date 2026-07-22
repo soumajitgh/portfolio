@@ -69,6 +69,8 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    projects: Project;
+    'project-stars': ProjectStar;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,17 +80,23 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'project-stars': ProjectStarsSelect<false> | ProjectStarsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'portfolio-settings': PortfolioSetting;
+  };
+  globalsSelect: {
+    'portfolio-settings': PortfolioSettingsSelect<false> | PortfolioSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -122,7 +130,7 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -147,8 +155,9 @@ export interface User {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
+  caption?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -163,10 +172,82 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: number;
+  title: string;
+  slug: string;
+  shortDescription: string;
+  category: 'infrastructure' | 'developer-tools' | 'application' | 'open-source' | 'experiment' | 'other';
+  overview: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  coverImage?: (number | null) | Media;
+  gallery?:
+    | {
+        media: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  links?:
+    | {
+        label: string;
+        url: string;
+        type: 'github' | 'demo' | 'documentation' | 'package' | 'article' | 'custom';
+        id?: string | null;
+      }[]
+    | null;
+  topics?:
+    | {
+        name: string;
+        slug: string;
+        id?: string | null;
+      }[]
+    | null;
+  status: 'active' | 'completed' | 'maintained' | 'archived' | 'experimental';
+  accent?: ('blue' | 'cyan' | 'green' | 'yellow' | 'purple') | null;
+  featured?: boolean | null;
+  pinned?: boolean | null;
+  displayOrder?: number | null;
+  projectYear?: number | null;
+  publishedAt?: string | null;
+  repositoryOwner?: string | null;
+  repositoryName?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-stars".
+ */
+export interface ProjectStar {
+  id: number;
+  project: number | Project;
+  visitorHash: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -183,20 +264,28 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'projects';
+        value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'project-stars';
+        value: number | ProjectStar;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -206,10 +295,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -229,7 +318,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -263,6 +352,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  caption?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -274,6 +364,62 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects_select".
+ */
+export interface ProjectsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  shortDescription?: T;
+  category?: T;
+  overview?: T;
+  coverImage?: T;
+  gallery?:
+    | T
+    | {
+        media?: T;
+        caption?: T;
+        id?: T;
+      };
+  links?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        type?: T;
+        id?: T;
+      };
+  topics?:
+    | T
+    | {
+        name?: T;
+        slug?: T;
+        id?: T;
+      };
+  status?: T;
+  accent?: T;
+  featured?: T;
+  pinned?: T;
+  displayOrder?: T;
+  projectYear?: T;
+  publishedAt?: T;
+  repositoryOwner?: T;
+  repositoryName?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-stars_select".
+ */
+export interface ProjectStarsSelect<T extends boolean = true> {
+  project?: T;
+  visitorHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -314,6 +460,102 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolio-settings".
+ */
+export interface PortfolioSetting {
+  id: number;
+  heroCommand: string;
+  heroHeadline: string;
+  heroDescription: string;
+  primaryAction: {
+    label: string;
+    url: string;
+  };
+  secondaryAction: {
+    label: string;
+    url: string;
+  };
+  interests?:
+    | {
+        name: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  skills?:
+    | {
+        category: 'languages' | 'backend-apis' | 'data-storage' | 'infrastructure' | 'observability' | 'tools';
+        items: {
+          name: string;
+          proficiency?: string | null;
+          icon?: string | null;
+          link?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Milliseconds between automatic panel changes.
+   */
+  carouselRotationInterval: number;
+  /**
+   * Optional ordered override. Leave empty to use featured projects.
+   */
+  featuredProjectOverride?: (number | Project)[] | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolio-settings_select".
+ */
+export interface PortfolioSettingsSelect<T extends boolean = true> {
+  heroCommand?: T;
+  heroHeadline?: T;
+  heroDescription?: T;
+  primaryAction?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  secondaryAction?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  interests?:
+    | T
+    | {
+        name?: T;
+        description?: T;
+        id?: T;
+      };
+  skills?:
+    | T
+    | {
+        category?: T;
+        items?:
+          | T
+          | {
+              name?: T;
+              proficiency?: T;
+              icon?: T;
+              link?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  carouselRotationInterval?: T;
+  featuredProjectOverride?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

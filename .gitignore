@@ -41,6 +41,7 @@ next-env.d.ts
 .env
 
 /media
+/portfolio.db
 
 # Playwright
 node_modules/

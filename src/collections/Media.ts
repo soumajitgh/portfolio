@@ -11,6 +11,13 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      name: 'caption',
+      type: 'text',
+    },
   ],
-  upload: true,
+  upload: {
+    focalPoint: true,
+    mimeTypes: ['image/*'],
+  },
 }

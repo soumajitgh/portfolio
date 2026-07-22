@@ -143,3 +143,170 @@
     color: var(--foreground);
   }
 }
+
+@layer components {
+  .landing-shell {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .landing-main {
+    display: grid;
+    height: calc(100dvh - 4rem);
+    grid-template-rows: minmax(0, 1fr) auto;
+    padding-bottom: clamp(0.75rem, 2dvh, 1.25rem);
+  }
+
+  .scrollbar-thin {
+    scrollbar-color: color-mix(in oklch, var(--border) 80%, transparent) transparent;
+    scrollbar-width: thin;
+  }
+
+  .readme {
+    color: var(--foreground);
+    font-size: 1rem;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+
+  .readme > * + * {
+    margin-top: 1.15rem;
+  }
+
+  .readme h2,
+  .readme h3,
+  .readme h4 {
+    border-bottom: 1px solid var(--border);
+    margin-top: 2.5rem;
+    padding-bottom: 0.45rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .readme h2 {
+    font-size: 1.5rem;
+  }
+  .readme h3 {
+    font-size: 1.2rem;
+  }
+  .readme ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+  }
+  .readme ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+  }
+  .readme blockquote {
+    border-left: 3px solid var(--terminal-purple);
+    color: var(--muted-foreground);
+    padding-left: 1rem;
+  }
+  .readme code {
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    background: var(--muted);
+    color: var(--terminal-cyan);
+    font-size: 0.875em;
+    padding: 0.12rem 0.35rem;
+  }
+  .readme pre {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    padding: 1rem;
+  }
+  .readme pre code {
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+  .readme .token.comment,
+  .readme .token.prolog,
+  .readme .token.doctype {
+    color: var(--muted-foreground);
+  }
+  .readme .token.punctuation {
+    color: var(--foreground);
+  }
+  .readme .token.property,
+  .readme .token.tag,
+  .readme .token.constant,
+  .readme .token.symbol {
+    color: var(--terminal-red);
+  }
+  .readme .token.boolean,
+  .readme .token.number {
+    color: var(--terminal-orange);
+  }
+  .readme .token.selector,
+  .readme .token.attr-name,
+  .readme .token.string,
+  .readme .token.char,
+  .readme .token.builtin {
+    color: var(--terminal-green);
+  }
+  .readme .token.operator,
+  .readme .token.entity,
+  .readme .token.url,
+  .readme .token.variable {
+    color: var(--terminal-cyan);
+  }
+  .readme .token.atrule,
+  .readme .token.attr-value,
+  .readme .token.function,
+  .readme .token.class-name {
+    color: var(--terminal-blue);
+  }
+  .readme .token.keyword {
+    color: var(--terminal-purple);
+  }
+  .readme .token.regex,
+  .readme .token.important {
+    color: var(--terminal-yellow);
+  }
+  .readme a {
+    color: var(--terminal-blue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .readme hr {
+    border-color: var(--border);
+    margin-block: 2rem;
+  }
+  .readme table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+  .readme th,
+  .readme td {
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .readme img {
+    height: auto;
+    max-width: 100%;
+    border-radius: var(--radius);
+  }
+}
+
+@media (max-width: 639px), (max-height: 680px) {
+  .landing-shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .landing-main {
+    height: auto;
+    min-height: calc(100dvh - 4rem);
+    grid-template-rows: auto auto;
+  }
+
+  .portfolio-panel {
+    min-height: 15.5rem;
+  }
+}
