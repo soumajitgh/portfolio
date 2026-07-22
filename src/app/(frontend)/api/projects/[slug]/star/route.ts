@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
+import { verifyTurnstileToken } from '@/lib/turnstile'
 
 const visitorCookie = 'portfolio_visitor'
 const rateWindow = 60_000
@@ -100,6 +101,15 @@ function errorResponse(message: string, status: number) {
   return NextResponse.json({ error: message }, { status })
 }
 
+async function verifyMutation(request: NextRequest) {
+  try {
+    const body = (await request.json()) as { turnstileToken?: unknown }
+    return verifyTurnstileToken(body.turnstileToken, 'star')
+  } catch {
+    return { configured: Boolean(process.env.TURNSTILE_SECRET_KEY), valid: false }
+  }
+}
+
 function revalidateProject(slug: string) {
   revalidatePath('/')
   revalidatePath('/projects')
@@ -127,6 +137,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   if (!isSameOrigin(request)) return errorResponse('Cross-origin request rejected', 403)
 
   try {
+    const turnstile = await verifyMutation(request)
+    if (!turnstile.configured) return errorResponse('Bot protection is not configured', 503)
+    if (!turnstile.valid) return errorResponse('Bot verification failed', 403)
+
     const { slug } = await params
     const projectID = await getPublishedProjectID(slug)
     if (!projectID) return errorResponse('Project not found', 404)
@@ -166,6 +180,10 @@ export async function DELETE(
   if (!isSameOrigin(request)) return errorResponse('Cross-origin request rejected', 403)
 
   try {
+    const turnstile = await verifyMutation(request)
+    if (!turnstile.configured) return errorResponse('Bot protection is not configured', 503)
+    if (!turnstile.valid) return errorResponse('Bot verification failed', 403)
+
     const { slug } = await params
     const projectID = await getPublishedProjectID(slug)
     if (!projectID) return errorResponse('Project not found', 404)

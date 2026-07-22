@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
+const r2PublicURL = process.env.R2_PUBLIC_URL
 
 const nextConfig: NextConfig = {
   output: 'standalone',
@@ -14,6 +15,15 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/file/**',
       },
     ],
+    remotePatterns: r2PublicURL
+      ? [
+          {
+            hostname: new URL(r2PublicURL).hostname,
+            pathname: '/**',
+            protocol: new URL(r2PublicURL).protocol.replace(':', '') as 'http' | 'https',
+          },
+        ]
+      : [],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

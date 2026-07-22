@@ -26,6 +26,7 @@ export const PortfolioSettings: GlobalConfig = {
       ({ context, doc }) => {
         if (context.disableRevalidate) return doc
         revalidatePath('/')
+        revalidatePath('/contact')
         return doc
       },
     ],
@@ -41,6 +42,52 @@ export const PortfolioSettings: GlobalConfig = {
     { name: 'heroDescription', type: 'textarea', required: true, maxLength: 320 },
     { name: 'primaryAction', type: 'group', fields: actionFields },
     { name: 'secondaryAction', type: 'group', fields: actionFields },
+    {
+      name: 'resumeFile',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'PDF downloaded by the Resume button on the home page.',
+      },
+      filterOptions: { mimeType: { equals: 'application/pdf' } },
+    },
+    {
+      name: 'contact',
+      type: 'group',
+      fields: [
+        {
+          name: 'email',
+          type: 'email',
+          required: true,
+          defaultValue: 'soumojitghosh02@gmail.com',
+          admin: {
+            description:
+              'Public contact address and fallback form recipient. CONTACT_TO_EMAIL overrides delivery.',
+          },
+        },
+        {
+          name: 'intro',
+          type: 'textarea',
+          required: true,
+          maxLength: 320,
+          defaultValue:
+            'Have a backend, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.',
+        },
+        {
+          name: 'socials',
+          type: 'array',
+          fields: [
+            { name: 'label', type: 'text', required: true },
+            {
+              name: 'url',
+              type: 'text',
+              required: true,
+              validate: (value: null | string | undefined) => validateWebURL(value),
+            },
+          ],
+        },
+      ],
+    },
     {
       name: 'interests',
       type: 'array',

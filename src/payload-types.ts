@@ -158,6 +158,7 @@ export interface Media {
   id: number;
   alt: string;
   caption?: string | null;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -353,6 +354,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -478,6 +480,24 @@ export interface PortfolioSetting {
     label: string;
     url: string;
   };
+  /**
+   * PDF downloaded by the Resume button on the home page.
+   */
+  resumeFile?: (number | null) | Media;
+  contact: {
+    /**
+     * Public contact address and fallback form recipient. CONTACT_TO_EMAIL overrides delivery.
+     */
+    email: string;
+    intro: string;
+    socials?:
+      | {
+          label: string;
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   interests?:
     | {
         name: string;
@@ -528,6 +548,20 @@ export interface PortfolioSettingsSelect<T extends boolean = true> {
     | {
         label?: T;
         url?: T;
+      };
+  resumeFile?: T;
+  contact?:
+    | T
+    | {
+        email?: T;
+        intro?: T;
+        socials?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              id?: T;
+            };
       };
   interests?:
     | T

@@ -24,23 +24,25 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const project = await getPublishedProject(slug)
-  if (!project) return { title: 'Project not found — Soumajit' }
+  if (!project) return { title: 'soumajit in ~/404' }
 
   const cover =
     project.coverImage && typeof project.coverImage === 'object' ? project.coverImage : null
+  const title = `soumajit in ~/projects/${project.slug}`
+  const description = `README: ${project.shortDescription}`
   return {
     alternates: { canonical: `/projects/${project.slug}` },
-    description: project.shortDescription,
+    description,
     openGraph: {
-      description: project.shortDescription,
+      description,
       images: cover?.url ? [{ alt: cover.alt, url: cover.url }] : undefined,
       modifiedTime: project.updatedAt,
       publishedTime: project.publishedAt || undefined,
-      title: `${project.title} — Soumajit`,
+      title,
       type: 'article',
       url: `/projects/${project.slug}`,
     },
-    title: `${project.title} — Soumajit`,
+    title,
   }
 }
 
@@ -81,13 +83,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           </div>
 
           <div className="mt-7 flex flex-wrap items-start justify-between gap-4">
-            <StarButton slug={project.slug} />
             {(project.projectYear || project.publishedAt) && (
               <span className="flex items-center gap-2 pt-2 font-mono text-xs text-terminal-yellow">
                 <CalendarDays className="size-4" aria-hidden="true" />
                 {project.projectYear || new Date(project.publishedAt as string).getFullYear()}
               </span>
             )}
+            <div className="ml-auto">
+              <StarButton slug={project.slug} />
+            </div>
           </div>
         </header>
 

@@ -81,7 +81,13 @@ async function seed() {
       heroCommand: 'soumajit@portfolio:~$ whoami',
       heroDescription:
         'I design APIs, distributed systems, and developer infrastructure with an emphasis on reliability, clarity, and long-term maintainability.',
-      heroHeadline: 'Backend systems built to scale.',
+      heroHeadline: 'I build reliable backend systems.',
+      contact: {
+        email: 'soumojitghosh02@gmail.com',
+        intro:
+          'Have a backend, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.',
+        socials: [{ label: 'GitHub', url: 'https://github.com/soumajitgh' }],
+      },
       interests: [
         {
           name: 'Distributed systems',

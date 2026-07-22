@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
+
+export const metadata: Metadata = {
+  description: 'error: the requested path does not exist.',
+  title: 'soumajit in ~/404',
+}
 
 export default function NotFound() {
   return (

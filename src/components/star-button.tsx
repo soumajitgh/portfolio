@@ -4,6 +4,7 @@ import { Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { Turnstile } from '@/components/turnstile'
 import { cn } from '@/lib/utils'
 
 type StarState = { count: number; starred: boolean }
@@ -12,6 +13,8 @@ export function StarButton({ slug }: { slug: string }) {
   const [state, setState] = useState<StarState>({ count: 0, starred: false })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0)
 
   useEffect(() => {
     let active = true
@@ -39,6 +42,10 @@ export function StarButton({ slug }: { slug: string }) {
 
   async function toggle() {
     if (loading) return
+    if (!turnstileToken) {
+      setError('complete bot verification first')
+      return
+    }
     const previous = state
     const optimistic = {
       starred: !state.starred,
@@ -50,7 +57,9 @@ export function StarButton({ slug }: { slug: string }) {
 
     try {
       const response = await fetch(`/api/projects/${slug}/star`, {
+        body: JSON.stringify({ turnstileToken }),
         credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
         method: optimistic.starred ? 'PUT' : 'DELETE',
       })
       if (!response.ok) throw new Error('Unable to update star')
@@ -60,11 +69,13 @@ export function StarButton({ slug }: { slug: string }) {
       setError('request failed — retry')
     } finally {
       setLoading(false)
+      setTurnstileToken('')
+      setTurnstileResetKey((value) => value + 1)
     }
   }
 
   return (
-    <div className="flex flex-col items-start gap-1">
+    <div className="flex flex-col items-end gap-1">
       <Button
         aria-label={`${state.starred ? 'Remove star from' : 'Star'} project. ${state.count} stars`}
         aria-pressed={state.starred}
@@ -79,6 +90,12 @@ export function StarButton({ slug }: { slug: string }) {
         {loading ? '...' : state.starred ? './starred' : './star'}
         <span className="text-muted-foreground">{state.count}</span>
       </Button>
+      <Turnstile
+        action="star"
+        className="max-w-[18rem]"
+        onTokenChange={setTurnstileToken}
+        resetKey={turnstileResetKey}
+      />
       <span aria-live="polite" className="min-h-4 font-mono text-[11px] text-terminal-red">
         {error}
       </span>

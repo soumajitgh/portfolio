@@ -170,14 +170,14 @@
   }
 
   .readme > * + * {
-    margin-top: 1.15rem;
+    margin-top: 1rem;
   }
 
   .readme h2,
   .readme h3,
   .readme h4 {
     border-bottom: 1px solid var(--border);
-    margin-top: 2.5rem;
+    margin-top: 2rem;
     padding-bottom: 0.45rem;
     scroll-margin-top: 5rem;
   }
@@ -187,6 +187,23 @@
   }
   .readme h3 {
     font-size: 1.2rem;
+  }
+  .readme > :first-child {
+    margin-top: 0;
+  }
+  .readme p + h2,
+  .readme p + h3,
+  .readme p + h4,
+  .readme ul + h2,
+  .readme ul + h3,
+  .readme ul + h4,
+  .readme ol + h2,
+  .readme ol + h3,
+  .readme ol + h4 {
+    margin-top: 2rem;
+  }
+  .readme p:has(> br:only-child) {
+    display: none;
   }
   .readme ul {
     list-style: disc;

@@ -11,14 +11,14 @@ export const revalidate = 300
 
 export const metadata: Metadata = {
   alternates: { canonical: '/projects' },
-  description: 'Published backend, infrastructure, and developer tooling projects by Soumajit.',
+  description: 'output: published backend, infrastructure, and developer tooling projects.',
   openGraph: {
-    description: 'Published backend, infrastructure, and developer tooling projects by Soumajit.',
-    title: 'Projects — Soumajit',
+    description: 'output: published backend, infrastructure, and developer tooling projects.',
+    title: 'soumajit in ~/projects',
     type: 'website',
     url: '/projects',
   },
-  title: 'Projects — Soumajit',
+  title: 'soumajit in ~/projects',
 }
 
 export default async function ProjectsPage({

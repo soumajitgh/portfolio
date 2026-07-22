@@ -7,8 +7,6 @@ export const revalidate = 300
 
 export const metadata: Metadata = {
   alternates: { canonical: '/' },
-  description: 'Backend systems, APIs, and developer infrastructure built by Soumajit.',
-  title: 'Soumajit — Backend Engineer',
 }
 
 async function loadHomeData() {

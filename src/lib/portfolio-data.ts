@@ -26,6 +26,13 @@ export type ProjectCardData = Pick<
 export type PortfolioHomeData = {
   projects: ProjectCardData[]
   settings: PortfolioSetting
+  stack: StackTopic[]
+}
+
+export type StackTopic = {
+  count: number
+  name: string
+  slug: string
 }
 
 const cardSelect = {
@@ -116,7 +123,40 @@ export const getPortfolioHome = cache(async (): Promise<PortfolioHomeData> => {
         })
       ).docs
 
-  return { projects: await addStarCounts(projectDocs), settings }
+  const stackProjects = await payload.find({
+    collection: 'projects',
+    depth: 0,
+    limit: 1000,
+    overrideAccess: false,
+    pagination: false,
+    select: { topics: true },
+    where: { _status: { equals: 'published' } },
+  })
+  const topicCounts = new Map<string, StackTopic>()
+  for (const project of stackProjects.docs) {
+    for (const topic of project.topics || []) {
+      const current = topicCounts.get(topic.slug)
+      topicCounts.set(topic.slug, {
+        count: (current?.count || 0) + 1,
+        name: topic.name,
+        slug: topic.slug,
+      })
+    }
+  }
+  const stack = Array.from(topicCounts.values()).sort(
+    (a, b) => b.count - a.count || a.name.localeCompare(b.name),
+  )
+
+  return { projects: await addStarCounts(projectDocs), settings, stack }
+})
+
+export const getPortfolioSettings = cache(async () => {
+  const payload = await getPayload({ config })
+  return payload.findGlobal({
+    slug: 'portfolio-settings',
+    depth: 0,
+    overrideAccess: false,
+  })
 })
 
 export const getPublishedProjects = cache(async (topic?: string): Promise<ProjectCardData[]> => {

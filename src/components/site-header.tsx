@@ -18,7 +18,10 @@ export function SiteHeader() {
           <Button asChild size="sm" variant="ghost">
             <Link href="/projects">./projects</Link>
           </Button>
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/contact">./contact</Link>
+          </Button>
+          <Button asChild className="hidden sm:inline-flex" size="sm" variant="outline">
             <Link href="/admin">./admin</Link>
           </Button>
         </div>
