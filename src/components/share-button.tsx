@@ -4,6 +4,7 @@ import { Check, CircleAlert, Share2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { captureEvent } from '@/lib/analytics'
 
 type ShareState = 'copied' | 'error' | 'idle' | 'shared'
 
@@ -44,6 +45,7 @@ export function ShareButton({ text, title }: { text?: string; title: string }) {
       try {
         await navigator.share({ text, title, url })
         setState('shared')
+        captureEvent('content_shared', { method: 'native_share', title })
         return
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return
@@ -53,8 +55,10 @@ export function ShareButton({ text, title }: { text?: string; title: string }) {
     try {
       await copyURL(url)
       setState('copied')
+      captureEvent('content_shared', { method: 'clipboard_fallback', title })
     } catch {
       setState('error')
+      captureEvent('content_share_failed', { title })
     }
   }
 

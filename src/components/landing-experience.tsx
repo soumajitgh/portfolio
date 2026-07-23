@@ -9,6 +9,7 @@ import { ProjectRail } from '@/components/project-rail'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import type { PortfolioHomeData } from '@/lib/portfolio-data'
+import { captureEvent } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
 
 const panels = [
@@ -39,6 +40,7 @@ export function PortfolioShowcase({ blogPosts, projects, settings, stack }: Port
       }
       if (announce) {
         setAnnouncement(`${panels.find((item) => item.id === panel)?.label} selected`)
+        captureEvent('portfolio_panel_selected', { panel })
       }
     },
     [pinnedPanel],
@@ -81,12 +83,14 @@ export function PortfolioShowcase({ blogPosts, projects, settings, stack }: Port
       setPinnedPanel(null)
       window.localStorage.removeItem(pinnedPanelKey)
       setAnnouncement('Automatic panel rotation enabled')
+      captureEvent('portfolio_panel_pin_changed', { action: 'unpinned', panel: pinnedPanel })
       return
     }
 
     setPinnedPanel(activePanel)
     window.localStorage.setItem(pinnedPanelKey, activePanel)
     setAnnouncement(`${panels.find((panel) => panel.id === activePanel)?.label} pinned`)
+    captureEvent('portfolio_panel_pin_changed', { action: 'pinned', panel: activePanel })
   }
 
   function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, panel: PanelID) {

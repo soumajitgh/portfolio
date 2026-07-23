@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { SiteHeader } from '@/components/site-header'
+import { SiteAnalytics } from '@/components/site-analytics'
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="min-h-[calc(100dvh-4rem)] outline-none" id="main-content" tabIndex={-1}>
         {children}
       </div>
+      <SiteAnalytics />
     </>
   )
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Turnstile } from '@/components/turnstile'
+import { captureEvent } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
 
 type StarState = { count: number; starred: boolean }
@@ -72,10 +73,22 @@ export function StarButton({
         method: optimistic.starred ? 'PUT' : 'DELETE',
       })
       if (!response.ok) throw new Error('Unable to update star')
-      setState((await response.json()) as StarState)
+      const result = (await response.json()) as StarState
+      setState(result)
+      captureEvent('content_star_updated', {
+        action: result.starred ? 'added' : 'removed',
+        resource_type: resource === 'blog' ? 'blog_post' : 'project',
+        slug,
+        star_count: result.count,
+      })
     } catch {
       setState(previous)
       setError('request failed — retry')
+      captureEvent('content_star_failed', {
+        attempted_action: optimistic.starred ? 'add' : 'remove',
+        resource_type: resource === 'blog' ? 'blog_post' : 'project',
+        slug,
+      })
     } finally {
       setLoading(false)
       setTurnstileToken('')

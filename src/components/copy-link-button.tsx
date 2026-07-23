@@ -4,6 +4,7 @@ import { Check, Link2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { captureEvent } from '@/lib/analytics'
 
 export function CopyLinkButton() {
   const [copied, setCopied] = useState(false)
@@ -18,8 +19,10 @@ export function CopyLinkButton() {
     try {
       await navigator.clipboard.writeText(window.location.href)
       setCopied(true)
+      captureEvent('content_link_copied', { content_type: 'blog_post' })
     } catch {
       setCopied(false)
+      captureEvent('content_link_copy_failed', { content_type: 'blog_post' })
     }
   }
 

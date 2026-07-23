@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState, useTransition } from 'react'
 
 import type { FilterOption } from '@/components/filter-select'
+import { captureEvent } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
 
 export function MultiFilterDropdown({
@@ -56,6 +57,12 @@ export function MultiFilterDropdown({
 
   const updateSelection = (nextValues: string[]) => {
     setSelected(nextValues)
+    captureEvent('content_filter_changed', {
+      filter_name: name,
+      filter_value: nextValues,
+      page_type: pathname.replace('/', '') || 'home',
+      selected_count: nextValues.length,
+    })
 
     const params = new URLSearchParams(searchParams.toString())
     params.delete(name)

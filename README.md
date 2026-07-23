@@ -35,6 +35,9 @@ DATABASE_URL=postgresql://payload:payload@localhost:5432/portfolio
 PAYLOAD_SECRET=replace-with-a-long-random-secret
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+
 RESEND_API_KEY=re_...
 EMAIL_FROM_ADDRESS=contact@your-domain.com
 EMAIL_FROM_NAME=soumajit.dev
@@ -58,6 +61,32 @@ optional comma-separated allowlist.
 
 Cloudflare R2 is enabled only when all five `R2_*` values are present. Otherwise Payload uses local
 uploads, which are suitable for development but not an ephemeral production container.
+
+## Analytics
+
+PostHog is enabled on the public portfolio only when `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is set.
+Use the public project token from PostHog project settings, not a personal API key. Set the host to
+the ingestion endpoint for your region (for example, `https://us.i.posthog.com` or
+`https://eu.i.posthog.com`).
+
+The integration captures SPA page views and exits, Core Web Vitals and network performance,
+JavaScript exceptions, heatmaps, dead clicks, and privacy-masked session replays. It also records
+the following decision-oriented custom events:
+
+- Content engagement: `content_engaged`, `content_scroll_depth_reached`,
+  `content_view_completed`, and `content_selected`
+- Discovery: `content_search_performed`, `content_search_cleared`,
+  `content_filter_changed`, and `in_page_navigation_clicked`
+- Conversion and intent: `contact_form_submitted`, `contact_form_succeeded`,
+  `contact_form_failed`, `resume_download_requested`, and `contact_link_clicked`
+- Advocacy: `content_star_updated`, `content_star_failed`, `content_shared`,
+  `content_share_failed`, `content_link_copied`, and `content_link_copy_failed`
+- Navigation: `external_link_clicked`, `portfolio_panel_selected`, and
+  `portfolio_panel_pin_changed`
+
+Payload Admin is excluded. Session replay masks every input, strips query strings from recorded
+network URLs, and the contact form is excluded from autocapture. Analytics also honors the
+browser's Do Not Track signal. No contact-form values are sent in custom events.
 
 ## Payload MCP
 
@@ -145,6 +174,8 @@ the image build:
 ```text
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=...
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 R2_PUBLIC_URL=https://media.your-domain.com
 ```
 

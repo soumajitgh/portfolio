@@ -4,6 +4,8 @@ import { ChevronDown } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useTransition } from 'react'
 
+import { captureEvent } from '@/lib/analytics'
+
 export type FilterOption = {
   label: string
   value: string
@@ -35,6 +37,11 @@ export function FilterSelect({
         className="terminal-input h-10 w-full appearance-none rounded-md border border-input bg-card px-3 pr-10 font-mono text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 sm:h-11"
         name={name}
         onChange={(event) => {
+          captureEvent('content_filter_changed', {
+            filter_name: name,
+            filter_value: event.target.value || 'all',
+            page_type: pathname.replace('/', '') || 'home',
+          })
           const params = new URLSearchParams(searchParams.toString())
           if (event.target.value) params.set(name, event.target.value)
           else params.delete(name)
