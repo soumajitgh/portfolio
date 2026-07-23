@@ -33,7 +33,7 @@ export async function GET() {
 <channel>
   <title>Fullstack Development Blog by Soumajit Ghosh</title>
   <link>${siteURL}/blogs</link>
-  <description>Practical articles about TypeScript, Next.js, APIs, databases, cloud infrastructure, reliability, and developer tooling.</description>
+  <description>Practical articles about React, Next.js, NestJS, AI systems, APIs, databases, cloud infrastructure, and reliability.</description>
   <language>en-IN</language>
   <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
   ${items}

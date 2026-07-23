@@ -5,13 +5,20 @@ import { MultiFilterDropdown } from '@/components/multi-filter-dropdown'
 import { ProjectCard } from '@/components/project-card'
 import { ProjectSearch } from '@/components/projects/project-search'
 import { getPublishedProjects } from '@/lib/portfolio-data'
-import { absoluteURL, nonIndexableRobots, serializeJsonLd } from '@/lib/seo'
+import {
+  absoluteURL,
+  nonIndexableRobots,
+  serializeJsonLd,
+  siteName,
+  siteProfiles,
+  siteRole,
+} from '@/lib/seo'
 
 export const revalidate = 300
 
 const pageTitle = 'Fullstack Developer Projects'
 const pageDescription =
-  'Explore fullstack projects by Soumajit Ghosh, including web applications, APIs, distributed systems, cloud infrastructure, open-source software, and developer tools.'
+  'Explore fullstack and AI projects by Soumajit Ghosh built with React, Next.js, NestJS, Python, Electron, PostgreSQL, Docker, and cloud infrastructure.'
 
 export async function generateMetadata({
   searchParams,
@@ -87,6 +94,14 @@ export default async function ProjectsPage({
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
+    author: {
+      '@id': `${absoluteURL('/')}#person`,
+      '@type': 'Person',
+      jobTitle: siteRole,
+      name: siteName,
+      sameAs: siteProfiles,
+      url: absoluteURL('/'),
+    },
     breadcrumb: {
       '@type': 'BreadcrumbList',
       itemListElement: [
@@ -132,8 +147,8 @@ export default async function ProjectsPage({
         <h1 className="page-title mt-4 font-semibold">Published projects</h1>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="page-lede max-w-2xl text-muted-foreground">
-            Production-minded web applications, APIs, distributed systems, cloud infrastructure,
-            open-source software, and developer tools.
+            Fullstack and AI products spanning React interfaces, NestJS and Python APIs, Electron
+            applications, databases, and production infrastructure.
           </p>
           <span
             aria-live="polite"

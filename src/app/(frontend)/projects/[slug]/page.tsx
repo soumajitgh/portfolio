@@ -12,7 +12,14 @@ import { StarButton } from '@/components/star-button'
 import { Badge } from '@/components/ui/badge'
 import { formatLabel } from '@/lib/content'
 import { getPublishedProject, getRelatedProjects } from '@/lib/portfolio-data'
-import { absoluteURL, getMediaURL, serializeJsonLd, siteName } from '@/lib/seo'
+import {
+  absoluteURL,
+  getMediaURL,
+  serializeJsonLd,
+  siteName,
+  siteProfiles,
+  siteRole,
+} from '@/lib/seo'
 
 export const revalidate = 300
 
@@ -76,7 +83,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         author: {
           '@id': `${absoluteURL('/')}#person`,
           '@type': 'Person',
+          jobTitle: siteRole,
           name: siteName,
+          sameAs: siteProfiles,
           url: absoluteURL('/'),
         },
         codeRepository: repositoryURL,

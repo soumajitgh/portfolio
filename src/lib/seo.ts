@@ -6,7 +6,61 @@ export const siteName = 'Soumajit Ghosh'
 export const siteRole = 'Fullstack Developer'
 export const siteTitle = `${siteName} – ${siteRole}`
 export const siteDescription =
-  'Fullstack developer Soumajit Ghosh builds accessible web applications, reliable APIs, and production-ready systems with TypeScript, Next.js, and Payload CMS.'
+  'Soumajit Ghosh is a fullstack developer building AI-powered web and desktop products with React, Next.js, NestJS, Python, PostgreSQL, and Docker.'
+export const siteProfiles = [
+  'https://github.com/soumajitgh',
+  'https://www.linkedin.com/in/soumajit-ghosh',
+]
+export const siteExpertise = [
+  'JavaScript',
+  'TypeScript',
+  'Python',
+  'Java',
+  'React',
+  'Next.js',
+  'NestJS',
+  'Express.js',
+  'Spring Boot',
+  'FastAPI',
+  'Electron',
+  'Generative AI',
+  'Large language models',
+  'AI agents',
+  'Retrieval-augmented generation',
+  'Vector search',
+  'GraphQL',
+  'REST APIs',
+  'gRPC',
+  'Kafka',
+  'PostgreSQL',
+  'MongoDB',
+  'Redis',
+  'Qdrant',
+  'AWS',
+  'Google Cloud',
+  'Railway',
+  'Docker',
+  'Linux',
+  'CI/CD',
+]
+export const siteKeywords = [
+  'fullstack developer',
+  'full stack developer',
+  'AI developer',
+  'React developer',
+  'Next.js developer',
+  'NestJS developer',
+  'TypeScript developer',
+  'Python developer',
+  'generative AI developer',
+  'LLM applications',
+  'AI agents',
+  'RAG systems',
+  'Electron developer',
+  'GraphQL API development',
+  'PostgreSQL',
+  'Docker',
+]
 
 export function getSiteURL() {
   return (process.env.NEXT_PUBLIC_SITE_URL || fallbackSiteURL).replace(/\/$/, '')

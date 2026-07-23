@@ -199,12 +199,12 @@ async function seed() {
       carouselRotationInterval: 7000,
       heroCommand: 'soumajit@portfolio:~$ whoami',
       heroDescription:
-        'Building accessible fullstack applications with polished interfaces, reliable APIs, and production-grade attention to detail.',
+        'Building AI-powered web and desktop products with React, Next.js, NestJS, Python, and production-grade infrastructure.',
       heroHeadline: 'Your request\nhas been handled.',
       contact: {
         email: 'soumojitghosh02@gmail.com',
         intro:
-          'Have a fullstack web application, API, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.',
+          'Have an AI-powered web or desktop product, fullstack application, API, or infrastructure problem worth solving? Send the context and I will get back to you.',
         socials: [{ label: 'GitHub', url: 'https://github.com/soumajitgh' }],
       },
       interests: [

@@ -3,7 +3,14 @@ import { GeistSans } from 'geist/font/sans'
 import type { Metadata } from 'next'
 
 import { AppShell } from '@/components/app-shell'
-import { getSiteURL, indexableRobots, siteDescription, siteName, siteTitle } from '@/lib/seo'
+import {
+  getSiteURL,
+  indexableRobots,
+  siteDescription,
+  siteKeywords,
+  siteName,
+  siteTitle,
+} from '@/lib/seo'
 
 import './globals.css'
 
@@ -18,18 +25,7 @@ export const metadata: Metadata = {
   category: 'technology',
   creator: siteName,
   description: siteDescription,
-  keywords: [
-    'fullstack developer',
-    'full stack developer',
-    'full-stack engineer',
-    'Next.js developer',
-    'React developer',
-    'TypeScript developer',
-    'Payload CMS developer',
-    'backend developer',
-    'API development',
-    'web application development',
-  ],
+  keywords: siteKeywords,
   openGraph: {
     description: siteDescription,
     locale: 'en_IN',

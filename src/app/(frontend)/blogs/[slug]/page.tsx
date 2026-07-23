@@ -11,7 +11,14 @@ import { Badge } from '@/components/ui/badge'
 import { formatBlogDate, wasMeaningfullyUpdated } from '@/lib/blog-content'
 import { getBlogNeighbors, getPublishedBlogPost } from '@/lib/blog-data'
 import { extractRichTextHeadings } from '@/lib/rich-text-headings'
-import { absoluteURL, getMediaURL, serializeJsonLd, siteName } from '@/lib/seo'
+import {
+  absoluteURL,
+  getMediaURL,
+  serializeJsonLd,
+  siteName,
+  siteProfiles,
+  siteRole,
+} from '@/lib/seo'
 
 export const revalidate = 300
 
@@ -73,7 +80,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         author: {
           '@id': `${absoluteURL('/')}#person`,
           '@type': 'Person',
+          jobTitle: siteRole,
           name: siteName,
+          sameAs: siteProfiles,
           url: absoluteURL('/'),
         },
         dateModified: post.updatedAt,

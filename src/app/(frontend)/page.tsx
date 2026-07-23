@@ -10,7 +10,9 @@ import {
   absoluteURL,
   serializeJsonLd,
   siteDescription,
+  siteExpertise,
   siteName,
+  siteProfiles,
   siteRole,
   siteTitle,
 } from '@/lib/seo'
@@ -43,7 +45,12 @@ export default async function HomePage() {
     )
   }
 
-  const socialProfiles = data.settings.contact?.socials?.map((social) => social.url) || []
+  const socialProfiles = Array.from(
+    new Set([
+      ...siteProfiles,
+      ...(data.settings.contact?.socials?.map((social) => social.url) || []),
+    ]),
+  )
   const skills =
     data.settings.skills?.flatMap((group) => group.items?.map((item) => item.name) || []) || []
   const structuredData = {
@@ -52,11 +59,28 @@ export default async function HomePage() {
       {
         '@id': `${absoluteURL('/')}#person`,
         '@type': 'Person',
+        affiliation: [
+          {
+            '@type': 'CollegeOrUniversity',
+            name: 'Kalinga Institute of Industrial Technology',
+          },
+          {
+            '@type': 'Organization',
+            name: 'Google Developer Group KIIT',
+          },
+        ],
         description: siteDescription,
         jobTitle: siteRole,
-        knowsAbout: Array.from(new Set([...skills, ...data.stack.map((topic) => topic.name)])),
+        knowsAbout: Array.from(
+          new Set([...siteExpertise, ...skills, ...data.stack.map((topic) => topic.name)]),
+        ),
         name: siteName,
         sameAs: socialProfiles,
+        subjectOf: {
+          '@type': 'CreativeWork',
+          name: `${siteName} Resume`,
+          url: absoluteURL('/resume'),
+        },
         url: absoluteURL('/'),
       },
       {
@@ -74,6 +98,7 @@ export default async function HomePage() {
         description: siteDescription,
         inLanguage: 'en',
         name: 'soumajit.dev',
+        publisher: { '@id': `${absoluteURL('/')}#person` },
         url: absoluteURL('/'),
       },
     ],

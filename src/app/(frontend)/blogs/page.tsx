@@ -8,13 +8,20 @@ import { FilterSelect } from '@/components/filter-select'
 import { Button } from '@/components/ui/button'
 import { getBlogIndex } from '@/lib/blog-data'
 import { blogHref } from '@/lib/blog-url'
-import { absoluteURL, nonIndexableRobots, serializeJsonLd } from '@/lib/seo'
+import {
+  absoluteURL,
+  nonIndexableRobots,
+  serializeJsonLd,
+  siteName,
+  siteProfiles,
+  siteRole,
+} from '@/lib/seo'
 
 export const revalidate = 300
 
 const pageTitle = 'Fullstack Development Blog'
 const pageDescription =
-  'Practical articles by fullstack developer Soumajit Ghosh about TypeScript, Next.js, APIs, databases, cloud infrastructure, reliability, and developer tooling.'
+  'Practical articles by fullstack developer Soumajit Ghosh about React, Next.js, NestJS, AI systems, APIs, databases, cloud infrastructure, and reliability.'
 
 type BlogSearchParams = {
   label?: string | string[]
@@ -79,7 +86,9 @@ export default async function BlogPage({
     author: {
       '@id': `${absoluteURL('/')}#person`,
       '@type': 'Person',
-      name: 'Soumajit Ghosh',
+      jobTitle: siteRole,
+      name: siteName,
+      sameAs: siteProfiles,
       url: absoluteURL('/'),
     },
     breadcrumb: {
@@ -127,8 +136,8 @@ export default async function BlogPage({
             </p>
             <h1 className="page-title mt-4 font-semibold">Published Blogs</h1>
             <p className="page-lede mt-3 max-w-2xl text-muted-foreground sm:mt-4">
-              Practical articles on TypeScript, Next.js, reliable APIs, databases, cloud
-              infrastructure, and lessons learned in production.
+              Practical articles on React, Next.js, NestJS, AI systems, reliable APIs, databases,
+              cloud infrastructure, and lessons learned in production.
             </p>
           </div>
           <Button asChild size="sm" variant="outline">

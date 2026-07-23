@@ -16,7 +16,7 @@ export default async function OpenGraphImage() {
     eyebrow: 'portfolio / soumajit.dev',
     identity,
     meta: ['production-ready'],
-    tags: ['typescript', 'next.js', 'payload cms'],
+    tags: ['react', 'nestjs', 'ai systems'],
     title: siteName,
   })
 }
