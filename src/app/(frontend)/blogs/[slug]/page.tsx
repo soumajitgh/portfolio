@@ -37,7 +37,7 @@ export async function generateMetadata({
       description,
       modifiedTime: post.updatedAt,
       publishedTime: post.publishedAt || undefined,
-      section: 'Backend Engineering',
+      section: 'Fullstack Development',
       tags: post.labels?.map((label) => label.name),
       title,
       type: 'article',
@@ -103,7 +103,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {
             '@type': 'ListItem',
             item: absoluteURL('/blogs'),
-            name: 'Backend Engineering Blog',
+            name: 'Fullstack Development Blog',
             position: 2,
           },
           {

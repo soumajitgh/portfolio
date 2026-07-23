@@ -17,8 +17,20 @@ import { getGitHubStats, getLeetCodeStats, getWakaTimeStats } from '@/lib/stats-
 export const metadata: Metadata = {
   alternates: { canonical: '/stats' },
   description:
-    'Live coding, open-source, problem-solving, and development activity statistics for Soumajit Ghosh.',
+    'Live coding, open-source, problem-solving, and development activity statistics for fullstack developer Soumajit Ghosh.',
+  openGraph: {
+    description:
+      'Live coding, open-source, problem-solving, and development activity statistics for fullstack developer Soumajit Ghosh.',
+    title: 'Developer Stats',
+    type: 'website',
+    url: '/stats',
+  },
   title: 'Developer Stats',
+  twitter: {
+    card: 'summary_large_image',
+    description: 'Live development activity and coding statistics for Soumajit Ghosh.',
+    title: 'Developer Stats',
+  },
 }
 
 export const revalidate = 900

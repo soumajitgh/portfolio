@@ -12,21 +12,25 @@ import {
 import { ContactForm } from '@/components/contact-form'
 import { Card } from '@/components/ui/card'
 import { getPortfolioSettings } from '@/lib/portfolio-data'
+import { siteName, siteRole } from '@/lib/seo'
 
 export const revalidate = 300
 
 export const metadata: Metadata = {
   alternates: { canonical: '/contact' },
-  description:
-    'Contact Soumajit Ghosh about backend development, APIs, cloud infrastructure, distributed systems, or developer tooling.',
+  description: `Contact ${siteName}, a ${siteRole.toLowerCase()}, about web applications, frontend experiences, APIs, cloud infrastructure, or developer tooling.`,
   openGraph: {
-    description:
-      'Contact Soumajit Ghosh about backend development, APIs, cloud infrastructure, distributed systems, or developer tooling.',
-    title: 'Contact Soumajit Ghosh',
+    description: `Contact ${siteName}, a ${siteRole.toLowerCase()}, about web applications, frontend experiences, APIs, cloud infrastructure, or developer tooling.`,
+    title: `Contact ${siteName}`,
     type: 'website',
     url: '/contact',
   },
   title: 'Contact',
+  twitter: {
+    card: 'summary_large_image',
+    description: `Contact ${siteName}, a ${siteRole.toLowerCase()}, about fullstack development and production-ready web products.`,
+    title: `Contact ${siteName}`,
+  },
 }
 
 function SocialIcon({ label, url }: { label: string; url: string }) {
@@ -59,7 +63,7 @@ export default async function ContactPage() {
         <h1 className="page-title mt-4 font-semibold">Start a conversation.</h1>
         <p className="page-lede mt-3 max-w-2xl text-muted-foreground sm:mt-4">
           {contact?.intro ||
-            'Have a backend, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.'}
+            'Have a fullstack web application, API, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.'}
         </p>
 
         <div className="mt-8 grid items-start gap-5 sm:mt-10 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)] lg:gap-6">

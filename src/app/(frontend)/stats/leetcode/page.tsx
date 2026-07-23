@@ -18,8 +18,20 @@ import { getLeetCodeStats } from '@/lib/stats-data'
 export const metadata: Metadata = {
   alternates: { canonical: '/stats/leetcode' },
   description:
-    'Detailed LeetCode problem-solving, contest, language, and submission statistics for Soumajit Ghosh.',
+    'Detailed LeetCode problem-solving, contest, language, and submission statistics for fullstack developer Soumajit Ghosh.',
+  openGraph: {
+    description:
+      'Detailed LeetCode problem-solving, contest, language, and submission statistics for fullstack developer Soumajit Ghosh.',
+    title: 'LeetCode Stats',
+    type: 'website',
+    url: '/stats/leetcode',
+  },
   title: 'LeetCode Stats',
+  twitter: {
+    card: 'summary_large_image',
+    description: 'LeetCode problem-solving and contest statistics for Soumajit Ghosh.',
+    title: 'LeetCode Stats',
+  },
 }
 
 export const revalidate = 900

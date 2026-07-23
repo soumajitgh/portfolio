@@ -6,7 +6,14 @@ import { HomeStatsFallback, HomeStatsWidget } from '@/components/home-stats-widg
 import { PortfolioShowcase } from '@/components/landing-experience'
 import { PageContainer } from '@/components/page-container'
 import { getPortfolioHome } from '@/lib/portfolio-data'
-import { absoluteURL, serializeJsonLd, siteDescription, siteName, siteTitle } from '@/lib/seo'
+import {
+  absoluteURL,
+  serializeJsonLd,
+  siteDescription,
+  siteName,
+  siteRole,
+  siteTitle,
+} from '@/lib/seo'
 
 export const revalidate = 300
 
@@ -46,7 +53,7 @@ export default async function HomePage() {
         '@id': `${absoluteURL('/')}#person`,
         '@type': 'Person',
         description: siteDescription,
-        jobTitle: 'Backend Developer',
+        jobTitle: siteRole,
         knowsAbout: Array.from(new Set([...skills, ...data.stack.map((topic) => topic.name)])),
         name: siteName,
         sameAs: socialProfiles,

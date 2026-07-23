@@ -12,9 +12,9 @@ import { absoluteURL, nonIndexableRobots, serializeJsonLd } from '@/lib/seo'
 
 export const revalidate = 300
 
-const pageTitle = 'Backend Engineering Blog'
+const pageTitle = 'Fullstack Development Blog'
 const pageDescription =
-  'Practical backend engineering articles by Soumajit Ghosh about APIs, distributed systems, databases, cloud infrastructure, reliability, and developer tooling.'
+  'Practical articles by fullstack developer Soumajit Ghosh about TypeScript, Next.js, APIs, databases, cloud infrastructure, reliability, and developer tooling.'
 
 type BlogSearchParams = {
   label?: string | string[]
@@ -94,7 +94,7 @@ export default async function BlogPage({
         {
           '@type': 'ListItem',
           item: absoluteURL('/blogs'),
-          name: 'Backend Engineering Blog',
+          name: 'Fullstack Development Blog',
           position: 2,
         },
       ],
@@ -127,7 +127,7 @@ export default async function BlogPage({
             </p>
             <h1 className="page-title mt-4 font-semibold">Published Blogs</h1>
             <p className="page-lede mt-3 max-w-2xl text-muted-foreground sm:mt-4">
-              Practical articles on reliable APIs, distributed systems, databases, cloud
+              Practical articles on TypeScript, Next.js, reliable APIs, databases, cloud
               infrastructure, and lessons learned in production.
             </p>
           </div>

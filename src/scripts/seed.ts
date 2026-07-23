@@ -199,12 +199,12 @@ async function seed() {
       carouselRotationInterval: 7000,
       heroCommand: 'soumajit@portfolio:~$ whoami',
       heroDescription:
-        'Designing fast, reliable backend systems with clean boundaries and production-grade attention to detail.',
+        'Building accessible fullstack applications with polished interfaces, reliable APIs, and production-grade attention to detail.',
       heroHeadline: 'Your request\nhas been handled.',
       contact: {
         email: 'soumojitghosh02@gmail.com',
         intro:
-          'Have a backend, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.',
+          'Have a fullstack web application, API, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.',
         socials: [{ label: 'GitHub', url: 'https://github.com/soumajitgh' }],
       },
       interests: [

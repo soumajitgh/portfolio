@@ -5,7 +5,7 @@ import type { BlogPost, Project } from '@/payload-types'
 import config from '@/payload.config'
 
 import type { SocialPreviewIdentity } from './social-preview'
-import { getMediaURL } from './seo'
+import { getMediaURL, siteName, siteRole } from './seo'
 
 const skipDatabaseDuringBuild = process.env.SKIP_DATABASE_DURING_BUILD === 'true'
 
@@ -31,7 +31,7 @@ const providerName = (label: string, url: string) => {
 
 export const getSocialPreviewIdentity = cache(async (): Promise<SocialPreviewIdentity> => {
   if (skipDatabaseDuringBuild) {
-    return { name: 'Soumajit Ghosh', site: 'soumajit.dev', socials: ['github'] }
+    return { name: siteName, role: siteRole, site: 'soumajit.dev', socials: ['github'] }
   }
 
   try {
@@ -48,9 +48,9 @@ export const getSocialPreviewIdentity = cache(async (): Promise<SocialPreviewIde
       ),
     )
 
-    return { name: 'Soumajit Ghosh', site: 'soumajit.dev', socials }
+    return { name: siteName, role: siteRole, site: 'soumajit.dev', socials }
   } catch {
-    return { name: 'Soumajit Ghosh', site: 'soumajit.dev', socials: ['github'] }
+    return { name: siteName, role: siteRole, site: 'soumajit.dev', socials: ['github'] }
   }
 })
 

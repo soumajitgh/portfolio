@@ -6,6 +6,7 @@ export const socialPreviewSize = { height: 630, width: 1200 }
 
 export type SocialPreviewIdentity = {
   name: string
+  role: string
   site: string
   socials: string[]
 }
@@ -254,8 +255,13 @@ export async function renderSocialPreview(content: SocialPreviewContent) {
           position: 'relative',
         }}
       >
-        <div style={{ color: '#c8ccd4', display: 'flex', fontWeight: 600 }}>
-          {content.identity.name.toLowerCase()}
+        <div style={{ alignItems: 'center', display: 'flex' }}>
+          <span style={{ color: '#c8ccd4', fontWeight: 600 }}>
+            {content.identity.name.toLowerCase()}
+          </span>
+          <span style={{ color: '#56b6c2', marginLeft: 12 }}>
+            · {content.identity.role.toLowerCase()}
+          </span>
         </div>
         <div style={{ color: '#8b92a1', display: 'flex' }}>{socialFooter}</div>
       </div>

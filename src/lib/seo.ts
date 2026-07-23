@@ -3,9 +3,10 @@ import type { Media } from '@/payload-types'
 const fallbackSiteURL = 'http://localhost:3000'
 
 export const siteName = 'Soumajit Ghosh'
-export const siteTitle = 'Soumajit Ghosh – Backend Developer'
+export const siteRole = 'Fullstack Developer'
+export const siteTitle = `${siteName} – ${siteRole}`
 export const siteDescription =
-  'Backend developer building reliable APIs, distributed systems, cloud infrastructure, and developer tools.'
+  'Fullstack developer Soumajit Ghosh builds accessible web applications, reliable APIs, and production-ready systems with TypeScript, Next.js, and Payload CMS.'
 
 export function getSiteURL() {
   return (process.env.NEXT_PUBLIC_SITE_URL || fallbackSiteURL).replace(/\/$/, '')

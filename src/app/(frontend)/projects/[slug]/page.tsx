@@ -25,7 +25,7 @@ export async function generateMetadata({
   const project = await getPublishedProject(slug)
   if (!project) return { title: 'soumajit in ~/404' }
 
-  const title = project.seo?.title || `${project.title} – Backend Project`
+  const title = project.seo?.title || `${project.title} – Fullstack Project`
   const description = project.seo?.description || project.shortDescription
   const socialImage = getMediaURL(project.seo?.image || project.coverImage)
 
@@ -103,7 +103,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           {
             '@type': 'ListItem',
             item: absoluteURL('/projects'),
-            name: 'Backend Projects',
+            name: 'Fullstack Projects',
             position: 2,
           },
           {

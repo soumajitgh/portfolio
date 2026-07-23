@@ -31,9 +31,9 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <title>Backend Engineering Blog by Soumajit Ghosh</title>
+  <title>Fullstack Development Blog by Soumajit Ghosh</title>
   <link>${siteURL}/blogs</link>
-  <description>Practical articles about APIs, distributed systems, databases, cloud infrastructure, reliability, and developer tooling.</description>
+  <description>Practical articles about TypeScript, Next.js, APIs, databases, cloud infrastructure, reliability, and developer tooling.</description>
   <language>en-IN</language>
   <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
   ${items}

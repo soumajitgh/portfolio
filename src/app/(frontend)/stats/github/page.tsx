@@ -14,8 +14,20 @@ import { getGitHubStats } from '@/lib/stats-data'
 export const metadata: Metadata = {
   alternates: { canonical: '/stats/github' },
   description:
-    'Detailed GitHub repository, language, contribution, follower, and open-source statistics for Soumajit Ghosh.',
+    'Detailed GitHub repository, language, contribution, follower, and open-source statistics for fullstack developer Soumajit Ghosh.',
+  openGraph: {
+    description:
+      'Detailed GitHub repository, language, contribution, and open-source statistics for fullstack developer Soumajit Ghosh.',
+    title: 'GitHub Stats',
+    type: 'website',
+    url: '/stats/github',
+  },
   title: 'GitHub Stats',
+  twitter: {
+    card: 'summary_large_image',
+    description: 'GitHub contribution and open-source statistics for Soumajit Ghosh.',
+    title: 'GitHub Stats',
+  },
 }
 
 export const revalidate = 900

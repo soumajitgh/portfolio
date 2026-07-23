@@ -9,9 +9,9 @@ import { absoluteURL, nonIndexableRobots, serializeJsonLd } from '@/lib/seo'
 
 export const revalidate = 300
 
-const pageTitle = 'Backend Developer Projects'
+const pageTitle = 'Fullstack Developer Projects'
 const pageDescription =
-  'Explore backend development projects by Soumajit Ghosh, including APIs, distributed systems, cloud infrastructure, open-source software, and developer tools.'
+  'Explore fullstack projects by Soumajit Ghosh, including web applications, APIs, distributed systems, cloud infrastructure, open-source software, and developer tools.'
 
 export async function generateMetadata({
   searchParams,
@@ -99,7 +99,7 @@ export default async function ProjectsPage({
         {
           '@type': 'ListItem',
           item: absoluteURL('/projects'),
-          name: 'Backend Projects',
+          name: 'Fullstack Projects',
           position: 2,
         },
       ],
@@ -132,8 +132,8 @@ export default async function ProjectsPage({
         <h1 className="page-title mt-4 font-semibold">Published projects</h1>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="page-lede max-w-2xl text-muted-foreground">
-            Production-minded APIs, distributed systems, cloud infrastructure, open-source software,
-            and developer tools.
+            Production-minded web applications, APIs, distributed systems, cloud infrastructure,
+            open-source software, and developer tools.
           </p>
           <span
             aria-live="polite"

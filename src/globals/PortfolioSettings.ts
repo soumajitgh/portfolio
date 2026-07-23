@@ -40,7 +40,7 @@ export const PortfolioSettings: GlobalConfig = {
       required: true,
       maxLength: 320,
       defaultValue:
-        'Designing fast, reliable backend systems with clean boundaries and production-grade attention to detail.',
+        'Building accessible fullstack applications with polished interfaces, reliable APIs, and production-grade attention to detail.',
     },
     {
       name: 'resumeFile',
@@ -71,7 +71,7 @@ export const PortfolioSettings: GlobalConfig = {
           required: true,
           maxLength: 320,
           defaultValue:
-            'Have a backend, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.',
+            'Have a fullstack web application, API, infrastructure, or developer tooling problem worth solving? Send the context and I will get back to you.',
         },
         {
           name: 'socials',

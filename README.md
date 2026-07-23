@@ -1,6 +1,6 @@
 # Terminal Backend Portfolio
 
-A production-oriented backend engineering portfolio built with Next.js 16, Payload CMS 3,
+A production-oriented fullstack developer portfolio built with Next.js 16, Payload CMS 3,
 Tailwind CSS, and PostgreSQL. It includes a Payload Admin workspace, draft-enabled projects and blog
 posts, search and topic filtering, anonymous star counters, Resend contact delivery, Cloudflare
 Turnstile protection, optional R2 media storage, and an authenticated Payload MCP endpoint.

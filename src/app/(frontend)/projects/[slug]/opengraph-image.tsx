@@ -1,7 +1,7 @@
 import { getProjectSocialPreview, getSocialPreviewIdentity } from '@/lib/social-preview-data'
 import { renderSocialPreview, socialPreviewSize } from '@/lib/social-preview'
 
-export const alt = 'Backend project by Soumajit Ghosh'
+export const alt = 'Fullstack project by Soumajit Ghosh'
 export const contentType = 'image/png'
 export const revalidate = 300
 export const size = socialPreviewSize
