@@ -55,7 +55,7 @@ export default async function StatsPage() {
         </div>
       </div>
 
-      <div className="mt-9 grid gap-5 lg:grid-cols-2">
+      <div className="mt-9 grid items-start gap-5 lg:grid-cols-2">
         <StatsPanel eyebrow="problem solving" href="/stats/leetcode" title="LeetCode">
           {leetcode.available ? (
             <>
@@ -94,35 +94,7 @@ export default async function StatsPage() {
                 <StatValue label="followers" tone="purple" value={github.followers} />
                 <StatValue label="total forks" tone="cyan" value={github.totalForks} />
               </div>
-              <div className="mt-7">
-                <ContributionDots days={github.contributionDays} />
-              </div>
-              <div className="mt-7">
-                <p className="font-mono text-xs text-muted-foreground">recent repositories</p>
-                <div className="mt-3 space-y-2">
-                  {github.recentRepositories.slice(0, 4).map((repo) => (
-                    <a
-                      className="group flex min-h-11 items-center justify-between gap-3 rounded-md border border-border/70 bg-background/25 px-3 py-2 transition-colors hover:border-primary/50"
-                      href={repo.url}
-                      key={repo.name}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      <span className="min-w-0">
-                        <span className="block truncate font-mono text-xs text-foreground group-hover:text-primary">
-                          {repo.name}
-                        </span>
-                        <span className="block text-[0.6875rem] text-muted-foreground">
-                          {repo.language || 'repository'}
-                        </span>
-                      </span>
-                      <span className="shrink-0 font-mono text-[0.6875rem] text-terminal-yellow">
-                        ★ {repo.stars}
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
+              <ContributionDots days={github.contributionDays} />
             </>
           ) : (
             <StatsUnavailable detail={github.error} label="GitHub stats" />

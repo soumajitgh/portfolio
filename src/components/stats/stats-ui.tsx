@@ -95,21 +95,15 @@ export function ContributionDots({
 }: {
   days: { count: number; date: string }[]
 }) {
-  const now = new Date()
-  const year = now.getUTCFullYear()
-  const month = now.getUTCMonth()
-  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate()
-  const leadingDays = new Date(Date.UTC(year, month, 1)).getUTCDay()
+  const today = new Date()
+  today.setUTCHours(0, 0, 0, 0)
   const counts = new Map(days.map((day) => [day.date, day.count]))
-  const cells: ({ count: number; date: string } | null)[] = Array.from(
-    { length: leadingDays },
-    () => null,
-  )
-
-  for (let day = 1; day <= daysInMonth; day += 1) {
-    const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    cells.push({ count: counts.get(date) || 0, date })
-  }
+  const cells = Array.from({ length: 30 }, (_, index) => {
+    const day = new Date(today)
+    day.setUTCDate(today.getUTCDate() - (29 - index))
+    const date = day.toISOString().slice(0, 10)
+    return { count: counts.get(date) || 0, date }
+  })
 
   const intensity = (count: number) => {
     if (count === 0) return 'border-border/70 bg-muted/60'
@@ -122,33 +116,25 @@ export function ContributionDots({
   return (
     <div className="mt-6 border-t border-border/70 pt-5">
       <div className="flex items-center justify-between gap-4">
-        <p className="font-mono text-xs text-muted-foreground">
-          {new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
-            now,
-          )}
-        </p>
+        <p className="font-mono text-xs text-muted-foreground">Last 30 days</p>
         <p className="font-mono text-[0.6875rem] text-terminal-green">
-          {cells.reduce((total, cell) => total + (cell?.count || 0), 0)} contributions
+          {cells.reduce((total, cell) => total + cell.count, 0)} contributions
         </p>
       </div>
       <div
-        aria-label="GitHub contribution activity for the current month"
+        aria-label="GitHub contribution activity for the last 30 days"
         className="scrollbar-thin mt-3 overflow-x-auto pb-1"
         role="img"
       >
-        <div className="grid w-fit grid-flow-col grid-rows-7 gap-1.5">
-          {cells.map((cell, index) =>
-            cell ? (
-              <span
-                aria-label={`${cell.count} contributions on ${cell.date}`}
-                className={cn('size-3 rounded-[2px] border sm:size-3.5', intensity(cell.count))}
-                key={cell.date}
-                title={`${cell.date}: ${cell.count} contributions`}
-              />
-            ) : (
-              <span aria-hidden="true" className="size-3 sm:size-3.5" key={`empty-${index}`} />
-            ),
-          )}
+        <div className="grid w-max grid-cols-[repeat(10,0.75rem)] gap-1 sm:grid-cols-[repeat(15,0.75rem)] lg:grid-cols-[repeat(30,0.75rem)]">
+          {cells.map((cell) => (
+            <span
+              aria-label={`${cell.count} contributions on ${cell.date}`}
+              className={cn('size-3 rounded-[2px] border', intensity(cell.count))}
+              key={cell.date}
+              title={`${cell.date}: ${cell.count} contributions`}
+            />
+          ))}
         </div>
       </div>
     </div>
