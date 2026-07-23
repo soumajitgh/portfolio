@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 
-import type { DailyActivity, Metric } from '@/lib/stats-data'
+import type { AIUsageStats, DailyActivity, Metric } from '@/lib/stats-data'
 
 import { StatsChart, type StatsChartOption } from './stats-chart'
 
@@ -309,6 +309,113 @@ export function WakaTimeCharts({
           description="WakaTime language share across the most used languages"
           option={modesOption}
         />
+      </div>
+    </div>
+  )
+}
+
+export function AIUsageCharts({ usage }: { usage: AIUsageStats }) {
+  const activeDays = usage.daily.filter((day) => day.aiLines > 0 || day.humanLines > 0)
+  const dailyOption = useMemo<StatsChartOption>(
+    () => ({
+      color: ['#c678dd', '#61afef'],
+      grid: { bottom: 24, containLabel: true, left: 8, right: 12, top: 20 },
+      legend: {
+        bottom: 0,
+        icon: 'circle',
+        itemHeight: 7,
+        itemWidth: 7,
+        textStyle: { color: '#8d96a6', fontFamily: 'JetBrains Mono', fontSize: 9 },
+      },
+      series: [
+        {
+          barMaxWidth: 18,
+          data: activeDays.map((day) => day.aiLines),
+          itemStyle: { borderRadius: [3, 3, 0, 0] },
+          name: 'AI',
+          stack: 'line-changes',
+          type: 'bar',
+        },
+        {
+          barMaxWidth: 18,
+          data: activeDays.map((day) => day.humanLines),
+          itemStyle: { borderRadius: [3, 3, 0, 0] },
+          name: 'Human',
+          stack: 'line-changes',
+          type: 'bar',
+        },
+      ],
+      tooltip: { ...tooltip, trigger: 'axis', valueFormatter: (value) => `${value} lines` },
+      xAxis: {
+        ...axis,
+        axisLabel: {
+          ...axis.axisLabel,
+          formatter: (value: string) =>
+            new Date(`${value}T00:00:00`).toLocaleDateString('en', {
+              day: 'numeric',
+              month: 'short',
+            }),
+          interval: Math.max(Math.floor(activeDays.length / 5) - 1, 0),
+        },
+        data: activeDays.map((day) => day.date),
+        type: 'category',
+      },
+      yAxis: { ...axis, minInterval: 1, type: 'value' },
+    }),
+    [activeDays],
+  )
+  const agentOption = useMemo<StatsChartOption>(
+    () => ({
+      color: colors,
+      legend: {
+        bottom: 0,
+        icon: 'circle',
+        itemGap: 12,
+        itemHeight: 7,
+        itemWidth: 7,
+        textStyle: { color: '#8d96a6', fontFamily: 'JetBrains Mono', fontSize: 9 },
+      },
+      series: [
+        {
+          center: ['50%', '43%'],
+          data: usage.agents.slice(0, 6).map((agent) => ({
+            name: agent.name,
+            value: agent.lines,
+          })),
+          itemStyle: { borderColor: '#272c35', borderWidth: 3 },
+          label: { show: false },
+          radius: ['50%', '72%'],
+          type: 'pie',
+        },
+      ],
+      tooltip: { ...tooltip, trigger: 'item', valueFormatter: (value) => `${value} lines` },
+    }),
+    [usage.agents],
+  )
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <div className="rounded-lg border border-border/70 bg-background/25 p-3">
+        <p className="font-mono text-xs text-muted-foreground">AI vs human line changes</p>
+        <StatsChart
+          className="h-60"
+          description="Daily AI-generated and human-written line changes reported by WakaTime"
+          option={dailyOption}
+        />
+      </div>
+      <div className="rounded-lg border border-border/70 bg-background/25 p-3">
+        <p className="font-mono text-xs text-muted-foreground">agent share</p>
+        {usage.agents.length ? (
+          <StatsChart
+            className="h-60"
+            description="AI-generated line changes grouped by coding agent"
+            option={agentOption}
+          />
+        ) : (
+          <div className="grid h-60 place-items-center px-4 text-center font-mono text-xs text-muted-foreground">
+            Agent-level attribution is not available for this range.
+          </div>
+        )}
       </div>
     </div>
   )

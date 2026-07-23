@@ -21,6 +21,23 @@ export type DailyActivity = {
   text: string
 }
 
+export type AIUsageStats = {
+  additions: number
+  adoptionPercent: number
+  agents: { cost: number; lines: number; name: string }[]
+  aiCodingTime: string
+  available: boolean
+  daily: { aiLines: number; date: string; humanLines: number }[]
+  deletions: number
+  humanLineChanges: number
+  lineChanges: number
+  promptCharacters: number
+  promptEvents: number
+  promptsPerSession: number
+  sessions: number
+  totalCost: number
+}
+
 export type LeetCodeStats = {
   available: boolean
   avatar?: string
@@ -91,6 +108,7 @@ export type GitHubStats = {
 }
 
 export type WakaTimeStats = {
+  ai: AIUsageStats
   available: boolean
   bestDay?: { date: string; seconds: number; text: string }
   daily: DailyActivity[]
@@ -430,8 +448,69 @@ const normalizeMetric = (value: unknown): Metric => {
   }
 }
 
+const emptyAIUsage = (): AIUsageStats => ({
+  additions: 0,
+  adoptionPercent: 0,
+  agents: [],
+  aiCodingTime: '—',
+  available: false,
+  daily: [],
+  deletions: 0,
+  humanLineChanges: 0,
+  lineChanges: 0,
+  promptCharacters: 0,
+  promptEvents: 0,
+  promptsPerSession: 0,
+  sessions: 0,
+  totalCost: 0,
+})
+
+function normalizeAgentUsage(stats: JsonRecord) {
+  const agents = new Map<string, { cost: number; lines: number; name: string }>()
+
+  const addAgent = (name: string, lines: unknown, cost: unknown) => {
+    if (!name) return
+    const current = agents.get(name) || { cost: 0, lines: 0, name }
+    current.lines += number(lines)
+    current.cost += number(cost)
+    agents.set(name, current)
+  }
+
+  const addBreakdown = (value: unknown) => {
+    for (const item of asArray(value)) {
+      const agent = asRecord(item)
+      addAgent(text(agent.name), first(agent.lines, agent.line_changes), agent.cost)
+    }
+  }
+
+  addBreakdown(stats.ai_agent_breakdown)
+  if (!agents.size) {
+    const lineChanges = asRecord(stats.ai_agent_line_changes)
+    const costs = asRecord(stats.ai_agent_costs)
+    for (const [name, lines] of Object.entries(lineChanges)) {
+      addAgent(name, lines, costs[name])
+    }
+  }
+
+  if (!agents.size) {
+    for (const projectValue of asArray(stats.projects)) {
+      const project = asRecord(projectValue)
+      addBreakdown(project.ai_agent_breakdown)
+      if (asArray(project.ai_agent_breakdown).length) continue
+      const lineChanges = asRecord(project.ai_agent_line_changes)
+      const costs = asRecord(project.ai_agent_costs)
+      for (const [name, lines] of Object.entries(lineChanges)) {
+        addAgent(name, lines, costs[name])
+      }
+    }
+  }
+
+  return Array.from(agents.values()).sort((a, b) => b.lines - a.lines)
+}
+
 export async function getWakaTimeStats(): Promise<WakaTimeStats> {
   const empty: WakaTimeStats = {
+    ai: emptyAIUsage(),
     available: false,
     daily: [],
     dailyAverage: '—',
@@ -464,8 +543,63 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
     const summaries = asArray(asRecord(summariesValue).data)
     const allTime = asRecord(asRecord(allTimeValue).data)
     const bestDay = asRecord(stats.best_day)
+    const aiAgents = normalizeAgentUsage(stats)
+    const aiAdditions = number(stats.ai_additions)
+    const aiDeletions = number(stats.ai_deletions)
+    const aiLineChanges = number(stats.ai_line_changes_total, aiAdditions + aiDeletions)
+    const humanLineChanges =
+      number(stats.human_additions) + number(stats.human_deletions)
+    const totalLineChanges = aiLineChanges + humanLineChanges
+    const aiCategory = asArray(stats.categories)
+      .map(asRecord)
+      .find((category) => text(category.name).toLowerCase() === 'ai coding')
+    const aiCodingMetric = normalizeMetric(aiCategory)
+    const aiDaily = summaries.map((summary) => {
+      const entry = asRecord(summary)
+      const range = asRecord(entry.range)
+      const total = asRecord(entry.grand_total)
+      return {
+        aiLines: number(
+          total.ai_line_changes_total,
+          number(total.ai_additions) + number(total.ai_deletions),
+        ),
+        date: text(first(range.date, range.start)).slice(0, 10),
+        humanLines: number(total.human_additions) + number(total.human_deletions),
+      }
+    })
+    const promptEvents = number(stats.ai_prompt_events_total)
+    const sessions = number(stats.ai_sessions)
+    const aiTotalCost = number(
+      stats.ai_agent_total_cost,
+      aiAgents.reduce((sum, agent) => sum + agent.cost, 0),
+    )
+    const hasAIData =
+      aiLineChanges > 0 ||
+      promptEvents > 0 ||
+      sessions > 0 ||
+      aiAgents.length > 0 ||
+      aiCodingMetric.seconds > 0
 
     return {
+      ai: {
+        additions: aiAdditions,
+        adoptionPercent: totalLineChanges ? (aiLineChanges / totalLineChanges) * 100 : 0,
+        agents: aiAgents,
+        aiCodingTime: aiCodingMetric.text || '—',
+        available: hasAIData,
+        daily: aiDaily,
+        deletions: aiDeletions,
+        humanLineChanges,
+        lineChanges: aiLineChanges,
+        promptCharacters: number(stats.ai_prompt_length_sum),
+        promptEvents,
+        promptsPerSession: number(
+          stats.ai_prompt_events_avg_per_session,
+          sessions ? promptEvents / sessions : 0,
+        ),
+        sessions,
+        totalCost: aiTotalCost,
+      },
       available: true,
       bestDay: Object.keys(bestDay).length
         ? {

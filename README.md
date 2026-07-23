@@ -72,6 +72,9 @@ with access to all repositories. The dashboard requests only each private reposi
 and aggregate commit count; it never requests or renders private repository names.
 `WAKATIME_API_KEY` is required for private WakaTime activity and is only read on the server; never
 expose either token through a `NEXT_PUBLIC_` variable.
+When WakaTime reports AI activity, the stats dashboard also shows AI-vs-human line changes,
+adoption percentage, prompts, sessions, per-agent usage, and estimated cost. The section remains
+hidden behind an informative empty state until an AI-enabled WakaTime plugin or agent reports data.
 
 Cloudflare R2 is enabled only when all five `R2_*` values are present. Otherwise Payload uses local
 uploads, which are suitable for development but not an ephemeral production container.
