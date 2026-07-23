@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { FilterSelect } from '@/components/filter-select'
+import { MultiFilterDropdown } from '@/components/multi-filter-dropdown'
 import { ProjectCard } from '@/components/project-card'
 import { ProjectSearch } from '@/components/projects/project-search'
 import { getPublishedProjects } from '@/lib/portfolio-data'
@@ -19,7 +19,7 @@ export async function generateMetadata({
   searchParams: Promise<{ q?: string | string[]; topic?: string | string[] }>
 }): Promise<Metadata> {
   const params = await searchParams
-  const hasFilters = Boolean(firstValue(params.q).trim() || firstValue(params.topic).trim())
+  const hasFilters = Boolean(firstValue(params.q).trim() || allValues(params.topic).length)
 
   return {
     alternates: { canonical: '/projects' },
@@ -48,16 +48,25 @@ export default async function ProjectsPage({
   const params = await searchParams
   const query = firstValue(params.q).trim()
   const normalizedQuery = query.toLowerCase()
-  const topic = firstValue(params.topic).trim().toLowerCase()
+  const selectedTopics = Array.from(
+    new Set(
+      allValues(params.topic)
+        .map((topic) => topic.trim().toLowerCase())
+        .filter(Boolean),
+    ),
+  )
   const projects = await getPublishedProjects()
   const topics = Array.from(
     new Map(
       projects.flatMap((project) => project.topics || []).map((item) => [item.slug, item]),
     ).values(),
   ).sort((a, b) => a.name.localeCompare(b.name))
-  const topicExists = !topic || topics.some((item) => item.slug === topic)
+  const knownTopicSlugs = new Set(topics.map((item) => item.slug))
+  const topicsExist = selectedTopics.every((topic) => knownTopicSlugs.has(topic))
+  const validSelectedTopics = selectedTopics.filter((topic) => knownTopicSlugs.has(topic))
   const visibleProjects = projects.filter((project) => {
-    const matchesTopic = !topic || project.topics?.some((item) => item.slug === topic)
+    const projectTopicSlugs = new Set(project.topics?.map((item) => item.slug) || [])
+    const matchesTopic = validSelectedTopics.every((topic) => projectTopicSlugs.has(topic))
     if (!matchesTopic || !normalizedQuery) return Boolean(matchesTopic)
 
     const searchableText = [
@@ -120,7 +129,7 @@ export default async function ProjectsPage({
         <p className="font-mono text-xs text-terminal-green sm:text-sm">
           soumajit@portfolio:<span className="text-terminal-blue">~</span>$ ls ./projects
         </p>
-        <h1 className="page-title mt-4 font-semibold">Backend development projects</h1>
+        <h1 className="page-title mt-4 font-semibold">Published projects</h1>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="page-lede max-w-2xl text-muted-foreground">
             Production-minded APIs, distributed systems, cloud infrastructure, open-source software,
@@ -138,23 +147,27 @@ export default async function ProjectsPage({
           aria-label="Search and filter projects"
           className="mt-8 rounded-lg border border-border bg-card/40 p-3 sm:p-5"
         >
-          <ProjectSearch initialQuery={query} />
-          {topics.length ? (
-            <div className="mt-3 sm:mt-4">
-              <FilterSelect
+          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]">
+            <ProjectSearch initialQuery={query} />
+            {topics.length ? (
+              <MultiFilterDropdown
                 accessibleLabel="Filter projects by technology"
                 allLabel="All technologies"
+                key={validSelectedTopics.join('|')}
                 name="topic"
                 options={topics.map((item) => ({ label: item.name, value: item.slug }))}
-                value={topicExists ? topic : ''}
+                values={validSelectedTopics}
               />
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </section>
 
-        {!topicExists ? (
+        {!topicsExist ? (
           <div className="mt-10 rounded-lg border border-destructive/40 bg-card p-6 font-mono text-sm">
-            <p className="text-terminal-red">error: unknown topic &quot;{topic}&quot;</p>
+            <p className="text-terminal-red">
+              error: unknown topic &quot;
+              {selectedTopics.filter((topic) => !knownTopicSlugs.has(topic)).join(', ')}&quot;
+            </p>
             <Link
               className="mt-2 inline-block text-primary hover:underline"
               href={projectsHref({ query })}
@@ -173,10 +186,10 @@ export default async function ProjectsPage({
             {query ? (
               <>
                 <p>0 projects matched &quot;{query}&quot;</p>
-                <p className="mt-2">Try another term or clear the active topic.</p>
+                <p className="mt-2">Try another term or clear the active technologies.</p>
                 <Link
                   className="mt-3 inline-block text-primary hover:underline"
-                  href={projectsHref({ topic })}
+                  href={projectsHref({ topics: validSelectedTopics })}
                 >
                   ./clear-search
                 </Link>
@@ -198,9 +211,12 @@ export default async function ProjectsPage({
 const firstValue = (value?: string | string[]) =>
   Array.isArray(value) ? value[0] || '' : value || ''
 
-function projectsHref({ query, topic }: { query?: string; topic?: string }) {
+const allValues = (value?: string | string[]) =>
+  (Array.isArray(value) ? value : value ? [value] : []).filter(Boolean)
+
+function projectsHref({ query, topics = [] }: { query?: string; topics?: string[] }) {
   const params = new URLSearchParams()
   if (query) params.set('q', query)
-  if (topic) params.set('topic', topic)
+  for (const topic of topics) params.append('topic', topic)
   return params.size ? `/projects?${params.toString()}` : '/projects'
 }

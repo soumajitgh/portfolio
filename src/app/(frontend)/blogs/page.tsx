@@ -125,7 +125,7 @@ export default async function BlogPage({
             <p className="font-mono text-xs text-terminal-green sm:text-sm">
               soumajit@portfolio:<span className="text-terminal-blue">~</span>$ ls ./blogs
             </p>
-            <h1 className="page-title mt-4 font-semibold">Backend engineering blog</h1>
+            <h1 className="page-title mt-4 font-semibold">Published Blogs</h1>
             <p className="page-lede mt-3 max-w-2xl text-muted-foreground sm:mt-4">
               Practical articles on reliable APIs, distributed systems, databases, cloud
               infrastructure, and lessons learned in production.
