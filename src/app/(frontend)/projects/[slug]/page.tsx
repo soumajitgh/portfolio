@@ -28,27 +28,26 @@ export async function generateMetadata({
   const title = project.seo?.title || `${project.title} – Backend Project`
   const description = project.seo?.description || project.shortDescription
   const socialImage = getMediaURL(project.seo?.image || project.coverImage)
-  const images = socialImage ? [{ alt: project.title, url: socialImage }] : undefined
 
   return {
     alternates: { canonical: `/projects/${project.slug}` },
     description,
     openGraph: {
       description,
-      images,
       modifiedTime: project.updatedAt,
       publishedTime: project.publishedAt || undefined,
       tags: project.topics?.map((topic) => topic.name),
       title,
       type: 'article',
       url: `/projects/${project.slug}`,
+      ...(socialImage ? { images: [{ alt: project.title, url: socialImage }] } : {}),
     },
     title,
     twitter: {
       card: 'summary_large_image',
       description,
-      images: socialImage ? [socialImage] : undefined,
       title,
+      ...(socialImage ? { images: [socialImage] } : {}),
     },
   }
 }

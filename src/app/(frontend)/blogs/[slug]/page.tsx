@@ -27,7 +27,6 @@ export async function generateMetadata({
   const title = post.seo?.title || post.title
   const description = post.seo?.description || post.excerpt || post.title
   const socialImage = getMediaURL(post.seo?.image)
-  const images = socialImage ? [{ alt: post.title, url: socialImage }] : undefined
 
   return {
     alternates: { canonical: `/blogs/${post.slug}` },
@@ -36,7 +35,6 @@ export async function generateMetadata({
     openGraph: {
       authors: [absoluteURL('/')],
       description,
-      images,
       modifiedTime: post.updatedAt,
       publishedTime: post.publishedAt || undefined,
       section: 'Backend Engineering',
@@ -44,13 +42,14 @@ export async function generateMetadata({
       title,
       type: 'article',
       url: `/blogs/${post.slug}`,
+      ...(socialImage ? { images: [{ alt: post.title, url: socialImage }] } : {}),
     },
     title,
     twitter: {
       card: 'summary_large_image',
       description,
-      images: socialImage ? [socialImage] : undefined,
       title,
+      ...(socialImage ? { images: [socialImage] } : {}),
     },
   }
 }

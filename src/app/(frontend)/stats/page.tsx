@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 
 import { DifficultyChart, WakaTimeCharts } from '@/components/stats/stats-charts'
 import {
-  Rank,
+  ContributionDots,
   StatValue,
   StatsPanel,
   StatsUnavailable,
@@ -52,9 +52,8 @@ export default async function StatsPage() {
         <StatsPanel eyebrow="problem solving" href="/stats/leetcode" title="LeetCode">
           {leetcode.available ? (
             <>
-              <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="mt-6 grid grid-cols-3 gap-4">
                 <StatValue label="problems solved" tone="green" value={leetcode.solved.total} />
-                <StatValue label="global rank" value={<Rank value={leetcode.profileRanking} />} />
                 <StatValue
                   label="contest rating"
                   tone="yellow"
@@ -87,6 +86,9 @@ export default async function StatsPage() {
                 <StatValue label="total stars" tone="yellow" value={github.totalStars} />
                 <StatValue label="followers" tone="purple" value={github.followers} />
                 <StatValue label="total forks" tone="cyan" value={github.totalForks} />
+              </div>
+              <div className="mt-7">
+                <ContributionDots days={github.contributionDays} />
               </div>
               <div className="mt-7">
                 <p className="font-mono text-xs text-muted-foreground">recent repositories</p>
