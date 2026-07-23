@@ -154,7 +154,13 @@ export const Projects: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'status', type: 'select', required: true, options: [...projectStatuses] },
+        {
+          name: 'status',
+          type: 'select',
+          enumName: 'enum_projects_lifecycle_status',
+          required: true,
+          options: [...projectStatuses],
+        },
         { name: 'accent', type: 'select', defaultValue: 'blue', options: [...accentOptions] },
       ],
     },

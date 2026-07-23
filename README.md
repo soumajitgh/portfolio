@@ -1,16 +1,17 @@
 # Terminal Backend Portfolio
 
 A production-oriented backend engineering portfolio built with Next.js 16, Payload CMS 3,
-Tailwind CSS, and libSQL. It includes a Payload Admin workspace, draft-enabled projects and blog
+Tailwind CSS, and PostgreSQL. It includes a Payload Admin workspace, draft-enabled projects and blog
 posts, search and topic filtering, anonymous star counters, Resend contact delivery, Cloudflare
 Turnstile protection, optional R2 media storage, and a read-only Payload MCP endpoint.
 
 ## Local development
 
-Requirements: Node.js 20.9+ and pnpm 11.
+Requirements: Node.js 20.9+, pnpm 11, and PostgreSQL 15+.
 
 ```bash
 cp .env.example .env
+docker compose up -d postgres
 pnpm install
 pnpm payload migrate
 pnpm seed
@@ -21,16 +22,15 @@ Open `http://localhost:3000` for the portfolio and `http://localhost:3000/admin`
 Admin. The seed command is idempotent: it updates portfolio settings and creates missing sample
 content without duplicating existing records.
 
+To run both PostgreSQL and the application in containers instead, use `docker compose up`. Compose
+waits for PostgreSQL to become healthy, applies pending migrations, and then starts Payload. The
+`postgres_data` volume preserves local database data between restarts. Set `POSTGRES_PORT` if port
+5432 is already occupied.
+
 ## Environment
 
 ```text
-# Local SQLite
-DATABASE_URL=file:./portfolio.db
-DATABASE_AUTH_TOKEN=
-
-# Hosted libSQL in production
-# DATABASE_URL=libsql://YOUR-DATABASE-HOST
-# DATABASE_AUTH_TOKEN=YOUR-DATABASE-TOKEN
+DATABASE_URL=postgresql://payload:payload@localhost:5432/portfolio
 
 PAYLOAD_SECRET=replace-with-a-long-random-secret
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
@@ -51,10 +51,10 @@ R2_ENDPOINT=https://ACCOUNT_ID.r2.cloudflarestorage.com
 R2_PUBLIC_URL=https://media.your-domain.com
 ```
 
-`DATABASE_AUTH_TOKEN` can stay empty for a local file database. Contact mail is sent with Resend;
-`CONTACT_TO_EMAIL` overrides the public contact address configured in Payload. Turnstile protects
-contact submissions and star mutations. `TURNSTILE_ALLOWED_HOSTNAMES` is an optional
-comma-separated allowlist.
+Use the PostgreSQL connection URL supplied by the hosting provider in production. Contact mail is
+sent with Resend; `CONTACT_TO_EMAIL` overrides the public contact address configured in Payload.
+Turnstile protects contact submissions and star mutations. `TURNSTILE_ALLOWED_HOSTNAMES` is an
+optional comma-separated allowlist.
 
 Cloudflare R2 is enabled only when all five `R2_*` values are present. Otherwise Payload uses local
 uploads, which are suitable for development but not an ephemeral production container.
@@ -124,18 +124,19 @@ changes.
 
 ## Docker and Dokploy
 
-The Dockerfile builds a Next.js standalone image as the non-root `nextjs` user. It uses a disposable
-SQLite database only while prerendering build-time pages. The running application connects to the
-hosted libSQL instance supplied through environment variables.
+The Dockerfile builds a Next.js standalone image as the non-root `nextjs` user. Payload-backed
+routes render dynamically, so image builds do not connect to PostgreSQL. The running application
+uses the PostgreSQL instance supplied through `DATABASE_URL`.
 
-Create a Dokploy application from this repository with:
+Create a PostgreSQL database and an application in the same Dokploy environment. Configure the
+application with:
 
 - Build type: `Dockerfile`
 - Dockerfile path: `Dockerfile`
 - Container port: `3000`
 - Health check path: `/`
 - HTTPS domain: your public portfolio domain
-- Persistent volume: not required when using hosted libSQL and R2
+- Persistent volume: not required for the application when using PostgreSQL and R2
 
 Set these build arguments because Next.js embeds public values and image host configuration during
 the image build:
@@ -149,11 +150,14 @@ R2_PUBLIC_URL=https://media.your-domain.com
 Set the complete environment list from the Environment section as runtime variables, especially:
 
 ```text
-DATABASE_URL=libsql://YOUR-DATABASE-HOST
-DATABASE_AUTH_TOKEN=YOUR-DATABASE-TOKEN
+DATABASE_URL=postgresql://USER:PASSWORD@DOKPLOY_POSTGRES_HOST:5432/DATABASE
 PAYLOAD_SECRET=YOUR-LONG-RANDOM-SECRET
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
+
+Use Dokploy's internal PostgreSQL connection URL when the application and database are on the same
+network. Do not embed `DATABASE_URL` as a Docker build argument. If a password contains URL-reserved
+characters, use the exact URL emitted by Dokploy or percent-encode the password.
 
 Deploy a single application instance while automatic production migrations are enabled. If the
 application is scaled horizontally later, move migrations to a one-off pre-deploy job so only one

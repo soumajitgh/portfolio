@@ -1,4 +1,4 @@
-import { sql } from '@payloadcms/db-sqlite'
+import { sql } from '@payloadcms/db-postgres'
 import type { PayloadRequest } from 'payload'
 
 type CounterResult = {
@@ -6,7 +6,7 @@ type CounterResult = {
 }
 
 export const allocateBlogIssueNumber = async (req: PayloadRequest) => {
-  const result = (await req.payload.db.drizzle.run(sql`
+  const result = (await req.payload.db.drizzle.execute(sql`
     UPDATE blog_issue_counter
     SET value = value + 1
     WHERE id = 1

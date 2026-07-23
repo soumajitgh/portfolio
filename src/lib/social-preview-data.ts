@@ -6,6 +6,8 @@ import config from '@/payload.config'
 
 import type { SocialPreviewIdentity } from './social-preview'
 
+const skipDatabaseDuringBuild = process.env.SKIP_DATABASE_DURING_BUILD === 'true'
+
 export type BlogSocialPreviewData = Pick<
   BlogPost,
   'excerpt' | 'issueNumber' | 'labels' | 'publishedAt' | 'slug' | 'title'
@@ -27,6 +29,10 @@ const providerName = (label: string, url: string) => {
 }
 
 export const getSocialPreviewIdentity = cache(async (): Promise<SocialPreviewIdentity> => {
+  if (skipDatabaseDuringBuild) {
+    return { name: 'Soumajit Ghosh', site: 'soumajit.dev', socials: ['github'] }
+  }
+
   try {
     const payload = await getPayload({ config })
     const settings = await payload.findGlobal({
@@ -49,6 +55,8 @@ export const getSocialPreviewIdentity = cache(async (): Promise<SocialPreviewIde
 
 export const getProjectSocialPreview = cache(
   async (slug: string): Promise<ProjectSocialPreviewData | null> => {
+    if (skipDatabaseDuringBuild) return null
+
     const payload = await getPayload({ config })
     const result = await payload.find({
       collection: 'projects',
@@ -81,6 +89,8 @@ export const getProjectSocialPreview = cache(
 
 export const getBlogSocialPreview = cache(
   async (slug: string): Promise<BlogSocialPreviewData | null> => {
+    if (skipDatabaseDuringBuild) return null
+
     const payload = await getPayload({ config })
     const result = await payload.find({
       collection: 'blog-posts',

@@ -4,7 +4,7 @@
 !.env.example
 .git
 .github
-.next
+.next*
 .vscode
 node_modules
 portfolio.db

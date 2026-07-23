@@ -1,4 +1,4 @@
-import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { BlocksFeature, CodeBlock, lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -55,17 +55,14 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: sqliteAdapter({
-    busyTimeout: 5000,
-    client: {
-      authToken: process.env.DATABASE_AUTH_TOKEN,
-      url: process.env.DATABASE_URL || '',
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URL || '',
     },
     // Migrations include database-level constraints and the atomic blog counter,
     // so automatic development pushes must not compete with them at startup.
     prodMigrations: migrations,
     push: false,
-    wal: (process.env.DATABASE_URL || '').startsWith('file:'),
   }),
   sharp,
   plugins: [

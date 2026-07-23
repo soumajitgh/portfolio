@@ -11,12 +11,13 @@ FROM deps AS builder
 WORKDIR /app
 COPY . .
 
-# Next.js renders data-backed routes during the build. Use a disposable SQLite
-# database; Payload applies the checked-in migrations through prodMigrations.
+# Payload-backed pages render dynamically and connect to PostgreSQL at runtime.
+# This non-routable placeholder is only parsed while Next.js builds the image.
 ARG NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
 ARG R2_PUBLIC_URL
-ENV DATABASE_URL=file:/tmp/portfolio-build.db
+ENV DATABASE_URL=postgresql://build:build@127.0.0.1:5432/portfolio_build
+ENV SKIP_DATABASE_DURING_BUILD=true
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
 ENV R2_PUBLIC_URL=$R2_PUBLIC_URL
@@ -41,17 +42,6 @@ RUN mkdir -p .next && chown nextjs:nodejs .next
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Next traces the libSQL native package but does not preserve pnpm's optional
-# dependency symlink. Recreate it for the image's CPU architecture.
-RUN set -eu; \
-  libsql_platform="linux-$(node -p 'process.arch')-musl"; \
-  libsql_target="$(find /app/node_modules/.pnpm -type d -path "*/node_modules/@libsql/${libsql_platform}" -print -quit)"; \
-  libsql_modules="$(find /app/node_modules/.pnpm -type d -path "*/libsql@*/node_modules" -print -quit)"; \
-  test -n "$libsql_target"; \
-  test -n "$libsql_modules"; \
-  mkdir -p "$libsql_modules/@libsql"; \
-  ln -s "$libsql_target" "$libsql_modules/@libsql/$libsql_platform"
 
 USER nextjs
 

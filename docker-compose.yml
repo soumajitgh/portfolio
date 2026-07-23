@@ -1,17 +1,39 @@
-version: '3'
-
 services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_PASSWORD: payload
+      POSTGRES_USER: payload
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U payload -d portfolio']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   payload:
-    image: node:20-alpine
+    image: node:22.17.0-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - '3000:3000'
     volumes:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
-    working_dir: /home/node/app/
-    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
+    working_dir: /home/node/app
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm payload migrate && pnpm dev"
     env_file:
       - .env
+    environment:
+      DATABASE_URL: postgresql://payload:payload@postgres:5432/portfolio
 
 volumes:
   node_modules:
+  postgres_data:

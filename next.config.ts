@@ -8,6 +8,7 @@ const dirname = path.dirname(__filename)
 const r2PublicURL = process.env.R2_PUBLIC_URL
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   output: 'standalone',
   redirects: async () => [
     {
@@ -25,10 +26,8 @@ const nextConfig: NextConfig = {
     '/*': [
       './node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.ttf',
       './node_modules/geist/dist/fonts/geist-mono/GeistMono-SemiBold.ttf',
-      './node_modules/.pnpm/@libsql+linux-*-musl@*/node_modules/@libsql/**/*',
     ],
   },
-  serverExternalPackages: ['@libsql/client', '@payloadcms/db-sqlite', 'libsql'],
   images: {
     localPatterns: [
       {
