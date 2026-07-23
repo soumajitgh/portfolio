@@ -743,14 +743,6 @@ export interface PortfolioSetting {
   heroCommand: string;
   heroHeadline: string;
   heroDescription: string;
-  primaryAction: {
-    label: string;
-    url: string;
-  };
-  secondaryAction: {
-    label: string;
-    url: string;
-  };
   /**
    * PDF downloaded by the Resume button on the home page.
    */
@@ -808,18 +800,6 @@ export interface PortfolioSettingsSelect<T extends boolean = true> {
   heroCommand?: T;
   heroHeadline?: T;
   heroDescription?: T;
-  primaryAction?:
-    | T
-    | {
-        label?: T;
-        url?: T;
-      };
-  secondaryAction?:
-    | T
-    | {
-        label?: T;
-        url?: T;
-      };
   resumeFile?: T;
   contact?:
     | T

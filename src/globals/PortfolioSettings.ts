@@ -3,16 +3,6 @@ import type { GlobalConfig } from 'payload'
 import { skillCategories, validateWebURL } from '@/lib/content'
 import { scheduleRevalidation } from '@/lib/revalidation'
 
-const actionFields = [
-  { name: 'label', type: 'text' as const, required: true },
-  {
-    name: 'url',
-    type: 'text' as const,
-    required: true,
-    validate: (value: unknown) => validateWebURL(value as string),
-  },
-]
-
 export const PortfolioSettings: GlobalConfig = {
   slug: 'portfolio-settings',
   label: 'Portfolio settings',
@@ -51,18 +41,6 @@ export const PortfolioSettings: GlobalConfig = {
       maxLength: 320,
       defaultValue:
         'Designing fast, reliable backend systems with clean boundaries and production-grade attention to detail.',
-    },
-    {
-      name: 'primaryAction',
-      type: 'group',
-      defaultValue: { label: './view-projects', url: '/projects' },
-      fields: actionFields,
-    },
-    {
-      name: 'secondaryAction',
-      type: 'group',
-      defaultValue: { label: './explore-stack', url: '#portfolio' },
-      fields: actionFields,
     },
     {
       name: 'resumeFile',

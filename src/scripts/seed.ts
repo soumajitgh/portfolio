@@ -233,8 +233,6 @@ async function seed() {
           description: 'Building in public and improving shared foundations.',
         },
       ],
-      primaryAction: { label: './view-projects', url: '/projects' },
-      secondaryAction: { label: './explore-stack', url: '#portfolio' },
       skills: [
         {
           category: 'languages',

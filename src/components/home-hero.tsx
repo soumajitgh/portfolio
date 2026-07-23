@@ -4,29 +4,15 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import type { PortfolioHomeData } from '@/lib/portfolio-data'
 
-function HeroAction({
-  action,
-  primary = false,
-}: {
-  action: { label: string; url: string }
-  primary?: boolean
-}) {
-  const label = action.label || './view-projects'
-  const url = action.url || '/projects'
-  const external = url.startsWith('http')
-
+function PrimaryAction() {
   return (
     <Button
       asChild
       className="h-auto min-h-11 w-full whitespace-normal py-2 sm:w-auto md:min-h-9"
-      variant={primary ? 'default' : 'outline'}
+      variant="default"
     >
-      <Link
-        href={url}
-        rel={external ? 'noopener noreferrer' : undefined}
-        target={external ? '_blank' : undefined}
-      >
-        {label} {primary ? <ArrowUpRight aria-hidden="true" /> : null}
+      <Link href="/projects">
+        ./view-projects <ArrowUpRight aria-hidden="true" />
       </Link>
     </Button>
   )
@@ -45,7 +31,7 @@ export function HomeHero({ settings }: Pick<PortfolioHomeData, 'settings'>) {
         {settings.heroDescription}
       </p>
       <div className="mt-4 flex flex-col gap-2 sm:mt-[clamp(1rem,2.5dvh,2rem)] sm:flex-row sm:flex-wrap sm:gap-3">
-        <HeroAction action={settings.primaryAction} primary />
+        <PrimaryAction />
         <Button asChild className="w-full sm:w-auto" variant="outline">
           <a href="/resume">
             ./resume <Download aria-hidden="true" />
