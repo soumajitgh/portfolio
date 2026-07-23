@@ -2,7 +2,7 @@
 
 import { Pin, PinOff } from 'lucide-react'
 import Link from 'next/link'
-import { type KeyboardEvent, useCallback, useEffect, useState } from 'react'
+import { type KeyboardEvent, type ReactNode, useCallback, useEffect, useState } from 'react'
 
 import { HomeBlogPosts } from '@/components/home-blog-posts'
 import { ProjectRail } from '@/components/project-rail'
@@ -14,15 +14,22 @@ import { cn } from '@/lib/utils'
 
 const panels = [
   { id: 'projects', label: 'Projects' },
-  { id: 'blog', label: 'Blog' },
+  { id: 'blog', label: 'Posts' },
   { id: 'stack', label: 'Stack' },
+  { id: 'stats', label: 'Stats' },
 ] as const
 
 type PanelID = (typeof panels)[number]['id']
 
 const pinnedPanelKey = 'portfolio:pinned-panel'
 
-export function PortfolioShowcase({ blogPosts, projects, settings, stack }: PortfolioHomeData) {
+export function PortfolioShowcase({
+  blogPosts,
+  projects,
+  settings,
+  stack,
+  statsPanel,
+}: PortfolioHomeData & { statsPanel: ReactNode }) {
   const [activePanel, setActivePanel] = useState<PanelID>('projects')
   const [isPaused, setIsPaused] = useState(false)
   const [isDocumentHidden, setIsDocumentHidden] = useState(false)
@@ -48,7 +55,9 @@ export function PortfolioShowcase({ blogPosts, projects, settings, stack }: Port
 
   useEffect(() => {
     const stored = window.localStorage.getItem(pinnedPanelKey)
-    if (stored !== 'projects' && stored !== 'blog' && stored !== 'stack') return
+    if (stored !== 'projects' && stored !== 'blog' && stored !== 'stack' && stored !== 'stats') {
+      return
+    }
 
     const timer = window.setTimeout(() => {
       setPinnedPanel(stored)
@@ -190,6 +199,7 @@ export function PortfolioShowcase({ blogPosts, projects, settings, stack }: Port
           >
             {panel.id === 'projects' && <ProjectRail projects={projects} />}
             {panel.id === 'blog' && <HomeBlogPosts posts={blogPosts} />}
+            {panel.id === 'stats' && statsPanel}
             {panel.id === 'stack' && (
               <Card className="h-full gap-4 overflow-auto px-5 py-5 sm:px-6">
                 <div className="flex items-center justify-between gap-4 font-mono text-xs">

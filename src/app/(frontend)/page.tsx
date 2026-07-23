@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 
 import { HomeHero } from '@/components/home-hero'
+import { HomeStatsFallback, HomeStatsWidget } from '@/components/home-stats-widget'
 import { PortfolioShowcase } from '@/components/landing-experience'
 import { PageContainer } from '@/components/page-container'
 import { getPortfolioHome } from '@/lib/portfolio-data'
@@ -74,7 +76,14 @@ export default async function HomePage() {
     <div className="landing-shell">
       <PageContainer className="landing-main">
         <HomeHero settings={data.settings} />
-        <PortfolioShowcase {...data} />
+        <PortfolioShowcase
+          {...data}
+          statsPanel={
+            <Suspense fallback={<HomeStatsFallback />}>
+              <HomeStatsWidget />
+            </Suspense>
+          }
+        />
         <script
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
           type="application/ld+json"

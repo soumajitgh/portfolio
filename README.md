@@ -38,6 +38,11 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_...
 NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 
+LEETCODE_USERNAME=soumajitgh
+GITHUB_USERNAME=soumajitgh
+GITHUB_STATS_TOKEN=github_pat_...
+WAKATIME_API_KEY=waka_...
+
 RESEND_API_KEY=re_...
 EMAIL_FROM_ADDRESS=contact@your-domain.com
 EMAIL_FROM_NAME=soumajit.dev
@@ -58,6 +63,15 @@ Use the PostgreSQL connection URL supplied by the hosting provider in production
 sent with Resend; `CONTACT_TO_EMAIL` overrides the public contact address configured in Payload.
 Turnstile protects contact submissions and star mutations. `TURNSTILE_ALLOWED_HOSTNAMES` is an
 optional comma-separated allowlist.
+
+The `/stats` dashboard reads LeetCode through alfa-leetcode-api and GitHub through the public REST
+API. `LEETCODE_USERNAME` and `GITHUB_USERNAME` default to `soumajitgh`. A read-only
+`GITHUB_STATS_TOKEN` is optional and enables the detailed contribution graph while increasing API
+rate limits. To include private commit counts, use a fine-grained token owned by the profile user
+with access to all repositories. The dashboard requests only each private repository's visibility
+and aggregate commit count; it never requests or renders private repository names.
+`WAKATIME_API_KEY` is required for private WakaTime activity and is only read on the server; never
+expose either token through a `NEXT_PUBLIC_` variable.
 
 Cloudflare R2 is enabled only when all five `R2_*` values are present. Otherwise Payload uses local
 uploads, which are suitable for development but not an ephemeral production container.
