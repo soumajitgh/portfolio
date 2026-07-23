@@ -536,7 +536,16 @@
 }
 
 @media (max-width: 767px) {
+  .landing-shell {
+    height: auto;
+    min-height: calc(100dvh - 4rem);
+    overflow: visible;
+  }
+
   .landing-main {
+    height: auto;
+    min-height: calc(100dvh - 4rem);
+    grid-template-rows: auto auto;
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
 
