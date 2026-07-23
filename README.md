@@ -3,7 +3,7 @@
 A production-oriented backend engineering portfolio built with Next.js 16, Payload CMS 3,
 Tailwind CSS, and PostgreSQL. It includes a Payload Admin workspace, draft-enabled projects and blog
 posts, search and topic filtering, anonymous star counters, Resend contact delivery, Cloudflare
-Turnstile protection, optional R2 media storage, and a read-only Payload MCP endpoint.
+Turnstile protection, optional R2 media storage, and an authenticated Payload MCP endpoint.
 
 ## Local development
 
@@ -61,17 +61,17 @@ uploads, which are suitable for development but not an ephemeral production cont
 
 ## Payload MCP
 
-The MCP endpoint is `POST /api/mcp`. It exposes read-only access to:
+The MCP endpoint is `POST /api/mcp`. It exposes:
 
-- `blog-posts`: find
-- `projects`: find
-- `portfolio-settings`: find
+- `blog-posts`: find, create, update, and delete
+- `projects`: find, create, update, and delete
+- `portfolio-settings`: find and update
 
 Create an API key after the database migrations have run:
 
 1. Sign in at `/admin`.
 2. Open **MCP → API Keys** and create a key associated with an admin user.
-3. Enable the permitted `find` capabilities and copy the generated key.
+3. Enable the capabilities that client should receive and copy the generated key.
 4. Configure an MCP client with the production endpoint and Bearer token:
 
 ```json
@@ -89,7 +89,8 @@ Create an API key after the database migrations have run:
 ```
 
 The plugin configuration and API-key toggles are both enforced, along with the existing Payload
-collection access rules. Create, update, and delete operations are disabled in code.
+collection access rules. The MCP key must be associated with an authenticated user for write
+operations.
 
 ## Content model
 

@@ -70,30 +70,17 @@ export default buildConfig({
       collections: {
         'blog-posts': {
           description: 'Published portfolio blog posts and their display metadata.',
-          enabled: {
-            find: true,
-            create: false,
-            update: false,
-            delete: false,
-          },
+          enabled: true,
         },
         projects: {
           description: 'Published portfolio projects, technologies, media, and external links.',
-          enabled: {
-            find: true,
-            create: false,
-            update: false,
-            delete: false,
-          },
+          enabled: true,
         },
       },
       globals: {
         'portfolio-settings': {
           description: 'Portfolio hero, contact, social, and home-page display settings.',
-          enabled: {
-            find: true,
-            update: false,
-          },
+          enabled: true,
         },
       },
     }),

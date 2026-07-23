@@ -378,18 +378,46 @@ export interface PayloadMcpApiKey {
      * Allow clients to find blog-posts.
      */
     find?: boolean | null;
+    /**
+     * Allow clients to create blog-posts.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update blog-posts.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete blog-posts.
+     */
+    delete?: boolean | null;
   };
   projects?: {
     /**
      * Allow clients to find projects.
      */
     find?: boolean | null;
+    /**
+     * Allow clients to create projects.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update projects.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete projects.
+     */
+    delete?: boolean | null;
   };
   portfolioSettings?: {
     /**
      * Allow clients to find portfolio-settings global.
      */
     find?: boolean | null;
+    /**
+     * Allow clients to update portfolio-settings global.
+     */
+    update?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -677,16 +705,23 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
     | T
     | {
         find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
       };
   projects?:
     | T
     | {
         find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
       };
   portfolioSettings?:
     | T
     | {
         find?: T;
+        update?: T;
       };
   updatedAt?: T;
   createdAt?: T;
