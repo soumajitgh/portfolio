@@ -1,0 +1,16 @@
+.agents
+.env
+.env.*
+!.env.example
+.git
+.github
+.next
+.vscode
+node_modules
+portfolio.db
+portfolio.db-*
+test-results
+playwright-report
+coverage
+*.log
+*.tsbuildinfo

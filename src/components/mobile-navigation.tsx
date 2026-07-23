@@ -11,7 +11,6 @@ const links = [
   { href: '/blogs', label: './blogs' },
   { href: '/projects', label: './projects' },
   { href: '/contact', label: './contact' },
-  { href: '/admin', label: './admin' },
 ]
 
 export function MobileNavigation() {

@@ -25,8 +25,10 @@ const nextConfig: NextConfig = {
     '/*': [
       './node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.ttf',
       './node_modules/geist/dist/fonts/geist-mono/GeistMono-SemiBold.ttf',
+      './node_modules/.pnpm/@libsql+linux-*-musl@*/node_modules/@libsql/**/*',
     ],
   },
+  serverExternalPackages: ['@libsql/client', '@payloadcms/db-sqlite', 'libsql'],
   images: {
     localPatterns: [
       {

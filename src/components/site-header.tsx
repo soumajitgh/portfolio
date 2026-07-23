@@ -27,9 +27,6 @@ export function SiteHeader() {
           <Button asChild className="px-2 sm:px-3" size="sm" variant="ghost">
             <Link href="/contact">./contact</Link>
           </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/admin">./admin</Link>
-          </Button>
         </div>
         <MobileNavigation />
       </nav>

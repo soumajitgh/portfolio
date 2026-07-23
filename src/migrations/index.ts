@@ -6,6 +6,7 @@ import * as migration_20260722_173500_update_hero_copy from './20260722_173500_u
 import * as migration_20260722_174500_ensure_blog_issue_counter from './20260722_174500_ensure_blog_issue_counter'
 import * as migration_20260722_175229_blog_stars from './20260722_175229_blog_stars'
 import * as migration_20260722_175734_home_blog_tab from './20260722_175734_home_blog_tab'
+import * as migration_20260723_092742_add_payload_mcp from './20260723_092742_add_payload_mcp'
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20260722_175734_home_blog_tab.up,
     down: migration_20260722_175734_home_blog_tab.down,
     name: '20260722_175734_home_blog_tab',
+  },
+  {
+    up: migration_20260723_092742_add_payload_mcp.up,
+    down: migration_20260723_092742_add_payload_mcp.down,
+    name: '20260723_092742_add_payload_mcp',
   },
 ]

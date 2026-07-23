@@ -11,7 +11,9 @@ function HeroAction({
   action: { label: string; url: string }
   primary?: boolean
 }) {
-  const external = action.url.startsWith('http')
+  const label = action.label || './view-projects'
+  const url = action.url || '/projects'
+  const external = url.startsWith('http')
 
   return (
     <Button
@@ -20,11 +22,11 @@ function HeroAction({
       variant={primary ? 'default' : 'outline'}
     >
       <Link
-        href={action.url}
+        href={url}
         rel={external ? 'noopener noreferrer' : undefined}
         target={external ? '_blank' : undefined}
       >
-        {action.label} {primary ? <ArrowUpRight aria-hidden="true" /> : null}
+        {label} {primary ? <ArrowUpRight aria-hidden="true" /> : null}
       </Link>
     </Button>
   )

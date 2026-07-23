@@ -52,8 +52,18 @@ export const PortfolioSettings: GlobalConfig = {
       defaultValue:
         'Designing fast, reliable backend systems with clean boundaries and production-grade attention to detail.',
     },
-    { name: 'primaryAction', type: 'group', fields: actionFields },
-    { name: 'secondaryAction', type: 'group', fields: actionFields },
+    {
+      name: 'primaryAction',
+      type: 'group',
+      defaultValue: { label: './view-projects', url: '/projects' },
+      fields: actionFields,
+    },
+    {
+      name: 'secondaryAction',
+      type: 'group',
+      defaultValue: { label: './explore-stack', url: '#portfolio' },
+      fields: actionFields,
+    },
     {
       name: 'resumeFile',
       type: 'upload',

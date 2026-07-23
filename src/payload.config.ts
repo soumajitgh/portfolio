@@ -1,5 +1,6 @@
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { resendAdapter } from '@payloadcms/email-resend'
+import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { BlocksFeature, CodeBlock, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
@@ -14,6 +15,7 @@ import { Media } from './collections/Media'
 import { Projects } from './collections/Projects'
 import { ProjectStars } from './collections/ProjectStars'
 import { PortfolioSettings } from './globals/PortfolioSettings'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -56,15 +58,48 @@ export default buildConfig({
   db: sqliteAdapter({
     busyTimeout: 5000,
     client: {
+      authToken: process.env.DATABASE_AUTH_TOKEN,
       url: process.env.DATABASE_URL || '',
     },
     // Migrations include database-level constraints and the atomic blog counter,
     // so automatic development pushes must not compete with them at startup.
+    prodMigrations: migrations,
     push: false,
-    wal: true,
+    wal: (process.env.DATABASE_URL || '').startsWith('file:'),
   }),
   sharp,
   plugins: [
+    mcpPlugin({
+      collections: {
+        'blog-posts': {
+          description: 'Published portfolio blog posts and their display metadata.',
+          enabled: {
+            find: true,
+            create: false,
+            update: false,
+            delete: false,
+          },
+        },
+        projects: {
+          description: 'Published portfolio projects, technologies, media, and external links.',
+          enabled: {
+            find: true,
+            create: false,
+            update: false,
+            delete: false,
+          },
+        },
+      },
+      globals: {
+        'portfolio-settings': {
+          description: 'Portfolio hero, contact, social, and home-page display settings.',
+          enabled: {
+            find: true,
+            update: false,
+          },
+        },
+      },
+    }),
     s3Storage({
       alwaysInsertFields: true,
       bucket: process.env.R2_BUCKET || '',
