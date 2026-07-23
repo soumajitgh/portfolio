@@ -5,18 +5,19 @@ import type { BlogPost, Project } from '@/payload-types'
 import config from '@/payload.config'
 
 import type { SocialPreviewIdentity } from './social-preview'
+import { getMediaURL } from './seo'
 
 const skipDatabaseDuringBuild = process.env.SKIP_DATABASE_DURING_BUILD === 'true'
 
 export type BlogSocialPreviewData = Pick<
   BlogPost,
   'excerpt' | 'issueNumber' | 'labels' | 'publishedAt' | 'slug' | 'title'
->
+> & { socialImage?: string }
 
 export type ProjectSocialPreviewData = Pick<
   Project,
   'shortDescription' | 'slug' | 'status' | 'title' | 'topics'
-> & { starCount: number }
+> & { socialImage?: string; starCount: number }
 
 const providerName = (label: string, url: string) => {
   const provider = `${label} ${url}`.toLowerCase()
@@ -60,10 +61,11 @@ export const getProjectSocialPreview = cache(
     const payload = await getPayload({ config })
     const result = await payload.find({
       collection: 'projects',
-      depth: 0,
+      depth: 1,
       limit: 1,
       overrideAccess: false,
       select: {
+        seo: true,
         shortDescription: true,
         slug: true,
         status: true,
@@ -76,6 +78,7 @@ export const getProjectSocialPreview = cache(
     })
     const project = result.docs[0]
     if (!project) return null
+    const { seo, ...preview } = project
 
     const stars = await payload.count({
       collection: 'project-stars',
@@ -83,7 +86,11 @@ export const getProjectSocialPreview = cache(
       where: { project: { equals: project.id } },
     })
 
-    return { ...project, starCount: stars.totalDocs }
+    return {
+      ...preview,
+      socialImage: getMediaURL(seo?.image),
+      starCount: stars.totalDocs,
+    }
   },
 )
 
@@ -94,7 +101,7 @@ export const getBlogSocialPreview = cache(
     const payload = await getPayload({ config })
     const result = await payload.find({
       collection: 'blog-posts',
-      depth: 0,
+      depth: 1,
       limit: 1,
       overrideAccess: false,
       select: {
@@ -102,6 +109,7 @@ export const getBlogSocialPreview = cache(
         issueNumber: true,
         labels: true,
         publishedAt: true,
+        seo: true,
         slug: true,
         title: true,
       },
@@ -110,6 +118,13 @@ export const getBlogSocialPreview = cache(
       },
     })
 
-    return result.docs[0] || null
+    const post = result.docs[0]
+    if (!post) return null
+    const { seo, ...preview } = post
+
+    return {
+      ...preview,
+      socialImage: getMediaURL(seo?.image),
+    }
   },
 )

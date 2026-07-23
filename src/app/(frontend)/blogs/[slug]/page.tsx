@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { formatBlogDate, wasMeaningfullyUpdated } from '@/lib/blog-content'
 import { getBlogNeighbors, getPublishedBlogPost } from '@/lib/blog-data'
 import { extractRichTextHeadings } from '@/lib/rich-text-headings'
+import { absoluteURL, getMediaURL, serializeJsonLd, siteName } from '@/lib/seo'
 
 export const revalidate = 300
 
@@ -23,16 +24,22 @@ export async function generateMetadata({
   const post = await getPublishedBlogPost(slug)
   if (!post) return { title: 'soumajit in ~/404' }
 
-  const title = post.seo?.title || `soumajit in ~/blogs/${post.slug}`
+  const title = post.seo?.title || post.title
   const description = post.seo?.description || post.excerpt || post.title
+  const socialImage = getMediaURL(post.seo?.image)
+  const images = socialImage ? [{ alt: post.title, url: socialImage }] : undefined
 
   return {
     alternates: { canonical: `/blogs/${post.slug}` },
+    authors: [{ name: siteName, url: '/' }],
     description,
     openGraph: {
+      authors: [absoluteURL('/')],
       description,
+      images,
       modifiedTime: post.updatedAt,
       publishedTime: post.publishedAt || undefined,
+      section: 'Backend Engineering',
       tags: post.labels?.map((label) => label.name),
       title,
       type: 'article',
@@ -42,6 +49,7 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       description,
+      images: socialImage ? [socialImage] : undefined,
       title,
     },
   }
@@ -55,23 +63,59 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const { newer, older } = await getBlogNeighbors(post.id)
   const headings = extractRichTextHeadings(post.body)
   const showUpdated = wasMeaningfullyUpdated(post.publishedAt, post.updatedAt)
-  const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  const canonicalURL = `${siteURL}/blogs/${post.slug}`
+  const canonicalURL = absoluteURL(`/blogs/${post.slug}`)
+  const description = post.seo?.description || post.excerpt || post.title
+  const socialImage = getMediaURL(post.seo?.image)
   const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    author: {
-      '@type': 'Person',
-      name: 'Soumajit Ghosh',
-      url: siteURL,
-    },
-    dateModified: post.updatedAt,
-    datePublished: post.publishedAt,
-    description: post.excerpt || post.title,
-    headline: post.title,
-    keywords: post.labels?.map((label) => label.name).join(', '),
-    mainEntityOfPage: canonicalURL,
-    url: canonicalURL,
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        author: {
+          '@id': `${absoluteURL('/')}#person`,
+          '@type': 'Person',
+          name: siteName,
+          url: absoluteURL('/'),
+        },
+        dateModified: post.updatedAt,
+        datePublished: post.publishedAt,
+        description,
+        headline: post.title,
+        image: socialImage,
+        inLanguage: 'en',
+        isAccessibleForFree: true,
+        keywords: post.labels?.map((label) => label.name),
+        mainEntityOfPage: {
+          '@id': canonicalURL,
+          '@type': 'WebPage',
+        },
+        timeRequired: `PT${post.readingMinutes}M`,
+        url: canonicalURL,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            item: absoluteURL('/'),
+            name: 'Home',
+            position: 1,
+          },
+          {
+            '@type': 'ListItem',
+            item: absoluteURL('/blogs'),
+            name: 'Backend Engineering Blog',
+            position: 2,
+          },
+          {
+            '@type': 'ListItem',
+            item: canonicalURL,
+            name: post.title,
+            position: 3,
+          },
+        ],
+      },
+    ],
   }
 
   return (
@@ -196,7 +240,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <script
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
+            __html: serializeJsonLd(structuredData),
           }}
           type="application/ld+json"
         />

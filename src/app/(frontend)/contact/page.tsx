@@ -17,14 +17,16 @@ export const revalidate = 300
 
 export const metadata: Metadata = {
   alternates: { canonical: '/contact' },
-  description: 'input: start a conversation about backend systems and developer infrastructure.',
+  description:
+    'Contact Soumajit Ghosh about backend development, APIs, cloud infrastructure, distributed systems, or developer tooling.',
   openGraph: {
-    description: 'input: start a conversation about backend systems and developer infrastructure.',
-    title: 'soumajit in ~/contact',
+    description:
+      'Contact Soumajit Ghosh about backend development, APIs, cloud infrastructure, distributed systems, or developer tooling.',
+    title: 'Contact Soumajit Ghosh',
     type: 'website',
     url: '/contact',
   },
-  title: 'soumajit in ~/contact',
+  title: 'Contact',
 }
 
 function SocialIcon({ label, url }: { label: string; url: string }) {

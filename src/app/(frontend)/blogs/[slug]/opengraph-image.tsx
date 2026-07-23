@@ -17,6 +17,7 @@ export default async function OpenGraphImage({ params }: { params: Promise<{ slu
     : ''
 
   return renderSocialPreview({
+    backgroundImageURL: post?.socialImage,
     command: `~/blogs/#${post?.issueNumber || '404'}`,
     description: post?.excerpt || 'The requested issue is not publicly available.',
     eyebrow: post ? `blog issue / #${post.issueNumber}` : 'blog issue / not-found',

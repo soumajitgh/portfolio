@@ -9,7 +9,7 @@ import { blogHref } from '@/lib/blog-url'
 export function BlogIssueRow({ post, query }: { post: BlogPostListItem; query: string }) {
   return (
     <article
-      className="group relative grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 border-b border-border px-4 py-4 last:border-b-0 hover:bg-accent/30 focus-within:bg-accent/30 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-3 sm:px-5 sm:py-5"
+      className="group relative grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 rounded-lg border border-border/80 bg-card px-4 py-5 transition-colors hover:border-primary/55 hover:bg-accent/25 focus-within:border-primary/55 focus-within:bg-accent/25 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-3 sm:px-6 sm:py-6"
       role="listitem"
     >
       <CircleDot

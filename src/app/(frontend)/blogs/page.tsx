@@ -4,28 +4,17 @@ import Link from 'next/link'
 
 import { BlogSearch } from '@/components/blog-search'
 import { BlogIssueRow } from '@/components/blog/blog-issue-row'
-import { Badge } from '@/components/ui/badge'
+import { FilterSelect } from '@/components/filter-select'
 import { Button } from '@/components/ui/button'
 import { getBlogIndex } from '@/lib/blog-data'
 import { blogHref } from '@/lib/blog-url'
-import { cn } from '@/lib/utils'
+import { absoluteURL, nonIndexableRobots, serializeJsonLd } from '@/lib/seo'
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  alternates: {
-    canonical: '/blogs',
-    types: { 'application/rss+xml': '/rss.xml' },
-  },
-  description: 'output: notes on backend systems, infrastructure, and developer tooling.',
-  openGraph: {
-    description: 'output: notes on backend systems, infrastructure, and developer tooling.',
-    title: 'soumajit in ~/blogs',
-    type: 'website',
-    url: '/blogs',
-  },
-  title: 'soumajit in ~/blogs',
-}
+const pageTitle = 'Backend Engineering Blog'
+const pageDescription =
+  'Practical backend engineering articles by Soumajit Ghosh about APIs, distributed systems, databases, cloud infrastructure, reliability, and developer tooling.'
 
 type BlogSearchParams = {
   label?: string | string[]
@@ -35,6 +24,41 @@ type BlogSearchParams = {
 
 const firstValue = (value?: string | string[]) =>
   Array.isArray(value) ? value[0] || '' : value || ''
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<BlogSearchParams>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const page = Number.parseInt(firstValue(params.page) || '1', 10)
+  const hasFilters = Boolean(
+    firstValue(params.q).trim() ||
+    firstValue(params.label).trim() ||
+    (Number.isFinite(page) && page > 1),
+  )
+
+  return {
+    alternates: {
+      canonical: '/blogs',
+      types: { 'application/rss+xml': '/rss.xml' },
+    },
+    description: pageDescription,
+    openGraph: {
+      description: pageDescription,
+      title: pageTitle,
+      type: 'website',
+      url: '/blogs',
+    },
+    ...(hasFilters ? { robots: nonIndexableRobots } : {}),
+    title: pageTitle,
+    twitter: {
+      card: 'summary_large_image',
+      description: pageDescription,
+      title: pageTitle,
+    },
+  }
+}
 
 export default async function BlogPage({
   searchParams,
@@ -49,6 +73,49 @@ export default async function BlogPage({
   const result = await getBlogIndex(query, label, requestedPage)
   const labelExists = !label || result.labels.includes(label)
   const hasFilters = Boolean(query || label)
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    author: {
+      '@id': `${absoluteURL('/')}#person`,
+      '@type': 'Person',
+      name: 'Soumajit Ghosh',
+      url: absoluteURL('/'),
+    },
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          item: absoluteURL('/'),
+          name: 'Home',
+          position: 1,
+        },
+        {
+          '@type': 'ListItem',
+          item: absoluteURL('/blogs'),
+          name: 'Backend Engineering Blog',
+          position: 2,
+        },
+      ],
+    },
+    description: pageDescription,
+    mainEntity: {
+      '@type': 'Blog',
+      blogPost: result.docs.map((post) => ({
+        '@type': 'BlogPosting',
+        dateModified: post.updatedAt,
+        datePublished: post.publishedAt,
+        description: post.excerpt || post.title,
+        headline: post.title,
+        url: absoluteURL(`/blogs/${post.slug}`),
+      })),
+      name: pageTitle,
+      url: absoluteURL('/blogs'),
+    },
+    name: pageTitle,
+    url: absoluteURL('/blogs'),
+  }
 
   return (
     <div className="min-h-[calc(100dvh-4rem)]">
@@ -58,10 +125,10 @@ export default async function BlogPage({
             <p className="font-mono text-xs text-terminal-green sm:text-sm">
               soumajit@portfolio:<span className="text-terminal-blue">~</span>$ ls ./blogs
             </p>
-            <h1 className="page-title mt-4 font-semibold">Published issues</h1>
+            <h1 className="page-title mt-4 font-semibold">Backend engineering blog</h1>
             <p className="page-lede mt-3 max-w-2xl text-muted-foreground sm:mt-4">
-              Engineering notes on reliable systems, practical tooling, and lessons learned in
-              production.
+              Practical articles on reliable APIs, distributed systems, databases, cloud
+              infrastructure, and lessons learned in production.
             </p>
           </div>
           <Button asChild size="sm" variant="outline">
@@ -72,60 +139,41 @@ export default async function BlogPage({
           </Button>
         </div>
 
-        <section aria-labelledby="blog-index-heading" className="mt-10">
+        <section aria-labelledby="blog-index-heading" className="mt-8">
           <h2 className="sr-only" id="blog-index-heading">
             Blog issue index
           </h2>
-          <div className="rounded-lg border border-border bg-card/40">
-            <div className="border-b border-border p-3 sm:p-5">
-              <BlogSearch initialQuery={query} />
-              {result.labels.length ? (
-                <nav
-                  aria-label="Filter blog posts by label"
-                  className="scrollbar-thin mobile-scrollbar-hidden -mx-3 mt-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mt-4 sm:flex-wrap sm:px-0 sm:pb-2"
-                >
-                  <Badge
-                    asChild
-                    className={cn(
-                      'min-h-9 shrink-0 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs',
-                      !label && 'border-primary text-primary',
-                    )}
-                    variant="outline"
-                  >
-                    <Link href={blogHref({ query })}>all</Link>
-                  </Badge>
-                  {result.labels.map((item) => (
-                    <Badge
-                      asChild
-                      className={cn(
-                        'min-h-9 shrink-0 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs',
-                        label === item && 'border-primary text-primary',
-                      )}
-                      key={item}
-                      variant="outline"
-                    >
-                      <Link href={blogHref({ label: item, query })}>{item}</Link>
-                    </Badge>
-                  ))}
-                </nav>
-              ) : null}
-            </div>
+          <div className="rounded-lg border border-border bg-card/40 p-3 sm:p-5">
+            <BlogSearch initialQuery={query} />
+            {result.labels.length ? (
+              <div className="mt-3 sm:mt-4">
+                <FilterSelect
+                  accessibleLabel="Filter blog posts by label"
+                  allLabel="All labels"
+                  name="label"
+                  options={result.labels.map((item) => ({ label: item, value: item }))}
+                  value={labelExists ? label : ''}
+                />
+              </div>
+            ) : null}
+          </div>
 
-            <div
-              aria-live="polite"
-              className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 font-mono text-xs text-muted-foreground sm:px-5"
-            >
+          <div
+            aria-live="polite"
+            className="mt-5 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-muted-foreground"
+          >
+            <span>
+              {result.totalDocs} {result.totalDocs === 1 ? 'issue' : 'issues'}
+              {query ? ` matched \"${query}\"` : ' published'}
+            </span>
+            {result.totalPages > 1 ? (
               <span>
-                {result.totalDocs} {result.totalDocs === 1 ? 'issue' : 'issues'}
-                {query ? ` matched \"${query}\"` : ' published'}
+                page {result.page}/{result.totalPages}
               </span>
-              {result.totalPages > 1 ? (
-                <span>
-                  page {result.page}/{result.totalPages}
-                </span>
-              ) : null}
-            </div>
+            ) : null}
+          </div>
 
+          <div className="mt-5">
             {!labelExists ? (
               <BlogEmptyState>
                 <p className="text-terminal-red">error: unknown label &quot;{label}&quot;</p>
@@ -146,7 +194,7 @@ export default async function BlogPage({
                 </Link>
               </BlogEmptyState>
             ) : result.docs.length ? (
-              <div role="list">
+              <div className="grid gap-5" role="list">
                 {result.docs.map((post) => (
                   <BlogIssueRow key={post.id} post={post} query={query} />
                 ))}
@@ -199,6 +247,10 @@ export default async function BlogPage({
             </nav>
           ) : null}
         </section>
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+          type="application/ld+json"
+        />
       </main>
     </div>
   )

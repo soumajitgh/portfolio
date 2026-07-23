@@ -12,6 +12,7 @@ import { StarButton } from '@/components/star-button'
 import { Badge } from '@/components/ui/badge'
 import { formatLabel } from '@/lib/content'
 import { getPublishedProject, getRelatedProjects } from '@/lib/portfolio-data'
+import { absoluteURL, getMediaURL, serializeJsonLd, siteName } from '@/lib/seo'
 
 export const revalidate = 300
 
@@ -24,15 +25,20 @@ export async function generateMetadata({
   const project = await getPublishedProject(slug)
   if (!project) return { title: 'soumajit in ~/404' }
 
-  const title = `soumajit in ~/projects/${project.slug}`
-  const description = `README: ${project.shortDescription}`
+  const title = project.seo?.title || `${project.title} – Backend Project`
+  const description = project.seo?.description || project.shortDescription
+  const socialImage = getMediaURL(project.seo?.image || project.coverImage)
+  const images = socialImage ? [{ alt: project.title, url: socialImage }] : undefined
+
   return {
     alternates: { canonical: `/projects/${project.slug}` },
     description,
     openGraph: {
       description,
+      images,
       modifiedTime: project.updatedAt,
       publishedTime: project.publishedAt || undefined,
+      tags: project.topics?.map((topic) => topic.name),
       title,
       type: 'article',
       url: `/projects/${project.slug}`,
@@ -41,6 +47,7 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       description,
+      images: socialImage ? [socialImage] : undefined,
       title,
     },
   }
@@ -54,6 +61,62 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const related = await getRelatedProjects(project)
   const cover =
     project.coverImage && typeof project.coverImage === 'object' ? project.coverImage : null
+  const canonicalURL = absoluteURL(`/projects/${project.slug}`)
+  const socialImage = getMediaURL(project.seo?.image || project.coverImage)
+  const externalLinks = project.links?.map((link) => link.url).filter(Boolean) || []
+  const repositoryURL =
+    project.links?.find((link) => link.type === 'github')?.url ||
+    (project.repositoryOwner && project.repositoryName
+      ? `https://github.com/${project.repositoryOwner}/${project.repositoryName}`
+      : undefined)
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'SoftwareSourceCode',
+        author: {
+          '@id': `${absoluteURL('/')}#person`,
+          '@type': 'Person',
+          name: siteName,
+          url: absoluteURL('/'),
+        },
+        codeRepository: repositoryURL,
+        dateModified: project.updatedAt,
+        datePublished: project.publishedAt || undefined,
+        description: project.seo?.description || project.shortDescription,
+        image: socialImage,
+        isAccessibleForFree: true,
+        keywords: project.topics?.map((topic) => topic.name),
+        mainEntityOfPage: canonicalURL,
+        name: project.title,
+        sameAs: externalLinks.length ? externalLinks : undefined,
+        url: canonicalURL,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            item: absoluteURL('/'),
+            name: 'Home',
+            position: 1,
+          },
+          {
+            '@type': 'ListItem',
+            item: absoluteURL('/projects'),
+            name: 'Backend Projects',
+            position: 2,
+          },
+          {
+            '@type': 'ListItem',
+            item: canonicalURL,
+            name: project.title,
+            position: 3,
+          },
+        ],
+      },
+    ],
+  }
 
   return (
     <div className="min-h-[calc(100dvh-4rem)]">
@@ -139,6 +202,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             </div>
           </section>
         ) : null}
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+          type="application/ld+json"
+        />
       </main>
     </div>
   )

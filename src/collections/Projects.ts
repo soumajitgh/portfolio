@@ -72,13 +72,13 @@ export const Projects: CollectionConfig = {
 
         const paths: string[] = []
         if (doc._status === 'published') {
-          paths.push('/', '/projects', `/projects/${doc.slug}`)
+          paths.push('/', '/projects', '/sitemap.xml', `/projects/${doc.slug}`)
         }
         if (
           previousDoc?._status === 'published' &&
           (doc._status !== 'published' || previousDoc.slug !== doc.slug)
         ) {
-          paths.push('/', '/projects', `/projects/${previousDoc.slug}`)
+          paths.push('/', '/projects', '/sitemap.xml', `/projects/${previousDoc.slug}`)
         }
         scheduleRevalidation(paths)
 
@@ -88,7 +88,7 @@ export const Projects: CollectionConfig = {
     afterDelete: [
       ({ context, doc }) => {
         if (context.disableRevalidate || doc._status !== 'published') return doc
-        scheduleRevalidation(['/', '/projects', `/projects/${doc.slug}`])
+        scheduleRevalidation(['/', '/projects', '/sitemap.xml', `/projects/${doc.slug}`])
         return doc
       },
     ],
@@ -188,6 +188,40 @@ export const Projects: CollectionConfig = {
       fields: [
         { name: 'repositoryOwner', type: 'text' },
         { name: 'repositoryName', type: 'text' },
+      ],
+    },
+    {
+      name: 'seo',
+      type: 'group',
+      admin: {
+        description:
+          'Optional search and social overrides. The project title, description, and cover image are used as fallbacks.',
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          maxLength: 70,
+          admin: {
+            description: 'Aim for 50–60 characters and describe what the project does.',
+          },
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          maxLength: 180,
+          admin: {
+            description: 'Aim for 140–160 characters with the main technology or outcome.',
+          },
+        },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          filterOptions: {
+            mimeType: { contains: 'image' },
+          },
+        },
       ],
     },
   ],

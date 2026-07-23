@@ -172,21 +172,34 @@ export const BlogPosts: CollectionConfig = {
     {
       name: 'seo',
       type: 'group',
+      admin: {
+        description:
+          'Optional search and social overrides. The article title and excerpt are used as fallbacks.',
+      },
       fields: [
         {
           name: 'title',
           type: 'text',
           maxLength: 70,
+          admin: {
+            description: 'Aim for 50–60 characters and lead with the article topic.',
+          },
         },
         {
           name: 'description',
           type: 'textarea',
           maxLength: 180,
+          admin: {
+            description: 'Aim for 140–160 characters and summarize the practical value.',
+          },
         },
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
+          filterOptions: {
+            mimeType: { contains: 'image' },
+          },
         },
       ],
     },

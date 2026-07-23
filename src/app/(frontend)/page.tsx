@@ -4,6 +4,7 @@ import { HomeHero } from '@/components/home-hero'
 import { PortfolioShowcase } from '@/components/landing-experience'
 import { PageContainer } from '@/components/page-container'
 import { getPortfolioHome } from '@/lib/portfolio-data'
+import { absoluteURL, serializeJsonLd, siteDescription, siteName, siteTitle } from '@/lib/seo'
 
 export const revalidate = 300
 
@@ -33,11 +34,51 @@ export default async function HomePage() {
     )
   }
 
+  const socialProfiles = data.settings.contact?.socials?.map((social) => social.url) || []
+  const skills =
+    data.settings.skills?.flatMap((group) => group.items?.map((item) => item.name) || []) || []
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@id': `${absoluteURL('/')}#person`,
+        '@type': 'Person',
+        description: siteDescription,
+        jobTitle: 'Backend Developer',
+        knowsAbout: Array.from(new Set([...skills, ...data.stack.map((topic) => topic.name)])),
+        name: siteName,
+        sameAs: socialProfiles,
+        url: absoluteURL('/'),
+      },
+      {
+        '@id': `${absoluteURL('/')}#profile`,
+        '@type': 'ProfilePage',
+        dateCreated: data.settings.createdAt,
+        dateModified: data.settings.updatedAt,
+        mainEntity: { '@id': `${absoluteURL('/')}#person` },
+        name: siteTitle,
+        url: absoluteURL('/'),
+      },
+      {
+        '@id': `${absoluteURL('/')}#website`,
+        '@type': 'WebSite',
+        description: siteDescription,
+        inLanguage: 'en',
+        name: 'soumajit.dev',
+        url: absoluteURL('/'),
+      },
+    ],
+  }
+
   return (
     <div className="landing-shell">
       <PageContainer className="landing-main">
         <HomeHero settings={data.settings} />
         <PortfolioShowcase {...data} />
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+          type="application/ld+json"
+        />
       </PageContainer>
     </div>
   )

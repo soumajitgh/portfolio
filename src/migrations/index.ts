@@ -1,6 +1,7 @@
-import * as migration_20260723_102158_postgres_initial from './20260723_102158_postgres_initial';
-import * as migration_20260723_110659_remove_portfolio_actions from './20260723_110659_remove_portfolio_actions';
-import * as migration_20260723_113924_add_mcp_write_permissions from './20260723_113924_add_mcp_write_permissions';
+import * as migration_20260723_102158_postgres_initial from './20260723_102158_postgres_initial'
+import * as migration_20260723_110659_remove_portfolio_actions from './20260723_110659_remove_portfolio_actions'
+import * as migration_20260723_113924_add_mcp_write_permissions from './20260723_113924_add_mcp_write_permissions'
+import * as migration_20260723_115619_seo_fields from './20260723_115619_seo_fields'
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20260723_113924_add_mcp_write_permissions.up,
     down: migration_20260723_113924_add_mcp_write_permissions.down,
-    name: '20260723_113924_add_mcp_write_permissions'
+    name: '20260723_113924_add_mcp_write_permissions',
   },
-];
+  {
+    up: migration_20260723_115619_seo_fields.up,
+    down: migration_20260723_115619_seo_fields.down,
+    name: '20260723_115619_seo_fields',
+  },
+]

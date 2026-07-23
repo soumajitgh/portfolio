@@ -25,6 +25,10 @@ export function ProjectCard({
   index: number
   project: ProjectCardData
 }) {
+  const visibleTopicCount = compact ? 3 : 6
+  const visibleTopics = project.topics?.slice(0, visibleTopicCount) || []
+  const hiddenTopicCount = Math.max(0, (project.topics?.length || 0) - visibleTopics.length)
+
   return (
     <Card
       className={cn(
@@ -80,7 +84,7 @@ export function ProjectCard({
           compact && 'gap-1.5 px-4 sm:px-5',
         )}
       >
-        {project.topics?.slice(0, compact ? 3 : undefined).map((topic) => (
+        {visibleTopics.map((topic) => (
           <Badge
             asChild
             className={cn(
@@ -94,6 +98,15 @@ export function ProjectCard({
             <Link href={`/projects?topic=${topic.slug}`}>{topic.name}</Link>
           </Badge>
         ))}
+        {hiddenTopicCount ? (
+          <Badge
+            className="relative z-10 min-h-9 px-2 text-[0.6875rem] text-muted-foreground sm:text-xs md:min-h-0"
+            title={`${hiddenTopicCount} more technologies`}
+            variant="outline"
+          >
+            +{hiddenTopicCount} more
+          </Badge>
+        ) : null}
         <span className="ml-auto flex items-center gap-1 font-mono text-xs text-muted-foreground">
           <Star className="size-3.5" aria-hidden="true" /> {project.starCount}
         </span>

@@ -3,31 +3,48 @@ import { GeistSans } from 'geist/font/sans'
 import type { Metadata } from 'next'
 
 import { AppShell } from '@/components/app-shell'
+import { getSiteURL, indexableRobots, siteDescription, siteName, siteTitle } from '@/lib/seo'
 
 import './globals.css'
-
-const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-const description = 'output: backend systems, APIs, and infrastructure.'
 
 // Payload-backed pages need the runtime PostgreSQL connection. Keeping this
 // segment dynamic prevents Docker builds from querying the production database.
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteURL),
+  metadataBase: new URL(getSiteURL()),
   applicationName: 'soumajit.dev',
-  description,
+  authors: [{ name: siteName, url: '/' }],
+  category: 'technology',
+  creator: siteName,
+  description: siteDescription,
+  keywords: [
+    'backend developer',
+    'backend engineer',
+    'API development',
+    'distributed systems',
+    'cloud infrastructure',
+    'developer tools',
+  ],
   openGraph: {
-    description,
+    description: siteDescription,
+    locale: 'en_IN',
     siteName: 'soumajit.dev',
-    title: 'soumajit ghosh',
+    title: siteTitle,
     type: 'website',
+    url: '/',
   },
-  title: 'soumajit ghosh',
+  publisher: siteName,
+  referrer: 'origin-when-cross-origin',
+  robots: indexableRobots,
+  title: {
+    default: siteTitle,
+    template: `%s | ${siteName}`,
+  },
   twitter: {
     card: 'summary_large_image',
-    description,
-    title: 'soumajit ghosh',
+    description: siteDescription,
+    title: siteTitle,
   },
 }
 

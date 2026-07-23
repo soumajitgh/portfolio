@@ -11,6 +11,7 @@ export type SocialPreviewIdentity = {
 }
 
 export type SocialPreviewContent = {
+  backgroundImageURL?: string
   command: string
   description: string
   eyebrow: string
@@ -64,6 +65,31 @@ export async function renderSocialPreview(content: SocialPreviewContent) {
         width: '100%',
       }}
     >
+      {content.backgroundImageURL ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse requires a plain image element. */}
+          <img
+            alt=""
+            src={content.backgroundImageURL}
+            style={{
+              height: '100%',
+              inset: 0,
+              objectFit: 'cover',
+              position: 'absolute',
+              width: '100%',
+            }}
+          />
+          <div
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(23,26,31,.97) 0%, rgba(23,26,31,.90) 56%, rgba(23,26,31,.58) 100%)',
+              display: 'flex',
+              inset: 0,
+              position: 'absolute',
+            }}
+          />
+        </>
+      ) : null}
       <div
         style={{
           backgroundImage:

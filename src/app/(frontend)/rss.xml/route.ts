@@ -1,4 +1,5 @@
 import { getBlogFeedPosts } from '@/lib/blog-data'
+import { getSiteURL } from '@/lib/seo'
 
 export const revalidate = 300
 export const dynamic = 'force-dynamic'
@@ -12,7 +13,7 @@ const escapeXML = (value: string) =>
     .replaceAll("'", '&apos;')
 
 export async function GET() {
-  const siteURL = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '')
+  const siteURL = getSiteURL()
   const posts = await getBlogFeedPosts()
   const items = posts
     .map(
@@ -30,10 +31,10 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <title>soumajit in ~/blogs</title>
+  <title>Backend Engineering Blog by Soumajit Ghosh</title>
   <link>${siteURL}/blogs</link>
-  <description>Notes on backend systems, infrastructure, and developer tooling.</description>
-  <language>en</language>
+  <description>Practical articles about APIs, distributed systems, databases, cloud infrastructure, reliability, and developer tooling.</description>
+  <language>en-IN</language>
   <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
   ${items}
 </channel>

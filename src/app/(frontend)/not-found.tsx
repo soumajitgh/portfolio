@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   description: 'error: the requested path does not exist.',
-  title: 'soumajit in ~/404',
+  robots: { follow: false, index: false },
+  title: 'Page not found',
 }
 
 export default function NotFound() {

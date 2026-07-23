@@ -1,24 +1,43 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { FilterSelect } from '@/components/filter-select'
 import { ProjectCard } from '@/components/project-card'
 import { ProjectSearch } from '@/components/projects/project-search'
-import { Badge } from '@/components/ui/badge'
 import { getPublishedProjects } from '@/lib/portfolio-data'
-import { cn } from '@/lib/utils'
+import { absoluteURL, nonIndexableRobots, serializeJsonLd } from '@/lib/seo'
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  alternates: { canonical: '/projects' },
-  description: 'output: published backend, infrastructure, and developer tooling projects.',
-  openGraph: {
-    description: 'output: published backend, infrastructure, and developer tooling projects.',
-    title: 'soumajit in ~/projects',
-    type: 'website',
-    url: '/projects',
-  },
-  title: 'soumajit in ~/projects',
+const pageTitle = 'Backend Developer Projects'
+const pageDescription =
+  'Explore backend development projects by Soumajit Ghosh, including APIs, distributed systems, cloud infrastructure, open-source software, and developer tools.'
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string | string[]; topic?: string | string[] }>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const hasFilters = Boolean(firstValue(params.q).trim() || firstValue(params.topic).trim())
+
+  return {
+    alternates: { canonical: '/projects' },
+    description: pageDescription,
+    openGraph: {
+      description: pageDescription,
+      title: pageTitle,
+      type: 'website',
+      url: '/projects',
+    },
+    ...(hasFilters ? { robots: nonIndexableRobots } : {}),
+    title: pageTitle,
+    twitter: {
+      card: 'summary_large_image',
+      description: pageDescription,
+      title: pageTitle,
+    },
+  }
 }
 
 export default async function ProjectsPage({
@@ -56,6 +75,44 @@ export default async function ProjectsPage({
 
     return searchableText.includes(normalizedQuery)
   })
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          item: absoluteURL('/'),
+          name: 'Home',
+          position: 1,
+        },
+        {
+          '@type': 'ListItem',
+          item: absoluteURL('/projects'),
+          name: 'Backend Projects',
+          position: 2,
+        },
+      ],
+    },
+    description: pageDescription,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: visibleProjects.map((project, index) => ({
+        '@type': 'ListItem',
+        item: {
+          '@type': 'SoftwareSourceCode',
+          description: project.shortDescription,
+          name: project.title,
+          url: absoluteURL(`/projects/${project.slug}`),
+        },
+        position: index + 1,
+      })),
+      numberOfItems: visibleProjects.length,
+    },
+    name: pageTitle,
+    url: absoluteURL('/projects'),
+  }
 
   return (
     <div className="min-h-[calc(100dvh-4rem)]">
@@ -63,10 +120,11 @@ export default async function ProjectsPage({
         <p className="font-mono text-xs text-terminal-green sm:text-sm">
           soumajit@portfolio:<span className="text-terminal-blue">~</span>$ ls ./projects
         </p>
-        <h1 className="page-title mt-4 font-semibold">Published projects</h1>
+        <h1 className="page-title mt-4 font-semibold">Backend development projects</h1>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="page-lede max-w-2xl text-muted-foreground">
-            Backend systems, infrastructure, open-source work, and developer tools.
+            Production-minded APIs, distributed systems, cloud infrastructure, open-source software,
+            and developer tools.
           </p>
           <span
             aria-live="polite"
@@ -82,34 +140,15 @@ export default async function ProjectsPage({
         >
           <ProjectSearch initialQuery={query} />
           {topics.length ? (
-            <nav
-              aria-label="Filter projects by topic"
-              className="scrollbar-thin mobile-scrollbar-hidden -mx-3 mt-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mt-4 sm:flex-wrap sm:overflow-visible sm:px-0"
-            >
-              <Badge
-                asChild
-                className={cn(
-                  'min-h-9 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs',
-                  !topic && 'border-primary text-primary',
-                )}
-                variant="outline"
-              >
-                <Link href={projectsHref({ query })}>All</Link>
-              </Badge>
-              {topics.map((item) => (
-                <Badge
-                  asChild
-                  className={cn(
-                    'min-h-9 px-2 text-[0.6875rem] sm:min-h-0 sm:text-xs',
-                    topic === item.slug && 'border-primary text-primary',
-                  )}
-                  key={item.slug}
-                  variant="outline"
-                >
-                  <Link href={projectsHref({ query, topic: item.slug })}>{item.name}</Link>
-                </Badge>
-              ))}
-            </nav>
+            <div className="mt-3 sm:mt-4">
+              <FilterSelect
+                accessibleLabel="Filter projects by technology"
+                allLabel="All technologies"
+                name="topic"
+                options={topics.map((item) => ({ label: item.name, value: item.slug }))}
+                value={topicExists ? topic : ''}
+              />
+            </div>
           ) : null}
         </section>
 
@@ -147,6 +186,10 @@ export default async function ProjectsPage({
             )}
           </div>
         )}
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+          type="application/ld+json"
+        />
       </main>
     </div>
   )

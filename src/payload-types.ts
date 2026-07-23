@@ -271,6 +271,20 @@ export interface Project {
   publishedAt?: string | null;
   repositoryOwner?: string | null;
   repositoryName?: string | null;
+  /**
+   * Optional search and social overrides. The project title, description, and cover image are used as fallbacks.
+   */
+  seo?: {
+    /**
+     * Aim for 50–60 characters and describe what the project does.
+     */
+    title?: string | null;
+    /**
+     * Aim for 140–160 characters with the main technology or outcome.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -322,8 +336,17 @@ export interface BlogPost {
    * Show this post in the home page Blog tab.
    */
   featured?: boolean | null;
+  /**
+   * Optional search and social overrides. The article title and excerpt are used as fallbacks.
+   */
   seo?: {
+    /**
+     * Aim for 50–60 characters and lead with the article topic.
+     */
     title?: string | null;
+    /**
+     * Aim for 140–160 characters and summarize the practical value.
+     */
     description?: string | null;
     image?: (number | null) | Media;
   };
@@ -638,6 +661,13 @@ export interface ProjectsSelect<T extends boolean = true> {
   publishedAt?: T;
   repositoryOwner?: T;
   repositoryName?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

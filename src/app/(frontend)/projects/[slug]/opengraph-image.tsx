@@ -14,6 +14,7 @@ export default async function OpenGraphImage({ params }: { params: Promise<{ slu
   ])
 
   return renderSocialPreview({
+    backgroundImageURL: project?.socialImage,
     command: `~/projects/${project?.slug || slug}`,
     description: project?.shortDescription || 'The requested project is not publicly available.',
     eyebrow: project ? `project / ${project.status}` : 'project / not-found',
