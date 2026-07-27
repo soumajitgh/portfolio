@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { changeFrequency: 'daily', priority: 0.8, url: absoluteURL('/stats') },
     { changeFrequency: 'daily', priority: 0.7, url: absoluteURL('/stats/leetcode') },
     { changeFrequency: 'daily', priority: 0.7, url: absoluteURL('/stats/github') },
+    { changeFrequency: 'daily', priority: 0.7, url: absoluteURL('/stats/ai') },
     { changeFrequency: 'yearly', priority: 0.7, url: absoluteURL('/contact') },
     ...projects.map((project) => ({
       changeFrequency: 'monthly' as const,

@@ -1,5 +1,4 @@
-const LEETCODE_API_URL =
-  process.env.LEETCODE_API_URL || 'https://alfa-leetcode-api.onrender.com'
+const LEETCODE_API_URL = process.env.LEETCODE_API_URL || 'https://alfa-leetcode-api.onrender.com'
 const LEETCODE_USERNAME = process.env.LEETCODE_USERNAME || 'soumajitgh'
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'soumajitgh'
 const GITHUB_TOKEN = process.env.GITHUB_STATS_TOKEN || process.env.GITHUB_TOKEN
@@ -24,13 +23,35 @@ export type DailyActivity = {
 export type AIUsageStats = {
   additions: number
   adoptionPercent: number
-  agents: { cost: number; lines: number; name: string }[]
+  averagePromptCharacters: number
   aiCodingTime: string
   available: boolean
-  daily: { aiLines: number; date: string; humanLines: number }[]
+  daily: {
+    aiLines: number
+    cost: number
+    date: string
+    humanLines: number
+    inputTokens: number
+    outputTokens: number
+    prompts: number
+    sessions: number
+  }[]
   deletions: number
   humanLineChanges: number
+  inputTokens: number
   lineChanges: number
+  medianPromptsPerSession: number
+  models: { cost: number; lines: number; name: string }[]
+  outputTokens: number
+  projects: {
+    adoptionPercent: number
+    aiLines: number
+    cost: number
+    humanLines: number
+    name: string
+    prompts: number
+    sessions: number
+  }[]
   promptCharacters: number
   promptEvents: number
   promptsPerSession: number
@@ -138,7 +159,8 @@ const number = (value: unknown, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
-const first = (...values: unknown[]) => values.find((value) => value !== undefined && value !== null)
+const first = (...values: unknown[]) =>
+  values.find((value) => value !== undefined && value !== null)
 
 async function fetchJSON(url: string, init?: RequestInit): Promise<unknown> {
   const response = await fetch(url, {
@@ -280,7 +302,10 @@ export async function getLeetCodeStats(): Promise<LeetCodeStats> {
         easy,
         hard,
         medium,
-        total: number(first(solved.solvedProblem, solved.totalSolved, profile.totalSolved), easy + medium + hard),
+        total: number(
+          first(solved.solvedProblem, solved.totalSolved, profile.totalSolved),
+          easy + medium + hard,
+        ),
       },
       totalQuestions: {
         easy: number(first(solved.totalEasy, profile.totalEasy)),
@@ -291,7 +316,10 @@ export async function getLeetCodeStats(): Promise<LeetCodeStats> {
       username: text(profile.username, LEETCODE_USERNAME),
     }
   } catch (error) {
-    return { ...empty, error: error instanceof Error ? error.message : 'Unable to load LeetCode stats' }
+    return {
+      ...empty,
+      error: error instanceof Error ? error.message : 'Unable to load LeetCode stats',
+    }
   }
 }
 
@@ -389,7 +417,9 @@ export async function getGitHubStats(): Promise<GitHubStats> {
       })),
     ])
     const user = asRecord(userValue)
-    const repos = asArray(reposValue).map(asRecord).filter((repo) => !repo.fork)
+    const repos = asArray(reposValue)
+      .map(asRecord)
+      .filter((repo) => !repo.fork)
     const languages = new Map<string, number>()
     for (const repo of repos) {
       const language = text(repo.language)
@@ -429,7 +459,10 @@ export async function getGitHubStats(): Promise<GitHubStats> {
       username: text(user.login, GITHUB_USERNAME),
     }
   } catch (error) {
-    return { ...empty, error: error instanceof Error ? error.message : 'Unable to load GitHub stats' }
+    return {
+      ...empty,
+      error: error instanceof Error ? error.message : 'Unable to load GitHub stats',
+    }
   }
 }
 
@@ -451,13 +484,18 @@ const normalizeMetric = (value: unknown): Metric => {
 const emptyAIUsage = (): AIUsageStats => ({
   additions: 0,
   adoptionPercent: 0,
-  agents: [],
+  averagePromptCharacters: 0,
   aiCodingTime: '—',
   available: false,
   daily: [],
   deletions: 0,
   humanLineChanges: 0,
+  inputTokens: 0,
   lineChanges: 0,
+  medianPromptsPerSession: 0,
+  models: [],
+  outputTokens: 0,
+  projects: [],
   promptCharacters: 0,
   promptEvents: 0,
   promptsPerSession: 0,
@@ -465,47 +503,50 @@ const emptyAIUsage = (): AIUsageStats => ({
   totalCost: 0,
 })
 
-function normalizeAgentUsage(stats: JsonRecord) {
-  const agents = new Map<string, { cost: number; lines: number; name: string }>()
+function normalizeModelUsage(stats: JsonRecord) {
+  const models = new Map<string, { cost: number; lines: number; name: string }>()
 
-  const addAgent = (name: string, lines: unknown, cost: unknown) => {
+  const addModel = (name: string, lines: unknown, cost: unknown) => {
     if (!name) return
-    const current = agents.get(name) || { cost: 0, lines: 0, name }
+    const current = models.get(name) || { cost: 0, lines: 0, name }
     current.lines += number(lines)
     current.cost += number(cost)
-    agents.set(name, current)
+    models.set(name, current)
   }
 
   const addBreakdown = (value: unknown) => {
     for (const item of asArray(value)) {
-      const agent = asRecord(item)
-      addAgent(text(agent.name), first(agent.lines, agent.line_changes), agent.cost)
+      const model = asRecord(item)
+      addModel(text(model.name), first(model.lines, model.line_changes), model.cost)
     }
   }
 
-  addBreakdown(stats.ai_agent_breakdown)
-  if (!agents.size) {
-    const lineChanges = asRecord(stats.ai_agent_line_changes)
-    const costs = asRecord(stats.ai_agent_costs)
+  addBreakdown(first(stats.ai_model_breakdown, stats.ai_agent_breakdown))
+  if (!models.size) {
+    const lineChanges = asRecord(first(stats.ai_model_line_changes, stats.ai_agent_line_changes))
+    const costs = asRecord(first(stats.ai_model_costs, stats.ai_agent_costs))
     for (const [name, lines] of Object.entries(lineChanges)) {
-      addAgent(name, lines, costs[name])
+      addModel(name, lines, costs[name])
     }
   }
 
-  if (!agents.size) {
+  if (!models.size) {
     for (const projectValue of asArray(stats.projects)) {
       const project = asRecord(projectValue)
-      addBreakdown(project.ai_agent_breakdown)
-      if (asArray(project.ai_agent_breakdown).length) continue
-      const lineChanges = asRecord(project.ai_agent_line_changes)
-      const costs = asRecord(project.ai_agent_costs)
+      const breakdown = first(project.ai_model_breakdown, project.ai_agent_breakdown)
+      addBreakdown(breakdown)
+      if (asArray(breakdown).length) continue
+      const lineChanges = asRecord(
+        first(project.ai_model_line_changes, project.ai_agent_line_changes),
+      )
+      const costs = asRecord(first(project.ai_model_costs, project.ai_agent_costs))
       for (const [name, lines] of Object.entries(lineChanges)) {
-        addAgent(name, lines, costs[name])
+        addModel(name, lines, costs[name])
       }
     }
   }
 
-  return Array.from(agents.values()).sort((a, b) => b.lines - a.lines)
+  return Array.from(models.values()).sort((a, b) => b.lines - a.lines)
 }
 
 export async function getWakaTimeStats(): Promise<WakaTimeStats> {
@@ -536,19 +577,20 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
     const headers = wakaHeaders()
     const [statsValue, summariesValue, allTimeValue] = await Promise.all([
       fetchJSON(`${WAKATIME_API_URL}/users/current/stats/last_7_days`, { headers }),
-      fetchJSON(`${WAKATIME_API_URL}/users/current/summaries?start=${start}&end=${end}`, { headers }),
+      fetchJSON(`${WAKATIME_API_URL}/users/current/summaries?start=${start}&end=${end}`, {
+        headers,
+      }),
       fetchJSON(`${WAKATIME_API_URL}/users/current/all_time_since_today`, { headers }),
     ])
     const stats = asRecord(asRecord(statsValue).data)
     const summaries = asArray(asRecord(summariesValue).data)
     const allTime = asRecord(asRecord(allTimeValue).data)
     const bestDay = asRecord(stats.best_day)
-    const aiAgents = normalizeAgentUsage(stats)
+    const aiModels = normalizeModelUsage(stats)
     const aiAdditions = number(stats.ai_additions)
     const aiDeletions = number(stats.ai_deletions)
     const aiLineChanges = number(stats.ai_line_changes_total, aiAdditions + aiDeletions)
-    const humanLineChanges =
-      number(stats.human_additions) + number(stats.human_deletions)
+    const humanLineChanges = number(stats.human_additions) + number(stats.human_deletions)
     const totalLineChanges = aiLineChanges + humanLineChanges
     const aiCategory = asArray(stats.categories)
       .map(asRecord)
@@ -563,34 +605,73 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
           total.ai_line_changes_total,
           number(total.ai_additions) + number(total.ai_deletions),
         ),
+        cost: number(first(total.ai_model_total_cost, total.ai_agent_total_cost)),
         date: text(first(range.date, range.start)).slice(0, 10),
         humanLines: number(total.human_additions) + number(total.human_deletions),
+        inputTokens: number(total.ai_input_tokens),
+        outputTokens: number(total.ai_output_tokens),
+        prompts: number(total.ai_prompt_events_total),
+        sessions: number(total.ai_sessions),
       }
     })
+    const aiProjects = asArray(stats.projects)
+      .map((value) => {
+        const project = asRecord(value)
+        const aiLines = number(
+          project.ai_line_changes_total,
+          number(project.ai_additions) + number(project.ai_deletions),
+        )
+        const humanLines = number(project.human_additions) + number(project.human_deletions)
+        const totalLines = aiLines + humanLines
+        return {
+          adoptionPercent: totalLines ? (aiLines / totalLines) * 100 : 0,
+          aiLines,
+          cost: number(first(project.ai_model_total_cost, project.ai_agent_total_cost)),
+          humanLines,
+          name: text(project.name, 'Unknown'),
+          prompts: number(project.ai_prompt_events_total),
+          sessions: number(project.ai_sessions),
+        }
+      })
+      .filter(
+        (project) =>
+          project.aiLines > 0 || project.prompts > 0 || project.sessions > 0 || project.cost > 0,
+      )
+      .sort((a, b) => b.aiLines - a.aiLines)
     const promptEvents = number(stats.ai_prompt_events_total)
     const sessions = number(stats.ai_sessions)
     const aiTotalCost = number(
-      stats.ai_agent_total_cost,
-      aiAgents.reduce((sum, agent) => sum + agent.cost, 0),
+      first(stats.ai_model_total_cost, stats.ai_agent_total_cost),
+      aiModels.reduce((sum, model) => sum + model.cost, 0),
     )
     const hasAIData =
       aiLineChanges > 0 ||
       promptEvents > 0 ||
       sessions > 0 ||
-      aiAgents.length > 0 ||
+      aiModels.length > 0 ||
+      number(stats.ai_input_tokens) > 0 ||
+      number(stats.ai_output_tokens) > 0 ||
       aiCodingMetric.seconds > 0
 
     return {
       ai: {
         additions: aiAdditions,
         adoptionPercent: totalLineChanges ? (aiLineChanges / totalLineChanges) * 100 : 0,
-        agents: aiAgents,
+        averagePromptCharacters: number(
+          stats.ai_prompt_length_avg,
+          promptEvents ? number(stats.ai_prompt_length_sum) / promptEvents : 0,
+        ),
         aiCodingTime: aiCodingMetric.text || '—',
         available: hasAIData,
         daily: aiDaily,
         deletions: aiDeletions,
         humanLineChanges,
+        inputTokens: number(stats.ai_input_tokens),
         lineChanges: aiLineChanges,
+        medianPromptsPerSession: number(stats.ai_prompt_events_median_per_session),
+        models: aiModels,
+        outputTokens: number(stats.ai_output_tokens),
+        projects: aiProjects,
         promptCharacters: number(stats.ai_prompt_length_sum),
         promptEvents,
         promptsPerSession: number(
@@ -634,6 +715,9 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
       totalThisWeek: text(stats.human_readable_total, '—'),
     }
   } catch (error) {
-    return { ...empty, error: error instanceof Error ? error.message : 'Unable to load WakaTime stats' }
+    return {
+      ...empty,
+      error: error instanceof Error ? error.message : 'Unable to load WakaTime stats',
+    }
   }
 }

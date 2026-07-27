@@ -301,9 +301,7 @@ export function WakaTimeCharts({
         />
       </div>
       <div className="rounded-lg border border-border/70 bg-background/25 p-3 lg:col-span-2">
-        <p className="font-mono text-xs text-muted-foreground">
-          languages / editor modes
-        </p>
+        <p className="font-mono text-xs text-muted-foreground">languages / editor modes</p>
         <StatsChart
           className="h-56"
           description="WakaTime language share across the most used languages"
@@ -364,7 +362,7 @@ export function AIUsageCharts({ usage }: { usage: AIUsageStats }) {
     }),
     [activeDays],
   )
-  const agentOption = useMemo<StatsChartOption>(
+  const modelOption = useMemo<StatsChartOption>(
     () => ({
       color: colors,
       legend: {
@@ -378,9 +376,9 @@ export function AIUsageCharts({ usage }: { usage: AIUsageStats }) {
       series: [
         {
           center: ['50%', '43%'],
-          data: usage.agents.slice(0, 6).map((agent) => ({
-            name: agent.name,
-            value: agent.lines,
+          data: usage.models.slice(0, 6).map((model) => ({
+            name: model.name,
+            value: model.lines,
           })),
           itemStyle: { borderColor: '#272c35', borderWidth: 3 },
           label: { show: false },
@@ -390,7 +388,7 @@ export function AIUsageCharts({ usage }: { usage: AIUsageStats }) {
       ],
       tooltip: { ...tooltip, trigger: 'item', valueFormatter: (value) => `${value} lines` },
     }),
-    [usage.agents],
+    [usage.models],
   )
 
   return (
@@ -404,16 +402,16 @@ export function AIUsageCharts({ usage }: { usage: AIUsageStats }) {
         />
       </div>
       <div className="rounded-lg border border-border/70 bg-background/25 p-3">
-        <p className="font-mono text-xs text-muted-foreground">agent share</p>
-        {usage.agents.length ? (
+        <p className="font-mono text-xs text-muted-foreground">model share</p>
+        {usage.models.length ? (
           <StatsChart
             className="h-60"
-            description="AI-generated line changes grouped by coding agent"
-            option={agentOption}
+            description="AI-generated line changes grouped by AI model"
+            option={modelOption}
           />
         ) : (
           <div className="grid h-60 place-items-center px-4 text-center font-mono text-xs text-muted-foreground">
-            Agent-level attribution is not available for this range.
+            Model-level attribution is not available for this range.
           </div>
         )}
       </div>

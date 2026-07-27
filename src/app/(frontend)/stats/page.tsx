@@ -1,11 +1,7 @@
 import { Clock3, Code2, GitCommitHorizontal, Radio } from 'lucide-react'
 import type { Metadata } from 'next'
 
-import {
-  AIUsageCharts,
-  DifficultyChart,
-  WakaTimeCharts,
-} from '@/components/stats/stats-charts'
+import { AIUsageCharts, DifficultyChart, WakaTimeCharts } from '@/components/stats/stats-charts'
 import {
   ContributionDots,
   StatValue,
@@ -113,19 +109,11 @@ export default async function StatsPage() {
           )}
         </StatsPanel>
 
-        <StatsPanel
-          className="lg:col-span-2"
-          eyebrow="coding activity"
-          title="WakaTime"
-        >
+        <StatsPanel className="lg:col-span-2" eyebrow="coding activity" title="WakaTime">
           {wakatime.available ? (
             <>
               <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-                <StatValue
-                  label="this week"
-                  tone="green"
-                  value={wakatime.totalThisWeek}
-                />
+                <StatValue label="this week" tone="green" value={wakatime.totalThisWeek} />
                 <StatValue label="daily average" value={wakatime.dailyAverage} />
                 <StatValue
                   label="active project"
@@ -136,11 +124,7 @@ export default async function StatsPage() {
                     </span>
                   }
                 />
-                <StatValue
-                  label="all-time activity"
-                  tone="yellow"
-                  value={wakatime.totalAllTime}
-                />
+                <StatValue label="all-time activity" tone="yellow" value={wakatime.totalAllTime} />
               </div>
               <div className="mt-7">
                 <WakaTimeCharts
@@ -160,10 +144,7 @@ export default async function StatsPage() {
                   {wakatime.languages[0]?.name || 'No language data'}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <GitCommitHorizontal
-                    aria-hidden="true"
-                    className="size-3 text-terminal-purple"
-                  />
+                  <GitCommitHorizontal aria-hidden="true" className="size-3 text-terminal-purple" />
                   editor: {wakatime.editors[0]?.name || 'unknown'}
                 </span>
               </div>
@@ -183,6 +164,7 @@ export default async function StatsPage() {
         <StatsPanel
           className="lg:col-span-2"
           eyebrow="assisted engineering"
+          href="/stats/ai"
           title="AI usage"
         >
           {wakatime.available && wakatime.ai.available ? (
@@ -194,14 +176,11 @@ export default async function StatsPage() {
                   value={compactNumber(wakatime.ai.lineChanges)}
                 />
                 <StatValue
-                  label="AI adoption"
+                  label="AI line share"
                   tone="green"
                   value={`${wakatime.ai.adoptionPercent.toFixed(1)}%`}
                 />
-                <StatValue
-                  label="prompt events"
-                  value={compactNumber(wakatime.ai.promptEvents)}
-                />
+                <StatValue label="prompt events" value={compactNumber(wakatime.ai.promptEvents)} />
                 <StatValue
                   label="AI sessions"
                   tone="cyan"
