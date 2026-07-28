@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+/apps/*/node_modules
+/.nx/
+/.pnpm-store/
 /.pnp
 .pnp.js
 .yarn/install-state.gz
@@ -16,6 +19,7 @@
 /.next/
 /.next-playwright/
 /out/
+/apps/*/.next/
 
 # production
 /build
@@ -38,6 +42,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/apps/*/next-env.d.ts
 
 .env
 
@@ -51,3 +56,6 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Go application output
+/apps/ssh/dist/
