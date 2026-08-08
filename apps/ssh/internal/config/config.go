@@ -35,7 +35,7 @@ func Load() (Config, error) {
 	cfg := Config{
 		SSHAddress:            getEnv("SSH_ADDRESS", "127.0.0.1:23234"),
 		SSHHostKeyPath:        getEnv("SSH_HOST_KEY_PATH", "./.ssh/id_ed25519"),
-		SSHAuthorizedKeysPath: getEnv("SSH_AUTHORIZED_KEYS_PATH", "./.ssh/authorized_keys"),
+		SSHAuthorizedKeysPath: os.Getenv("SSH_AUTHORIZED_KEYS_PATH"),
 		SSHIdleTimeout:        idleTimeout,
 		SSHMaxTimeout:         maxTimeout,
 		ShutdownTimeout:       shutdownTimeout,
@@ -48,10 +48,6 @@ func Load() (Config, error) {
 	if cfg.SSHHostKeyPath == "" {
 		return Config{}, fmt.Errorf("SSH_HOST_KEY_PATH cannot be empty")
 	}
-	if cfg.SSHAuthorizedKeysPath == "" {
-		return Config{}, fmt.Errorf("SSH_AUTHORIZED_KEYS_PATH cannot be empty")
-	}
-
 	if cfg.SSHMaxTimeout < cfg.SSHIdleTimeout {
 		return Config{}, fmt.Errorf("SSH_MAX_TIMEOUT must be greater than or equal to SSH_IDLE_TIMEOUT")
 	}

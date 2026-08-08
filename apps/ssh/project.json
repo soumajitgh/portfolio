@@ -16,7 +16,7 @@
       "executor": "nx:run-commands",
       "cache": false,
       "options": {
-        "command": "go run ./cmd/ssh",
+        "command": "go tool air -c .air.toml",
         "cwd": "apps/ssh"
       }
     },
