@@ -3,11 +3,13 @@ package config
 import (
 	"fmt"
 	"net"
+	"net/url"
 	"os"
 	"time"
 )
 
 type Config struct {
+	PayloadURL            string
 	SSHAddress            string
 	SSHHostKeyPath        string
 	SSHAuthorizedKeysPath string
@@ -33,6 +35,7 @@ func Load() (Config, error) {
 	}
 
 	cfg := Config{
+		PayloadURL:            getEnv("PAYLOAD_URL", "http://127.0.0.1:3000"),
 		SSHAddress:            getEnv("SSH_ADDRESS", "127.0.0.1:23234"),
 		SSHHostKeyPath:        getEnv("SSH_HOST_KEY_PATH", "./.ssh/id_ed25519"),
 		SSHAuthorizedKeysPath: os.Getenv("SSH_AUTHORIZED_KEYS_PATH"),
@@ -43,6 +46,13 @@ func Load() (Config, error) {
 
 	if _, _, err := net.SplitHostPort(cfg.SSHAddress); err != nil {
 		return Config{}, fmt.Errorf("invalid SSH_ADDRESS %q: %w", cfg.SSHAddress, err)
+	}
+	payloadURL, err := url.ParseRequestURI(cfg.PayloadURL)
+	if err != nil || payloadURL.Scheme == "" || payloadURL.Host == "" {
+		return Config{}, fmt.Errorf("PAYLOAD_URL must be an absolute HTTP URL, got %q", cfg.PayloadURL)
+	}
+	if payloadURL.Scheme != "http" && payloadURL.Scheme != "https" {
+		return Config{}, fmt.Errorf("PAYLOAD_URL must use http or https, got %q", cfg.PayloadURL)
 	}
 
 	if cfg.SSHHostKeyPath == "" {

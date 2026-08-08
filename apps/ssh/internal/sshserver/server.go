@@ -13,15 +13,17 @@ import (
 	"charm.land/wish/v2/recover"
 
 	"github.com/soumajit/portfolio/apps/ssh/internal/config"
+	"github.com/soumajit/portfolio/apps/ssh/internal/payload"
 	"github.com/soumajit/portfolio/apps/ssh/internal/tui"
 )
 
 type Server struct {
-	server *ssh.Server
-	logger *slog.Logger
+	server  *ssh.Server
+	logger  *slog.Logger
+	payload *payload.Client
 }
 
-func New(cfg config.Config, logger *slog.Logger) (*Server, error) {
+func New(cfg config.Config, logger *slog.Logger, payloadClient *payload.Client) (*Server, error) {
 	if logger == nil {
 		logger = slog.Default()
 	}
@@ -58,8 +60,9 @@ func New(cfg config.Config, logger *slog.Logger) (*Server, error) {
 	}
 
 	return &Server{
-		server: srv,
-		logger: logger,
+		server:  srv,
+		logger:  logger,
+		payload: payloadClient,
 	}, nil
 }
 

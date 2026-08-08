@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/soumajit/portfolio/apps/ssh/internal/config"
+	"github.com/soumajit/portfolio/apps/ssh/internal/payload"
 	"github.com/soumajit/portfolio/apps/ssh/internal/sshserver"
 )
 
@@ -26,7 +27,8 @@ func run(logger *slog.Logger) error {
 		return err
 	}
 
-	server, err := sshserver.New(cfg, logger)
+	payloadClient := payload.NewClient(cfg.PayloadURL)
+	server, err := sshserver.New(cfg, logger, payloadClient)
 	if err != nil {
 		return err
 	}

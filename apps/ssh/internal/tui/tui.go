@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"strings"
 
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
@@ -14,6 +15,8 @@ var (
 			Foreground(lipgloss.Color("62"))
 	helpStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("241"))
+	roleStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("110"))
 )
 
 type model struct {
@@ -45,18 +48,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() tea.View {
-	content := lipgloss.JoinVertical(
-		lipgloss.Left,
-		titleStyle.Render("Portfolio SSH"),
+	content := strings.Join([]string{
+		titleStyle.Render("Soumajit over SSH"),
+		roleStyle.Render("Backend Engineer"),
 		"",
 		fmt.Sprintf("Connected as %s from %s", m.user, m.remoteAddr),
 		"",
 		helpStyle.Render("Press q, Esc, or Ctrl+C to disconnect."),
-	)
+	}, "\n")
 
 	view := tea.NewView(content)
 	view.AltScreen = true
-	view.WindowTitle = "Portfolio SSH"
+	view.WindowTitle = "Soumajit over SSH"
 
 	return view
 }

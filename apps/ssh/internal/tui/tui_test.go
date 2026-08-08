@@ -17,6 +17,9 @@ func TestViewUsesAlternateScreen(t *testing.T) {
 	if !strings.Contains(view.Content, "Connected as alice from 127.0.0.1:2222") {
 		t.Fatalf("unexpected view content: %q", view.Content)
 	}
+	if !strings.Contains(view.Content, "Soumajit over SSH") || !strings.Contains(view.Content, "Backend Engineer") {
+		t.Fatalf("expected profile details in view: %q", view.Content)
+	}
 }
 
 func TestQuitKeysReturnQuitCommand(t *testing.T) {

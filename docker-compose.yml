@@ -39,8 +39,12 @@ services:
       context: .
       dockerfile: apps/ssh/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - web
     ports:
-      - '8080:8080'
+      - '23234:23234'
+    environment:
+      PAYLOAD_URL: http://web:3000
 
 volumes:
   node_modules:

@@ -1,4 +1,4 @@
-# SSH service
+# Soumajit over SSH
 
 A Wish v2 SSH server. It generates an Ed25519 host key when the configured key path does not
 exist and handles `SIGINT`/`SIGTERM` with a graceful shutdown. Each SSH session runs an isolated
@@ -11,6 +11,7 @@ behind the intended network controls.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
+| `PAYLOAD_URL` | `http://127.0.0.1:3000` | Base URL of the Payload REST API served by `apps/web`. |
 | `SSH_ADDRESS` | `127.0.0.1:23234` | Address on which the server listens. |
 | `SSH_HOST_KEY_PATH` | `./.ssh/id_ed25519` | Persistent server host-key path. |
 | `SSH_AUTHORIZED_KEYS_PATH` | Unset | Public keys allowed to connect. Required for non-local deployments. |
@@ -26,6 +27,10 @@ changes:
 ```bash
 go tool air
 ```
+
+For a non-local deployment, set `PAYLOAD_URL` to the public or private URL at which the `web`
+service exposes Payload. The SSH app creates one reusable Resty client at startup; it does not make
+any content requests yet.
 
 In another terminal, connect with a local public key:
 
