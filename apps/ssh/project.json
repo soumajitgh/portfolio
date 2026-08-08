@@ -8,7 +8,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "command": "go build -trimpath -o dist/ssh .",
+        "command": "go build -trimpath -o dist/ssh ./cmd/ssh",
         "cwd": "apps/ssh"
       }
     },
@@ -16,7 +16,7 @@
       "executor": "nx:run-commands",
       "cache": false,
       "options": {
-        "command": "go run .",
+        "command": "go run ./cmd/ssh",
         "cwd": "apps/ssh"
       }
     },
