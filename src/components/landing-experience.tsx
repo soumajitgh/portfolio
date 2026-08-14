@@ -122,7 +122,7 @@ export function PortfolioShowcase({
   return (
     <section
       aria-label="Portfolio overview"
-      className="min-h-0 border-t border-border/60 pt-4 sm:border-t-0 sm:pt-0"
+      className="min-h-0 min-w-0 max-w-full overflow-hidden border-t border-border/60 pt-4 sm:border-t-0 sm:pt-0"
       id="portfolio"
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setIsPaused(false)
@@ -131,20 +131,20 @@ export function PortfolioShowcase({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="mb-2 flex items-end justify-between gap-4 sm:mb-3">
-        <div className="scrollbar-thin mobile-scrollbar-hidden min-w-0 overflow-x-auto overscroll-x-contain">
+      <div className="mb-3 flex min-w-0 items-end justify-between gap-4">
+        <div className="scrollbar-thin mobile-scrollbar-hidden min-w-0 flex-1 overflow-visible sm:overflow-x-auto sm:overscroll-x-contain">
           <div
-            className="flex min-w-max items-center gap-2 font-mono text-xs sm:gap-1"
+            className="grid w-full grid-cols-2 items-center gap-1 font-mono text-xs sm:flex sm:min-w-max"
             role="tablist"
           >
             <span className="mr-1 hidden text-terminal-purple sm:inline">portfolio = [</span>
             {panels.map((panel, index) => (
-              <span className="flex items-center" key={panel.id}>
+              <span className="flex min-w-0 items-center" key={panel.id}>
                 <button
                   aria-controls={`panel-${panel.id}`}
                   aria-selected={activePanel === panel.id}
                   className={cn(
-                    'min-h-11 rounded px-3 py-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'min-h-11 w-full min-w-0 rounded px-2 py-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto sm:px-3',
                     activePanel === panel.id && 'bg-accent text-accent-foreground',
                   )}
                   id={`tab-${panel.id}`}
@@ -164,7 +164,7 @@ export function PortfolioShowcase({
             <span className="ml-1 hidden text-terminal-purple sm:inline">]</span>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="hidden shrink-0 items-center gap-2 sm:flex">
           <span className="hidden font-mono text-[11px] text-muted-foreground sm:inline">
             {pinnedPanel
               ? `pinned / ${pinnedPanel}`
@@ -184,7 +184,7 @@ export function PortfolioShowcase({
         </div>
       </div>
 
-      <div className="portfolio-panel relative h-[19rem] overflow-hidden sm:h-[clamp(15.5rem,36dvh,21rem)]">
+      <div className="portfolio-panel relative h-[19rem] w-full min-w-0 max-w-full overflow-hidden sm:h-[clamp(15.5rem,36dvh,21rem)]">
         {panels.map((panel) => (
           <div
             aria-labelledby={`tab-${panel.id}`}
@@ -201,20 +201,20 @@ export function PortfolioShowcase({
             {panel.id === 'blog' && <HomeBlogPosts posts={blogPosts} />}
             {panel.id === 'stats' && statsPanel}
             {panel.id === 'stack' && (
-              <Card className="h-full gap-4 overflow-auto px-5 py-5 sm:px-6">
+              <Card className="h-full max-w-full gap-4 overflow-y-auto overflow-x-hidden px-4 py-5 sm:px-6">
                 <div className="flex items-center justify-between gap-4 font-mono text-xs">
                   <p className="text-terminal-cyan">const stack = {'{'}</p>
                   <p className="text-muted-foreground">frequency ↓</p>
                 </div>
                 {stack.length ? (
-                  <div className="flex flex-wrap content-start gap-2.5">
+                  <div className="flex min-w-0 max-w-full flex-wrap content-start gap-2.5">
                     {stack.map((topic, index) => (
                       <Link
-                        className="group inline-flex min-h-11 max-w-full items-center gap-2 rounded-sm border border-border bg-background/20 px-3 font-mono text-xs text-foreground transition-colors hover:border-terminal-cyan/60 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="group inline-flex min-h-11 min-w-0 max-w-full items-center gap-2 rounded-sm border border-border bg-background/20 px-3 font-mono text-xs whitespace-normal text-foreground transition-colors hover:border-terminal-cyan/60 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         href={`/projects?topic=${topic.slug}`}
                         key={topic.slug}
                       >
-                        <span className="text-terminal-purple">{topic.slug}</span>
+                        <span className="break-all text-terminal-purple">{topic.slug}</span>
                         <span
                           className="text-muted-foreground"
                           aria-label={`${topic.count} projects`}

@@ -1,7 +1,7 @@
 const LEETCODE_API_URL = process.env.LEETCODE_API_URL || 'https://alfa-leetcode-api.onrender.com'
 const LEETCODE_USERNAME = process.env.LEETCODE_USERNAME || 'soumajitgh'
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'soumajitgh'
-const GITHUB_TOKEN = process.env.GITHUB_STATS_TOKEN || process.env.GITHUB_TOKEN
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 const WAKATIME_API_URL = process.env.WAKATIME_API_URL || 'https://wakatime.com/api/v1'
 
 type JsonRecord = Record<string, unknown>

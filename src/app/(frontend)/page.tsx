@@ -111,7 +111,7 @@ export default async function HomePage() {
         <PortfolioShowcase
           {...data}
           statsPanel={
-            <Suspense fallback={<HomeStatsFallback />}>
+            <Suspense fallback={<HomeStatsFallback />} key="home-stats-panel">
               <HomeStatsWidget />
             </Suspense>
           }
