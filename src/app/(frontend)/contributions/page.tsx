@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 
-import { ContributionIssueRow } from '@/components/contributions/contribution-issue-row'
-import { FilterSelect } from '@/components/filter-select'
+import { ContributionsTable } from '@/components/contributions/contributions-table'
+import type { ContributionSort } from '@/components/contributions/contributions-table'
 import { getVisibleContributions } from '@/lib/contribution-data'
 import { absoluteURL, nonIndexableRobots, serializeJsonLd, siteName } from '@/lib/seo'
 
@@ -11,13 +10,36 @@ export const revalidate = 300
 const pageTitle = 'Open Source Contributions'
 const pageDescription =
   'Open source pull requests by Soumajit Ghosh across developer tools, applications, and infrastructure projects.'
+const contributionSorts = new Set<ContributionSort>([
+  'changes-asc',
+  'changes-desc',
+  'newest',
+  'oldest',
+  'portfolio',
+  'repo-asc',
+  'repo-desc',
+  'stars-asc',
+  'stars-desc',
+])
+
+type ContributionsSearchParams = {
+  featured?: string | string[]
+  filter?: string | string[]
+  page?: string | string[]
+  q?: string | string[]
+  repo?: string | string[]
+  sort?: string | string[]
+  status?: string | string[]
+  tag?: string | string[]
+}
 
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ filter?: string | string[] }>
+  searchParams: Promise<ContributionsSearchParams>
 }): Promise<Metadata> {
-  const filter = firstValue((await searchParams).filter)
+  const params = await searchParams
+  const hasFilters = Object.values(params).some((value) => firstValue(value).trim())
 
   return {
     alternates: { canonical: '/contributions' },
@@ -28,7 +50,7 @@ export async function generateMetadata({
       type: 'website',
       url: '/contributions',
     },
-    ...(filter ? { robots: nonIndexableRobots } : {}),
+    ...(hasFilters ? { robots: nonIndexableRobots } : {}),
     title: pageTitle,
     twitter: {
       card: 'summary_large_image',
@@ -41,44 +63,37 @@ export async function generateMetadata({
 export default async function ContributionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ filter?: string | string[] }>
+  searchParams: Promise<ContributionsSearchParams>
 }) {
-  const requestedFilter = firstValue((await searchParams).filter)
-    .trim()
-    .toLowerCase()
+  const params = await searchParams
   const contributions = await getVisibleContributions()
-  const statusFilters = (['merged', 'open', 'closed'] as const)
-    .map((status) => ({
-      count: contributions.filter((item) => item.status === status).length,
-      label: status[0].toUpperCase() + status.slice(1),
-      value: status,
-    }))
-    .filter((filter) => filter.count > 0)
-  const tagFilters = Array.from(
-    contributions
-      .flatMap((contribution) => contribution.tags || [])
-      .reduce((tags, tag) => {
-        const existing = tags.get(tag.slug)
-        tags.set(tag.slug, { count: (existing?.count || 0) + 1, label: tag.name, value: tag.slug })
-        return tags
-      }, new Map<string, { count: number; label: string; value: string }>())
-      .values(),
-  ).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
-  const featuredCount = contributions.filter((item) => item.featured).length
-  const filters = [
-    { count: contributions.length, label: 'All', value: 'all' },
-    ...(featuredCount ? [{ count: featuredCount, label: 'Featured', value: 'featured' }] : []),
-    ...statusFilters,
-    ...tagFilters,
-  ]
-  const knownFilters = new Set(filters.map((filter) => filter.value))
-  const activeFilter = knownFilters.has(requestedFilter) ? requestedFilter : 'all'
-  const visibleContributions = contributions.filter((contribution) => {
-    if (activeFilter === 'all') return true
-    if (activeFilter === 'featured') return contribution.featured
-    if (contribution.status === activeFilter) return true
-    return contribution.tags?.some((tag) => tag.slug === activeFilter) || false
-  })
+  const legacyFilter = firstValue(params.filter).trim().toLowerCase()
+  const requestedStatus = firstValue(params.status).trim().toLowerCase()
+  const requestedRepository = firstValue(params.repo).trim().toLowerCase()
+  const requestedTag = firstValue(params.tag).trim().toLowerCase()
+  const requestedSort = firstValue(params.sort).trim().toLowerCase()
+  const requestedPage = Number.parseInt(firstValue(params.page), 10)
+  const knownRepositories = new Set(
+    contributions.map((item) => `${item.organization}/${item.repository}`.toLowerCase()),
+  )
+  const knownTags = new Set(
+    contributions.flatMap((contribution) =>
+      (contribution.tags || []).map((tag) => tag.slug.toLowerCase()),
+    ),
+  )
+  const status = ['merged', 'open'].includes(requestedStatus)
+    ? requestedStatus
+    : ['merged', 'open'].includes(legacyFilter)
+      ? legacyFilter
+      : ''
+  const tag = knownTags.has(requestedTag)
+    ? requestedTag
+    : knownTags.has(legacyFilter)
+      ? legacyFilter
+      : ''
+  const sort: ContributionSort = contributionSorts.has(requestedSort as ContributionSort)
+    ? (requestedSort as ContributionSort)
+    : 'newest'
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -86,7 +101,7 @@ export default async function ContributionsPage({
     description: pageDescription,
     mainEntity: {
       '@type': 'ItemList',
-      itemListElement: visibleContributions.map((contribution, index) => ({
+      itemListElement: contributions.map((contribution, index) => ({
         '@type': 'ListItem',
         item: {
           '@type': 'CreativeWork',
@@ -96,7 +111,7 @@ export default async function ContributionsPage({
         },
         position: index + 1,
       })),
-      numberOfItems: visibleContributions.length,
+      numberOfItems: contributions.length,
     },
     name: pageTitle,
     url: absoluteURL('/contributions'),
@@ -119,56 +134,18 @@ export default async function ContributionsPage({
             Pull request index
           </h2>
 
-          {filters.length > 1 ? (
-            <div className="rounded-lg border border-border bg-card/40 p-3 sm:p-5">
-              <FilterSelect
-                accessibleLabel="Filter open source contributions"
-                allLabel={`All contributions (${contributions.length})`}
-                name="filter"
-                options={filters.slice(1).map((filter) => ({
-                  label: `${filter.label} (${filter.count})`,
-                  value: filter.value,
-                }))}
-                value={activeFilter === 'all' ? '' : activeFilter}
-              />
-            </div>
-          ) : null}
-
-          <div
-            aria-live="polite"
-            className="mt-5 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-muted-foreground"
-          >
-            <span>
-              {visibleContributions.length}{' '}
-              {visibleContributions.length === 1 ? 'pull request' : 'pull requests'}
-            </span>
-            <span className="text-terminal-yellow">portfolio order</span>
-          </div>
-
-          {visibleContributions.length ? (
-            <div className="mt-5 overflow-hidden rounded-lg border border-border/80 bg-card/45">
-              <div className="hidden grid-cols-[1.25rem_minmax(0,1fr)_minmax(13rem,auto)] gap-3 border-b border-border/80 bg-muted/20 px-6 py-3 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-muted-foreground sm:grid">
-                <span aria-hidden="true" />
-                <span>Pull request</span>
-                <span className="text-right">Impact / status</span>
-              </div>
-              <div className="divide-y divide-border/80" role="list">
-                {visibleContributions.map((contribution) => (
-                  <ContributionIssueRow contribution={contribution} key={contribution.id} />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="mt-5 px-4 py-10 text-center font-mono text-sm text-muted-foreground sm:p-10">
-              <p>0 pull requests matched this filter</p>
-              <Link
-                className="mt-3 inline-block text-primary hover:underline"
-                href="/contributions"
-              >
-                ./clear-filter
-              </Link>
-            </div>
-          )}
+          <ContributionsTable
+            contributions={contributions}
+            initialFilters={{
+              featured: firstValue(params.featured) === '1' || legacyFilter === 'featured',
+              page: Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1,
+              query: firstValue(params.q).trim(),
+              repository: knownRepositories.has(requestedRepository) ? requestedRepository : '',
+              sort,
+              status,
+              tag,
+            }}
+          />
         </section>
 
         <script

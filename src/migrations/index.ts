@@ -4,6 +4,7 @@ import * as migration_20260723_113924_add_mcp_write_permissions from './20260723
 import * as migration_20260723_115619_seo_fields from './20260723_115619_seo_fields'
 import * as migration_20260814_075947_oss_contributions from './20260814_075947_oss_contributions'
 import * as migration_20260814_092312_tracked_repository_sync from './20260814_092312_tracked_repository_sync'
+import * as migration_20260814_100155_oss_contributions_mcp from './20260814_100155_oss_contributions_mcp'
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20260814_092312_tracked_repository_sync.up,
     down: migration_20260814_092312_tracked_repository_sync.down,
     name: '20260814_092312_tracked_repository_sync',
+  },
+  {
+    up: migration_20260814_100155_oss_contributions_mcp.up,
+    down: migration_20260814_100155_oss_contributions_mcp.down,
+    name: '20260814_100155_oss_contributions_mcp',
   },
 ]

@@ -531,6 +531,24 @@ export interface PayloadMcpApiKey {
      */
     delete?: boolean | null;
   };
+  ossContributions?: {
+    /**
+     * Allow clients to find oss-contributions.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create oss-contributions.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update oss-contributions.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete oss-contributions.
+     */
+    delete?: boolean | null;
+  };
   projects?: {
     /**
      * Allow clients to find projects.
@@ -546,6 +564,24 @@ export interface PayloadMcpApiKey {
     update?: boolean | null;
     /**
      * Allow clients to delete projects.
+     */
+    delete?: boolean | null;
+  };
+  trackedRepositories?: {
+    /**
+     * Allow clients to find tracked-repositories.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create tracked-repositories.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update tracked-repositories.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete tracked-repositories.
      */
     delete?: boolean | null;
   };
@@ -1039,7 +1075,23 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
         update?: T;
         delete?: T;
       };
+  ossContributions?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
   projects?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  trackedRepositories?:
     | T
     | {
         find?: T;
