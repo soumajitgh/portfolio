@@ -5,12 +5,11 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY apps/web/package.json ./apps/web/package.json
-RUN corepack enable && pnpm install --frozen-lockfile --filter web...
+RUN corepack enable && pnpm install --frozen-lockfile
 
 FROM deps AS builder
 WORKDIR /app
-COPY apps/web ./apps/web
+COPY . .
 
 # Payload-backed pages render dynamically and connect to PostgreSQL at runtime.
 # This non-routable placeholder is only parsed while Next.js builds the image.
@@ -28,7 +27,7 @@ ENV NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST
 ENV R2_PUBLIC_URL=$R2_PUBLIC_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN PAYLOAD_SECRET=build-only-placeholder pnpm --filter web build
+RUN PAYLOAD_SECRET=build-only-placeholder pnpm build
 
 FROM base AS runner
 WORKDIR /app
@@ -41,15 +40,15 @@ ENV PORT=3000
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/public ./public
 
-RUN mkdir -p apps/web/.next && chown -R nextjs:nodejs apps
+RUN mkdir -p .next && chown nextjs:nodejs .next
 
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "apps/web/server.js"]
+CMD ["node", "server.js"]

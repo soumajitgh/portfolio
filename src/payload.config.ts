@@ -3,7 +3,6 @@ import { resendAdapter } from '@payloadcms/email-resend'
 import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { BlocksFeature, CodeBlock, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
-import { config as loadEnv } from 'dotenv'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -20,12 +19,6 @@ import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-
-// Payload commands run outside Next.js too (migrations, seeding, and type generation).
-// Load app-local settings first and retain compatibility with the workspace-root .env.
-loadEnv({ path: path.resolve(dirname, '../.env') })
-loadEnv({ path: path.resolve(dirname, '../../../.env') })
-
 const r2PublicURL = (process.env.R2_PUBLIC_URL || '').replace(/\/$/, '')
 const r2Enabled = Boolean(
   process.env.R2_BUCKET &&
