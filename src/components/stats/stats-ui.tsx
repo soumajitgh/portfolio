@@ -98,12 +98,15 @@ export function ContributionDots({
   const today = new Date()
   today.setUTCHours(0, 0, 0, 0)
   const counts = new Map(days.map((day) => [day.date, day.count]))
-  const cells = Array.from({ length: 30 }, (_, index) => {
-    const day = new Date(today)
-    day.setUTCDate(today.getUTCDate() - (29 - index))
+  const calendarStart = new Date(today)
+  calendarStart.setUTCDate(today.getUTCDate() - today.getUTCDay() - 52 * 7)
+  const cells = Array.from({ length: 53 * 7 }, (_, index) => {
+    const day = new Date(calendarStart)
+    day.setUTCDate(calendarStart.getUTCDate() + index)
     const date = day.toISOString().slice(0, 10)
-    return { count: counts.get(date) || 0, date }
+    return { count: counts.get(date) || 0, date, future: day > today }
   })
+  const visibleCells = cells.filter((cell) => !cell.future)
 
   const intensity = (count: number) => {
     if (count === 0) return 'border-border/70 bg-muted/60'
@@ -114,25 +117,29 @@ export function ContributionDots({
   }
 
   return (
-    <div className="mt-6 border-t border-border/70 pt-5">
+    <div className="mt-6 flex min-h-0 flex-1 flex-col border-t border-border/70 pt-5">
       <div className="flex items-center justify-between gap-4">
-        <p className="font-mono text-xs text-muted-foreground">Last 30 days</p>
+        <p className="font-mono text-xs text-muted-foreground">Last 12 months</p>
         <p className="font-mono text-[0.6875rem] text-terminal-green">
-          {cells.reduce((total, cell) => total + cell.count, 0)} contributions
+          {visibleCells.reduce((total, cell) => total + cell.count, 0)} contributions
         </p>
       </div>
       <div
-        aria-label="GitHub contribution activity for the last 30 days"
-        className="scrollbar-thin mt-3 overflow-x-auto pb-1"
+        aria-label="GitHub contribution activity for the last 12 months"
+        className="scrollbar-thin mt-3 flex flex-1 items-center overflow-x-auto pb-1"
         role="img"
       >
-        <div className="grid w-max grid-cols-[repeat(10,0.75rem)] gap-1 sm:grid-cols-[repeat(15,0.75rem)] lg:grid-cols-[repeat(30,0.75rem)]">
+        <div className="grid w-max grid-flow-col grid-rows-7 gap-1">
           {cells.map((cell) => (
             <span
-              aria-label={`${cell.count} contributions on ${cell.date}`}
-              className={cn('size-3 rounded-[2px] border', intensity(cell.count))}
+              aria-hidden={cell.future || undefined}
+              aria-label={cell.future ? undefined : `${cell.count} contributions on ${cell.date}`}
+              className={cn(
+                'size-3 rounded-[2px] border',
+                cell.future ? 'border-transparent bg-transparent' : intensity(cell.count),
+              )}
               key={cell.date}
-              title={`${cell.date}: ${cell.count} contributions`}
+              title={cell.future ? undefined : `${cell.date}: ${cell.count} contributions`}
             />
           ))}
         </div>

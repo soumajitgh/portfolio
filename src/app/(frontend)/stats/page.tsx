@@ -63,7 +63,7 @@ export default async function StatsPage() {
         </div>
       </div>
 
-      <div className="mt-9 grid items-start gap-5 lg:grid-cols-2">
+      <div className="mt-9 grid gap-5 lg:grid-cols-2">
         <StatsPanel eyebrow="problem solving" href="/stats/leetcode" title="LeetCode">
           {leetcode.available ? (
             <>
@@ -93,7 +93,12 @@ export default async function StatsPage() {
           )}
         </StatsPanel>
 
-        <StatsPanel eyebrow="open source" href="/stats/github" title="GitHub">
+        <StatsPanel
+          className="flex h-full flex-col"
+          eyebrow="open source"
+          href="/stats/github"
+          title="GitHub"
+        >
           {github.available ? (
             <>
               <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
