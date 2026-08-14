@@ -23,7 +23,6 @@ const contributionSorts = new Set<ContributionSort>([
 ])
 
 type ContributionsSearchParams = {
-  featured?: string | string[]
   filter?: string | string[]
   page?: string | string[]
   q?: string | string[]
@@ -137,7 +136,6 @@ export default async function ContributionsPage({
           <ContributionsTable
             contributions={contributions}
             initialFilters={{
-              featured: firstValue(params.featured) === '1' || legacyFilter === 'featured',
               page: Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1,
               query: firstValue(params.q).trim(),
               repository: knownRepositories.has(requestedRepository) ? requestedRepository : '',

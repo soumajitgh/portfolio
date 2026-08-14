@@ -42,7 +42,6 @@ export type ContributionSort =
   | 'stars-desc'
 
 type InitialFilters = {
-  featured: boolean
   page: number
   query: string
   repository: string
@@ -94,7 +93,6 @@ export function ContributionsTable({
   const [repository, setRepository] = useState(initialFilters.repository)
   const [status, setStatus] = useState(initialFilters.status)
   const [tag, setTag] = useState(initialFilters.tag)
-  const [featured, setFeatured] = useState(initialFilters.featured)
   const [sort, setSort] = useState<ContributionSort>(initialFilters.sort)
   const [page, setPage] = useState(initialFilters.page)
   const tableRef = useRef<HTMLDivElement>(null)
@@ -133,7 +131,6 @@ export function ContributionsTable({
       if (repository && repositoryValue(contribution) !== repository) return false
       if (status && contribution.status !== status) return false
       if (tag && !contribution.tags?.some((item) => item.slug === tag)) return false
-      if (featured && !contribution.featured) return false
       if (!normalizedQuery) return true
 
       return [
@@ -150,7 +147,7 @@ export function ContributionsTable({
     })
 
     return sortContributions(filtered, sort)
-  }, [contributions, featured, query, repository, sort, status, tag])
+  }, [contributions, query, repository, sort, status, tag])
 
   const pageCount = Math.max(1, Math.ceil(visibleContributions.length / pageSize))
   const currentPage = Math.min(page, pageCount)
@@ -158,18 +155,14 @@ export function ContributionsTable({
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   )
-  const firstVisibleItem = visibleContributions.length ? (currentPage - 1) * pageSize + 1 : 0
-  const lastVisibleItem = Math.min(currentPage * pageSize, visibleContributions.length)
-  const hasFilters = Boolean(query || repository || status || tag || featured || sort !== 'newest')
 
   function updateURL(next: Partial<InitialFilters>) {
-    const values = { featured, page, query, repository, sort, status, tag, ...next }
+    const values = { page, query, repository, sort, status, tag, ...next }
     const params = new URLSearchParams()
     if (values.query.trim()) params.set('q', values.query.trim())
     if (values.repository) params.set('repo', values.repository)
     if (values.status) params.set('status', values.status)
     if (values.tag) params.set('tag', values.tag)
-    if (values.featured) params.set('featured', '1')
     if (values.sort !== 'newest') params.set('sort', values.sort)
     if (values.page > 1) params.set('page', String(values.page))
     const queryString = params.toString()
@@ -200,7 +193,6 @@ export function ContributionsTable({
     setRepository('')
     setStatus('')
     setTag('')
-    setFeatured(false)
     setSort('newest')
     setPage(1)
     window.history.replaceState(null, '', '/contributions')
@@ -297,47 +289,6 @@ export function ContributionsTable({
             options={sortOptions}
             value={sort}
           />
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              aria-pressed={featured}
-              className={cn(
-                'h-9 min-h-9 px-2.5 text-[0.6875rem]',
-                featured && 'border-terminal-yellow/50 text-terminal-yellow',
-              )}
-              onClick={() => {
-                const next = !featured
-                setFeatured(next)
-                setPage(1)
-                updateURL({ featured: next, page: 1 })
-                trackFilter('featured', next ? 'true' : 'false')
-              }}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              <Star aria-hidden="true" />
-              Featured
-            </Button>
-            {hasFilters ? (
-              <Button
-                className="h-9 min-h-9 px-2.5 text-[0.6875rem] text-muted-foreground"
-                onClick={clearFilters}
-                size="sm"
-                type="button"
-                variant="ghost"
-              >
-                <RotateCcw aria-hidden="true" />
-                Clear
-              </Button>
-            ) : null}
-          </div>
-          <p aria-live="polite" className="font-mono text-[0.6875rem] text-muted-foreground">
-            {firstVisibleItem}–{lastVisibleItem} of {visibleContributions.length}{' '}
-            {visibleContributions.length === 1 ? 'pull request' : 'pull requests'}
-          </p>
         </div>
       </div>
 
