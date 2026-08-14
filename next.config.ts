@@ -1,24 +1,15 @@
 import { withPayload } from '@payloadcms/next/withPayload'
-import { config as loadEnv } from 'dotenv'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
-
-// Keep existing workspace-level development configuration working while allowing
-// app-local .env files to take precedence.
-loadEnv({ path: path.resolve(dirname, '.env') })
-loadEnv({ path: path.resolve(dirname, '../../.env') })
-
 const r2PublicURL = process.env.R2_PUBLIC_URL
 
 const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
   output: 'standalone',
-  // Keep standalone tracing correct when this app is built from the Nx workspace root.
-  outputFileTracingRoot: path.resolve(dirname, '../..'),
   redirects: async () => [
     {
       destination: '/blogs',
@@ -63,7 +54,7 @@ const nextConfig: NextConfig = {
     return webpackConfig
   },
   turbopack: {
-    root: path.resolve(dirname, '../..'),
+    root: path.resolve(dirname),
   },
 }
 
