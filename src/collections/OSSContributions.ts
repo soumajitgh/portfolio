@@ -21,6 +21,7 @@ const githubMetadataFields = [
   'additions',
   'deletions',
   'changedFiles',
+  'githubNodeId',
   'prDescription',
   'repoUrl',
   'repoDescription',
@@ -48,7 +49,7 @@ export const OSSContributions: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'repository', 'status', 'featured', 'hidden', 'githubSyncedAt'],
     description:
-      'Paste a GitHub pull request URL. GitHub facts are imported automatically; portfolio fields stay under your control.',
+      'Pull requests are discovered from Tracked Repositories. GitHub facts stay synchronized while portfolio fields remain under your control.',
   },
   access: {
     create: ({ req }) => Boolean(req.user),
@@ -186,8 +187,20 @@ export const OSSContributions: CollectionConfig = {
       unique: true,
       index: true,
       admin: {
-        description: 'Paste a URL like https://github.com/org/repo/pull/123.',
+        description:
+          'Filled automatically for tracked repositories. A PR URL can still be imported manually as a fallback.',
         placeholder: 'https://github.com/org/repo/pull/123',
+      },
+    },
+    {
+      name: 'trackedRepository',
+      label: 'Tracked repository',
+      type: 'relationship',
+      relationTo: 'tracked-repositories',
+      index: true,
+      admin: {
+        description: 'The repository tracker that discovered and refreshes this pull request.',
+        readOnly: true,
       },
     },
     {
@@ -387,6 +400,13 @@ export const OSSContributions: CollectionConfig = {
       name: 'prKey',
       type: 'text',
       required: true,
+      unique: true,
+      index: true,
+      admin: { hidden: true },
+    },
+    {
+      name: 'githubNodeId',
+      type: 'text',
       unique: true,
       index: true,
       admin: { hidden: true },

@@ -15,7 +15,9 @@ import { Media } from './collections/Media'
 import { OSSContributions } from './collections/OSSContributions'
 import { Projects } from './collections/Projects'
 import { ProjectStars } from './collections/ProjectStars'
+import { TrackedRepositories } from './collections/TrackedRepositories'
 import { PortfolioSettings } from './globals/PortfolioSettings'
+import { SyncTrackedRepositories } from './jobs/SyncTrackedRepositories'
 import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
@@ -39,13 +41,36 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Media, Projects, OSSContributions, BlogPosts, ProjectStars, BlogStars],
+  collections: [
+    Users,
+    Media,
+    Projects,
+    TrackedRepositories,
+    OSSContributions,
+    BlogPosts,
+    ProjectStars,
+    BlogStars,
+  ],
   email: resendAdapter({
     apiKey: process.env.RESEND_API_KEY || '',
     defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev',
     defaultFromName: process.env.EMAIL_FROM_NAME || 'soumajit.dev',
   }),
   globals: [PortfolioSettings],
+  jobs: {
+    autoRun: [
+      {
+        cron: '* * * * *',
+        limit: 1,
+        queue: 'github-contributions',
+      },
+    ],
+    deleteJobOnComplete: true,
+    enableConcurrencyControl: true,
+    shouldAutoRun: () =>
+      process.env.NODE_ENV !== 'test' && process.env.ENABLE_GITHUB_SYNC_WORKER !== 'false',
+    tasks: [SyncTrackedRepositories],
+  },
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,

@@ -135,7 +135,7 @@ export default async function GitHubStatsPage() {
                 title="Contribution activity"
               >
                 <StatsUnavailable
-                  detail="Set GITHUB_STATS_TOKEN on the server to add the one-year contribution graph. Public repository metrics are already live."
+                  detail="Set GITHUB_TOKEN on the server to add the one-year contribution graph. Public repository metrics are already live."
                   label="Contribution timeline"
                 />
               </StatsPanel>

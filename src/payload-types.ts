@@ -71,12 +71,14 @@ export interface Config {
     users: User;
     media: Media;
     projects: Project;
+    'tracked-repositories': TrackedRepository;
     'oss-contributions': OSSContribution;
     'blog-posts': BlogPost;
     'project-stars': ProjectStar;
     'blog-stars': BlogStar;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
+    'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -86,12 +88,14 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'tracked-repositories': TrackedRepositoriesSelect<false> | TrackedRepositoriesSelect<true>;
     'oss-contributions': OssContributionsSelect<false> | OssContributionsSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     'project-stars': ProjectStarsSelect<false> | ProjectStarsSelect<true>;
     'blog-stars': BlogStarsSelect<false> | BlogStarsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -102,9 +106,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'portfolio-settings': PortfolioSetting;
+    'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     'portfolio-settings': PortfolioSettingsSelect<false> | PortfolioSettingsSelect<true>;
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -112,7 +118,13 @@ export interface Config {
   };
   user: User | PayloadMcpApiKey;
   jobs: {
-    tasks: unknown;
+    tasks: {
+      syncTrackedRepositories: TaskSyncTrackedRepositories;
+      inline: {
+        input: unknown;
+        output: unknown;
+      };
+    };
     workflows: unknown;
   };
 }
@@ -292,7 +304,49 @@ export interface Project {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Paste a GitHub pull request URL. GitHub facts are imported automatically; portfolio fields stay under your control.
+ * Add a GitHub repository once. Pull requests opened by the configured username are discovered and refreshed automatically.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tracked-repositories".
+ */
+export interface TrackedRepository {
+  id: number;
+  /**
+   * Paste a repository URL like https://github.com/OneBusAway/maglev.
+   */
+  repositoryUrl: string;
+  /**
+   * Only pull requests opened by this GitHub account are imported.
+   */
+  githubUsername: string;
+  /**
+   * Automatic runs skip this repository until its cache expires.
+   */
+  syncIntervalHours: number;
+  enabled?: boolean | null;
+  /**
+   * Bypasses the two-hour cache once when this document is saved.
+   */
+  refreshNow?: boolean | null;
+  organization: string;
+  repository: string;
+  repoDescription?: string | null;
+  stars?: number | null;
+  discoveredPullRequests?: number | null;
+  syncStatus: 'pending' | 'syncing' | 'synced' | 'error';
+  nextSyncAt: string;
+  lastSyncAttemptAt?: string | null;
+  lastSyncedAt?: string | null;
+  syncError?: string | null;
+  githubRequestsLastSync?: number | null;
+  githubRateLimitRemaining?: number | null;
+  githubRateLimitResetAt?: string | null;
+  repoKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Pull requests are discovered from Tracked Repositories. GitHub facts stay synchronized while portfolio fields remain under your control.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "oss-contributions".
@@ -300,9 +354,13 @@ export interface Project {
 export interface OSSContribution {
   id: number;
   /**
-   * Paste a URL like https://github.com/org/repo/pull/123.
+   * Filled automatically for tracked repositories. A PR URL can still be imported manually as a fallback.
    */
   prUrl: string;
+  /**
+   * The repository tracker that discovered and refreshes this pull request.
+   */
+  trackedRepository?: (number | null) | TrackedRepository;
   /**
    * Bypasses the soumajitgh ownership check for co-authored or maintainer-opened PRs.
    */
@@ -344,6 +402,7 @@ export interface OSSContribution {
   githubSyncedAt: string;
   githubSyncError?: string | null;
   prKey: string;
+  githubNodeId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -526,6 +585,111 @@ export interface PayloadKv {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number;
+  /**
+   * Input data provided to the job
+   */
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taskStatus?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
+  /**
+   * If hasError is true this job will not be retried
+   */
+  hasError?: boolean | null;
+  /**
+   * If hasError is true, this is the error that caused it
+   */
+  error?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Task execution log
+   */
+  log?:
+    | {
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'syncTrackedRepositories';
+        taskID: string;
+        input?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        output?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        state: 'failed' | 'succeeded';
+        error?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  taskSlug?: ('inline' | 'syncTrackedRepositories') | null;
+  queue?: string | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  /**
+   * Used for concurrency control. Jobs with the same key are subject to exclusive/supersedes rules.
+   */
+  concurrencyKey?: string | null;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -542,6 +706,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'tracked-repositories';
+        value: number | TrackedRepository;
       } | null)
     | ({
         relationTo: 'oss-contributions';
@@ -736,10 +904,38 @@ export interface ProjectsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tracked-repositories_select".
+ */
+export interface TrackedRepositoriesSelect<T extends boolean = true> {
+  repositoryUrl?: T;
+  githubUsername?: T;
+  syncIntervalHours?: T;
+  enabled?: T;
+  refreshNow?: T;
+  organization?: T;
+  repository?: T;
+  repoDescription?: T;
+  stars?: T;
+  discoveredPullRequests?: T;
+  syncStatus?: T;
+  nextSyncAt?: T;
+  lastSyncAttemptAt?: T;
+  lastSyncedAt?: T;
+  syncError?: T;
+  githubRequestsLastSync?: T;
+  githubRateLimitRemaining?: T;
+  githubRateLimitResetAt?: T;
+  repoKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "oss-contributions_select".
  */
 export interface OssContributionsSelect<T extends boolean = true> {
   prUrl?: T;
+  trackedRepository?: T;
   allowDifferentAuthor?: T;
   refreshFromGitHub?: T;
   portfolioSummary?: T;
@@ -772,6 +968,7 @@ export interface OssContributionsSelect<T extends boolean = true> {
   githubSyncedAt?: T;
   githubSyncError?: T;
   prKey?: T;
+  githubNodeId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -872,6 +1069,39 @@ export interface PayloadKvSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
+  log?:
+    | T
+    | {
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  concurrencyKey?: T;
+  meta?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -962,6 +1192,24 @@ export interface PortfolioSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: number;
+  stats?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "portfolio-settings_select".
  */
 export interface PortfolioSettingsSelect<T extends boolean = true> {
@@ -1012,6 +1260,16 @@ export interface PortfolioSettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -1019,6 +1277,23 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSyncTrackedRepositories".
+ */
+export interface TaskSyncTrackedRepositories {
+  input: {
+    repositoryId?: number | null;
+    force?: boolean | null;
+  };
+  output: {
+    cached: number;
+    contributionsCreated: number;
+    contributionsUpdated: number;
+    failed: number;
+    repositoriesSynced: number;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

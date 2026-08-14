@@ -338,6 +338,67 @@ async function seed() {
     })
   }
 
+  const trackedRepositorySeeds = [
+    {
+      githubUsername: 'soumajitgh',
+      organization: 'OneBusAway',
+      repoDescription: 'Tools for processing and publishing public transit data.',
+      repoKey: 'onebusaway/maglev',
+      repository: 'maglev',
+      repositoryUrl: 'https://github.com/OneBusAway/maglev',
+      stars: 1500,
+    },
+    {
+      githubUsername: 'soumajitgh',
+      organization: 'payloadcms',
+      repoDescription: 'The fullstack website and application framework for Next.js.',
+      repoKey: 'payloadcms/payload',
+      repository: 'payload',
+      repositoryUrl: 'https://github.com/payloadcms/payload',
+      stars: 39000,
+    },
+    {
+      githubUsername: 'soumajitgh',
+      organization: 'vercel',
+      repoDescription: 'The React framework for the web.',
+      repoKey: 'vercel/next.js',
+      repository: 'next.js',
+      repositoryUrl: 'https://github.com/vercel/next.js',
+      stars: 136000,
+    },
+  ]
+  const trackedRepositoryIDs = new Map<string, number>()
+
+  for (const repository of trackedRepositorySeeds) {
+    const existing = await payload.find({
+      collection: 'tracked-repositories',
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+      where: { repoKey: { equals: repository.repoKey } },
+    })
+    const tracked = existing.docs[0]
+      ? existing.docs[0]
+      : await payload.create({
+          collection: 'tracked-repositories',
+          context: { skipRepositorySync: true },
+          data: {
+            ...repository,
+            discoveredPullRequests: 1,
+            enabled: true,
+            githubRequestsLastSync: 1,
+            lastSyncAttemptAt: '2026-08-14T10:00:00.000Z',
+            lastSyncedAt: '2026-08-14T10:00:00.000Z',
+            nextSyncAt: '2099-01-01T00:00:00.000Z',
+            syncIntervalHours: 2,
+            syncStatus: 'synced',
+          },
+          overrideAccess: true,
+        })
+
+    trackedRepositoryIDs.set(repository.repoKey, tracked.id)
+  }
+
   const contributionSeeds = [
     {
       additions: 120,
@@ -432,6 +493,8 @@ async function seed() {
   ]
 
   for (const contribution of contributionSeeds) {
+    const repoKey = contribution.prKey.split('#')[0]
+    const trackedRepository = trackedRepositoryIDs.get(repoKey)
     const existing = await payload.find({
       collection: 'oss-contributions',
       depth: 0,
@@ -439,12 +502,23 @@ async function seed() {
       overrideAccess: true,
       where: { prKey: { equals: contribution.prKey } },
     })
-    if (existing.docs.length) continue
+    if (existing.docs.length) {
+      if (!existing.docs[0].trackedRepository && trackedRepository) {
+        await payload.update({
+          collection: 'oss-contributions',
+          context: { disableRevalidate: true, skipGitHubSync: true },
+          data: { trackedRepository },
+          id: existing.docs[0].id,
+          overrideAccess: true,
+        })
+      }
+      continue
+    }
 
     await payload.create({
       collection: 'oss-contributions',
       context: { disableRevalidate: true, skipGitHubSync: true },
-      data: contribution,
+      data: { ...contribution, trackedRepository },
       overrideAccess: true,
     })
   }

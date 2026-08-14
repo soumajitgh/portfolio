@@ -20,9 +20,10 @@ pnpm dev
 
 Open `http://localhost:3000` for the portfolio and `http://localhost:3000/admin` for Payload
 Admin. The seed command is idempotent: it updates portfolio settings and creates missing sample
-projects, OSS contributions, and blog content without duplicating existing records. It is intended
-for local development and refuses to run when `NODE_ENV=production`. Contribution fixtures bypass
-live GitHub requests so local setup is deterministic and does not consume API rate limits.
+projects, tracked repositories, OSS contributions, and blog content without duplicating existing
+records. It is intended for local development and refuses to run when `NODE_ENV=production`.
+Contribution fixtures bypass live GitHub requests so local setup is deterministic and does not
+consume API rate limits.
 
 To run both PostgreSQL and the application in containers instead, use `docker compose up`. Compose
 waits for PostgreSQL to become healthy, applies pending migrations, and then starts Payload. The
@@ -42,8 +43,8 @@ NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 
 LEETCODE_USERNAME=soumajitgh
 GITHUB_USERNAME=soumajitgh
-GITHUB_STATS_TOKEN=github_pat_...
-GITHUB_CONTRIBUTIONS_TOKEN=github_pat_...
+GITHUB_TOKEN=github_pat_...
+ENABLE_GITHUB_SYNC_WORKER=true
 WAKATIME_API_KEY=waka_...
 
 RESEND_API_KEY=re_...
@@ -68,18 +69,28 @@ Turnstile protects contact submissions and star mutations. `TURNSTILE_ALLOWED_HO
 optional comma-separated allowlist.
 
 The `/stats` dashboard reads LeetCode through alfa-leetcode-api and GitHub through the public REST
-API. `LEETCODE_USERNAME` and `GITHUB_USERNAME` default to `soumajitgh`. A read-only
-`GITHUB_STATS_TOKEN` is optional and enables the detailed contribution graph while increasing API
-rate limits. To include private commit counts, use a fine-grained token owned by the profile user
-with access to all repositories. The dashboard requests only each private repository's visibility
-and aggregate commit count; it never requests or renders private repository names.
+API. `LEETCODE_USERNAME` and `GITHUB_USERNAME` default to `soumajitgh`. A server-only, read-only
+`GITHUB_TOKEN` enables the detailed contribution graph, tracked-repository syncing, and higher API
+rate limits. To include private commit counts or track private repositories, use a fine-grained
+token owned by the profile user with access to those repositories. The dashboard requests only each
+private repository's visibility and aggregate commit count; it never requests or renders private
+repository names.
 `WAKATIME_API_KEY` is required for private WakaTime activity and is only read on the server; never
 expose either token through a `NEXT_PUBLIC_` variable.
 
-The OSS Contributions collection imports pull request and repository metadata when an authenticated
-admin saves a GitHub PR URL. `GITHUB_CONTRIBUTIONS_TOKEN` is optional for public repositories and
-falls back to `GITHUB_STATS_TOKEN`, then `GITHUB_TOKEN`. Set `GITHUB_USERNAME` to enforce PR
-ownership by default; individual co-authored or maintainer-opened PRs can use the admin override.
+Add repositories once in the Tracked Repositories collection. Payload searches each enabled
+repository for pull requests opened by its configured GitHub username, creates missing OSS
+Contributions, and refreshes existing GitHub facts every two hours. The persisted `nextSyncAt`
+cache prevents duplicate GitHub requests when the worker runs more often; explicit **Refresh now**
+is the only cache bypass. Syncs are sequential and use one GitHub GraphQL request for up to 100 PRs
+per repository page. Portfolio summaries, tags, ordering, featured state, and visibility are never
+overwritten.
+
+`GITHUB_TOKEN` is required for tracked-repository GraphQL sync. Use a read-only token with access to
+any private repositories you want to track. `GITHUB_USERNAME` defaults new trackers to `soumajitgh`.
+`ENABLE_GITHUB_SYNC_WORKER=true` runs Payload's persistent job worker in the Next.js process, which
+fits the documented Docker/Dokploy deployment. Set it to `false` only if a separate process runs
+`pnpm payload jobs:run --cron "* * * * *" --queue github-contributions --handle-schedules`.
 When WakaTime reports AI activity, the stats dashboard and `/stats/ai` detail page show AI-vs-human
 line changes, adoption percentage, prompts, sessions, tokens, per-model and per-project usage, and
 estimated cost. The section remains behind an informative empty state until an AI-enabled WakaTime
@@ -150,6 +161,7 @@ operations.
 ## Content model
 
 - `projects`: draft-enabled project content, topics, media, links, and display metadata
+- `tracked-repositories`: repository-level GitHub discovery, cache, rate-limit, and sync state
 - `oss-contributions`: GitHub PR facts plus manually controlled portfolio summaries and visibility
 - `blog-posts`: draft-enabled engineering articles with labels and issue numbers
 - `media`: optimized uploads with alt text, captions, focal points, and optional R2 storage
