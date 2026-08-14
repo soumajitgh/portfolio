@@ -71,6 +71,7 @@ export interface Config {
     users: User;
     media: Media;
     projects: Project;
+    'oss-contributions': OSSContribution;
     'blog-posts': BlogPost;
     'project-stars': ProjectStar;
     'blog-stars': BlogStar;
@@ -85,6 +86,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'oss-contributions': OssContributionsSelect<false> | OssContributionsSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     'project-stars': ProjectStarsSelect<false> | ProjectStarsSelect<true>;
     'blog-stars': BlogStarsSelect<false> | BlogStarsSelect<true>;
@@ -290,6 +292,62 @@ export interface Project {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Paste a GitHub pull request URL. GitHub facts are imported automatically; portfolio fields stay under your control.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oss-contributions".
+ */
+export interface OSSContribution {
+  id: number;
+  /**
+   * Paste a URL like https://github.com/org/repo/pull/123.
+   */
+  prUrl: string;
+  /**
+   * Bypasses the soumajitgh ownership check for co-authored or maintainer-opened PRs.
+   */
+  allowDifferentAuthor?: boolean | null;
+  /**
+   * Re-fetch factual metadata without changing your portfolio summary, tags, or visibility.
+   */
+  refreshFromGitHub?: boolean | null;
+  /**
+   * Explain your contribution and its impact. The PR title is used as the public fallback.
+   */
+  portfolioSummary?: string | null;
+  tags?:
+    | {
+        name: string;
+        slug: string;
+        id?: string | null;
+      }[]
+    | null;
+  featured?: boolean | null;
+  hidden?: boolean | null;
+  displayOrder?: number | null;
+  title: string;
+  prNumber: number;
+  author: string;
+  status: 'open' | 'closed' | 'merged';
+  prCreatedAt: string;
+  mergedAt?: string | null;
+  additions: number;
+  deletions: number;
+  changedFiles: number;
+  prDescription?: string | null;
+  organization: string;
+  repository: string;
+  repoUrl: string;
+  repoDescription?: string | null;
+  stars: number;
+  githubSyncStatus: 'synced' | 'unavailable';
+  githubSyncedAt: string;
+  githubSyncError?: string | null;
+  prKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "blog-posts".
  */
@@ -486,6 +544,10 @@ export interface PayloadLockedDocument {
         value: number | Project;
       } | null)
     | ({
+        relationTo: 'oss-contributions';
+        value: number | OSSContribution;
+      } | null)
+    | ({
         relationTo: 'blog-posts';
         value: number | BlogPost;
       } | null)
@@ -671,6 +733,47 @@ export interface ProjectsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oss-contributions_select".
+ */
+export interface OssContributionsSelect<T extends boolean = true> {
+  prUrl?: T;
+  allowDifferentAuthor?: T;
+  refreshFromGitHub?: T;
+  portfolioSummary?: T;
+  tags?:
+    | T
+    | {
+        name?: T;
+        slug?: T;
+        id?: T;
+      };
+  featured?: T;
+  hidden?: T;
+  displayOrder?: T;
+  title?: T;
+  prNumber?: T;
+  author?: T;
+  status?: T;
+  prCreatedAt?: T;
+  mergedAt?: T;
+  additions?: T;
+  deletions?: T;
+  changedFiles?: T;
+  prDescription?: T;
+  organization?: T;
+  repository?: T;
+  repoUrl?: T;
+  repoDescription?: T;
+  stars?: T;
+  githubSyncStatus?: T;
+  githubSyncedAt?: T;
+  githubSyncError?: T;
+  prKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

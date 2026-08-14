@@ -20,7 +20,9 @@ pnpm dev
 
 Open `http://localhost:3000` for the portfolio and `http://localhost:3000/admin` for Payload
 Admin. The seed command is idempotent: it updates portfolio settings and creates missing sample
-content without duplicating existing records.
+projects, OSS contributions, and blog content without duplicating existing records. It is intended
+for local development and refuses to run when `NODE_ENV=production`. Contribution fixtures bypass
+live GitHub requests so local setup is deterministic and does not consume API rate limits.
 
 To run both PostgreSQL and the application in containers instead, use `docker compose up`. Compose
 waits for PostgreSQL to become healthy, applies pending migrations, and then starts Payload. The
@@ -41,6 +43,7 @@ NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 LEETCODE_USERNAME=soumajitgh
 GITHUB_USERNAME=soumajitgh
 GITHUB_STATS_TOKEN=github_pat_...
+GITHUB_CONTRIBUTIONS_TOKEN=github_pat_...
 WAKATIME_API_KEY=waka_...
 
 RESEND_API_KEY=re_...
@@ -72,6 +75,11 @@ with access to all repositories. The dashboard requests only each private reposi
 and aggregate commit count; it never requests or renders private repository names.
 `WAKATIME_API_KEY` is required for private WakaTime activity and is only read on the server; never
 expose either token through a `NEXT_PUBLIC_` variable.
+
+The OSS Contributions collection imports pull request and repository metadata when an authenticated
+admin saves a GitHub PR URL. `GITHUB_CONTRIBUTIONS_TOKEN` is optional for public repositories and
+falls back to `GITHUB_STATS_TOKEN`, then `GITHUB_TOKEN`. Set `GITHUB_USERNAME` to enforce PR
+ownership by default; individual co-authored or maintainer-opened PRs can use the admin override.
 When WakaTime reports AI activity, the stats dashboard and `/stats/ai` detail page show AI-vs-human
 line changes, adoption percentage, prompts, sessions, tokens, per-model and per-project usage, and
 estimated cost. The section remains behind an informative empty state until an AI-enabled WakaTime
@@ -142,6 +150,7 @@ operations.
 ## Content model
 
 - `projects`: draft-enabled project content, topics, media, links, and display metadata
+- `oss-contributions`: GitHub PR facts plus manually controlled portfolio summaries and visibility
 - `blog-posts`: draft-enabled engineering articles with labels and issue numbers
 - `media`: optimized uploads with alt text, captions, focal points, and optional R2 storage
 - `project-stars` and `blog-stars`: private anonymous star records
@@ -163,7 +172,7 @@ pnpm test:e2e            # run Playwright tests
 pnpm generate:types      # regenerate Payload types
 pnpm generate:importmap  # regenerate Payload Admin imports
 pnpm payload migrate     # apply pending database migrations
-pnpm seed                # seed development content
+pnpm seed                # idempotently seed local development content through Payload Local API
 ```
 
 Schema pushing is disabled. Checked-in migrations are applied automatically when Payload

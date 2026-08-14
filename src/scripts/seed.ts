@@ -1,5 +1,3 @@
-import 'dotenv/config'
-
 import { getPayload } from 'payload'
 
 import type { BlogPost, Project } from '@/payload-types'
@@ -190,6 +188,10 @@ export async function handleJob(
 }
 
 async function seed() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('The development seed cannot run with NODE_ENV=production.')
+  }
+
   const payload = await getPayload({ config })
 
   await payload.updateGlobal({
@@ -256,7 +258,7 @@ async function seed() {
     },
   })
 
-  const seeds = [
+  const projectSeeds = [
     {
       accent: 'blue' as const,
       category: 'infrastructure' as const,
@@ -313,7 +315,7 @@ async function seed() {
     },
   ]
 
-  for (const project of seeds) {
+  for (const project of projectSeeds) {
     const existing = await payload.find({
       collection: 'projects',
       limit: 1,
@@ -332,6 +334,117 @@ async function seed() {
         publishedAt: new Date().toISOString(),
       },
       draft: false,
+      overrideAccess: true,
+    })
+  }
+
+  const contributionSeeds = [
+    {
+      additions: 120,
+      author: 'soumajitgh',
+      changedFiles: 8,
+      deletions: 34,
+      displayOrder: 1,
+      featured: true,
+      githubSyncedAt: '2026-06-20T10:00:00.000Z',
+      githubSyncStatus: 'synced' as const,
+      hidden: false,
+      mergedAt: '2026-06-20T09:30:00.000Z',
+      organization: 'OneBusAway',
+      portfolioSummary:
+        'Improved GTFS processing and validation, making transit data imports more predictable.',
+      prCreatedAt: '2026-06-12T08:00:00.000Z',
+      prDescription: 'Development fixture for the merged contribution card state.',
+      prKey: 'onebusaway/maglev#737',
+      prNumber: 737,
+      prUrl: 'https://github.com/OneBusAway/maglev/pull/737',
+      repoDescription: 'Tools for processing and publishing public transit data.',
+      repository: 'maglev',
+      repoUrl: 'https://github.com/OneBusAway/maglev',
+      stars: 1500,
+      status: 'merged' as const,
+      tags: [
+        { name: 'Go', slug: 'go' },
+        { name: 'GTFS', slug: 'gtfs' },
+      ],
+      title: 'Improve GTFS processing and validation',
+    },
+    {
+      additions: 86,
+      author: 'soumajitgh',
+      changedFiles: 5,
+      deletions: 18,
+      displayOrder: 2,
+      featured: false,
+      githubSyncedAt: '2026-07-04T14:15:00.000Z',
+      githubSyncStatus: 'synced' as const,
+      hidden: false,
+      mergedAt: null,
+      organization: 'payloadcms',
+      portfolioSummary:
+        'Refined an admin workflow with clearer validation and safer server-side defaults.',
+      prCreatedAt: '2026-07-01T11:00:00.000Z',
+      prDescription: 'Development fixture for the open contribution card state.',
+      prKey: 'payloadcms/payload#12345',
+      prNumber: 12345,
+      prUrl: 'https://github.com/payloadcms/payload/pull/12345',
+      repoDescription: 'The fullstack website and application framework for Next.js.',
+      repository: 'payload',
+      repoUrl: 'https://github.com/payloadcms/payload',
+      stars: 39000,
+      status: 'open' as const,
+      tags: [
+        { name: 'TypeScript', slug: 'typescript' },
+        { name: 'Payload CMS', slug: 'payload-cms' },
+      ],
+      title: 'Improve collection validation feedback',
+    },
+    {
+      additions: 24,
+      author: 'soumajitgh',
+      changedFiles: 3,
+      deletions: 9,
+      displayOrder: 3,
+      featured: false,
+      githubSyncedAt: '2026-05-17T16:45:00.000Z',
+      githubSyncStatus: 'synced' as const,
+      hidden: false,
+      mergedAt: null,
+      organization: 'vercel',
+      portfolioSummary:
+        'Documented a routing edge case and added a focused regression test for maintainers.',
+      prCreatedAt: '2026-05-10T10:30:00.000Z',
+      prDescription: 'Development fixture for the closed contribution card state.',
+      prKey: 'vercel/next.js#54321',
+      prNumber: 54321,
+      prUrl: 'https://github.com/vercel/next.js/pull/54321',
+      repoDescription: 'The React framework for the web.',
+      repository: 'next.js',
+      repoUrl: 'https://github.com/vercel/next.js',
+      stars: 136000,
+      status: 'closed' as const,
+      tags: [
+        { name: 'TypeScript', slug: 'typescript' },
+        { name: 'Next.js', slug: 'nextjs' },
+      ],
+      title: 'Cover a routing edge case with regression tests',
+    },
+  ]
+
+  for (const contribution of contributionSeeds) {
+    const existing = await payload.find({
+      collection: 'oss-contributions',
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+      where: { prKey: { equals: contribution.prKey } },
+    })
+    if (existing.docs.length) continue
+
+    await payload.create({
+      collection: 'oss-contributions',
+      context: { disableRevalidate: true, skipGitHubSync: true },
+      data: contribution,
       overrideAccess: true,
     })
   }

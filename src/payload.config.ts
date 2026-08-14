@@ -12,6 +12,7 @@ import { Users } from './collections/Users'
 import { BlogPosts } from './collections/BlogPosts'
 import { BlogStars } from './collections/BlogStars'
 import { Media } from './collections/Media'
+import { OSSContributions } from './collections/OSSContributions'
 import { Projects } from './collections/Projects'
 import { ProjectStars } from './collections/ProjectStars'
 import { PortfolioSettings } from './globals/PortfolioSettings'
@@ -38,7 +39,7 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Media, Projects, BlogPosts, ProjectStars, BlogStars],
+  collections: [Users, Media, Projects, OSSContributions, BlogPosts, ProjectStars, BlogStars],
   email: resendAdapter({
     apiKey: process.env.RESEND_API_KEY || '',
     defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev',

@@ -8,8 +8,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 const links = [
-  { href: '/blogs', label: './blogs' },
-  { href: '/projects', label: './projects' },
+  { href: '/blogs', label: './blog' },
+  { href: '/work', label: './work' },
   { href: '/stats', label: './stats' },
   { href: '/contact', label: './contact' },
 ]

@@ -12,8 +12,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     { changeFrequency: 'monthly', priority: 1, url: absoluteURL('/') },
+    { changeFrequency: 'weekly', priority: 0.9, url: absoluteURL('/work') },
     { changeFrequency: 'weekly', priority: 0.9, url: absoluteURL('/projects') },
     { changeFrequency: 'weekly', priority: 0.9, url: absoluteURL('/blogs') },
+    { changeFrequency: 'weekly', priority: 0.9, url: absoluteURL('/contributions') },
     { changeFrequency: 'daily', priority: 0.8, url: absoluteURL('/stats') },
     { changeFrequency: 'daily', priority: 0.7, url: absoluteURL('/stats/leetcode') },
     { changeFrequency: 'daily', priority: 0.7, url: absoluteURL('/stats/github') },

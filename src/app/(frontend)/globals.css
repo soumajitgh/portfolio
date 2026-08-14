@@ -206,6 +206,8 @@
     display: grid;
     height: 100%;
     grid-template-rows: minmax(0, 1fr) auto;
+    min-width: 0;
+    overflow-x: clip;
     padding-bottom: clamp(0.75rem, 2dvh, 1.25rem);
   }
 
@@ -543,6 +545,7 @@
   }
 
   .landing-main {
+    gap: 1.25rem;
     height: auto;
     min-height: calc(100dvh - 4rem);
     grid-template-rows: auto auto;
@@ -551,6 +554,8 @@
 
   .portfolio-panel {
     min-height: 19rem;
+    min-width: 0;
+    width: 100%;
   }
 
   .mobile-scrollbar-hidden {
