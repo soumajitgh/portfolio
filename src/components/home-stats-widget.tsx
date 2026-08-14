@@ -41,38 +41,41 @@ export async function HomeStatsWidget() {
   const activeProject =
     [...wakatime.daily].reverse().find((day) => day.projects.length)?.projects[0]?.name ||
     wakatime.projects[0]?.name
+  const nonTrivialProblems = leetcode.solved.medium + leetcode.solved.hard
 
   return (
     <Card className="h-full gap-4 overflow-auto px-4 py-4 sm:px-6 sm:py-5">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="font-mono text-xs text-terminal-cyan">telemetry.snapshot()</p>
-          <p className="mt-1 text-xs text-muted-foreground">Live metrics, cached for 15 minutes.</p>
+          <p className="font-mono text-xs text-terminal-cyan">engineering.signal()</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Problem-solving depth, consistency, and current focus.
+          </p>
         </div>
         <span className="flex items-center gap-1.5 font-mono text-[0.6875rem] text-terminal-green">
           <span aria-hidden="true" className="size-1.5 rounded-full bg-terminal-green" />
-          live
+          updated
         </span>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         <CompactMetric
-          label="LeetCode solved"
+          label="problems solved"
           tone="text-terminal-green"
           value={leetcode.available ? leetcode.solved.total : '—'}
         />
         <CompactMetric
-          label="GitHub repos"
+          label="medium + hard"
           tone="text-terminal-blue"
-          value={github.available ? github.publicRepos : '—'}
+          value={leetcode.available ? nonTrivialProblems : '—'}
         />
         <CompactMetric
-          label="private commits"
+          label="contributions / year"
           tone="text-terminal-purple"
-          value={github.privateCommits ?? '—'}
+          value={github.totalContributions || '—'}
         />
         <CompactMetric
-          label="coding this week"
+          label="focused coding / week"
           tone="text-terminal-yellow"
           value={wakatime.available ? wakatime.totalThisWeek : '—'}
         />
@@ -81,15 +84,19 @@ export async function HomeStatsWidget() {
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[0.6875rem] text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <Code2 aria-hidden="true" className="size-3 text-terminal-green" />
-          {leetcode.solved.medium} medium solved
+          {leetcode.contest.rating
+            ? `${Math.round(leetcode.contest.rating)} contest rating`
+            : `${leetcode.solved.hard} hard problems solved`}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <GitCommitHorizontal aria-hidden="true" className="size-3 text-terminal-purple" />
-          {github.totalContributions || '—'} yearly contributions
+          {github.available ? `${github.totalStars} stars earned` : 'GitHub unavailable'}
         </span>
         <span className="inline-flex min-w-0 items-center gap-1.5">
           <Clock3 aria-hidden="true" className="size-3 shrink-0 text-terminal-blue" />
-          <span className="truncate">{activeProject || 'WakaTime not configured'}</span>
+          <span className="truncate">
+            {activeProject ? `building ${activeProject}` : 'Current focus unavailable'}
+          </span>
         </span>
       </div>
 
