@@ -130,7 +130,9 @@ browser's Do Not Track signal. No contact-form values are sent in custom events.
 The MCP endpoint is `POST /api/mcp`. It exposes:
 
 - `blog-posts`: find, create, update, and delete
+- `oss-contributions`: find, create, update, and delete
 - `projects`: find, create, update, and delete
+- `tracked-repositories`: find, create, update, and delete
 - `portfolio-settings`: find and update
 
 Create an API key after the database migrations have run:

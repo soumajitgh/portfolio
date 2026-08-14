@@ -98,8 +98,18 @@ export default buildConfig({
           description: 'Published portfolio blog posts and their display metadata.',
           enabled: true,
         },
+        'oss-contributions': {
+          description:
+            'Open-source pull requests with GitHub facts and manually curated portfolio metadata.',
+          enabled: true,
+        },
         projects: {
           description: 'Published portfolio projects, technologies, media, and external links.',
+          enabled: true,
+        },
+        'tracked-repositories': {
+          description:
+            'GitHub repositories tracked for automatic pull-request discovery and synchronization.',
           enabled: true,
         },
       },

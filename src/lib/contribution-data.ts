@@ -57,8 +57,10 @@ export const getVisibleContributions = cache(async (): Promise<ContributionCardD
     overrideAccess: false,
     pagination: false,
     select: contributionSelect,
-    sort: ['-featured', 'displayOrder', '-mergedAt', '-prCreatedAt'],
-    where: { hidden: { not_equals: true } },
+    sort: ['-mergedAt', '-prCreatedAt'],
+    where: {
+      and: [{ hidden: { not_equals: true } }, { status: { in: ['open', 'merged'] } }],
+    },
   })
 
   return result.docs
