@@ -38,8 +38,8 @@ DATABASE_URL=postgresql://payload:payload@localhost:5432/portfolio
 PAYLOAD_SECRET=replace-with-a-long-random-secret
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_...
-NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_CaLtPZDA7oPnyivEYP4XpXB8qUXx5wfsmeZvgzdVgtdY
+NEXT_PUBLIC_POSTHOG_HOST=https://t.soumajit.dev
 
 LEETCODE_USERNAME=soumajitgh
 GITHUB_USERNAME=soumajitgh
@@ -102,9 +102,8 @@ uploads, which are suitable for development but not an ephemeral production cont
 ## Analytics
 
 PostHog is enabled on the public portfolio only when `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is set.
-Use the public project token from PostHog project settings, not a personal API key. Set the host to
-the ingestion endpoint for your region (for example, `https://us.i.posthog.com` or
-`https://eu.i.posthog.com`).
+Use the public project token from PostHog project settings, not a personal API key. Events are
+sent through `https://t.soumajit.dev`, the managed reverse proxy; PostHog links open in the EU UI.
 
 The integration captures SPA page views and exits, Core Web Vitals and network performance,
 JavaScript exceptions, heatmaps, dead clicks, and privacy-masked session replays. It also records
@@ -215,8 +214,8 @@ the image build:
 ```text
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=...
-NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_...
-NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_CaLtPZDA7oPnyivEYP4XpXB8qUXx5wfsmeZvgzdVgtdY
+NEXT_PUBLIC_POSTHOG_HOST=https://t.soumajit.dev
 R2_PUBLIC_URL=https://media.your-domain.com
 ```
 
