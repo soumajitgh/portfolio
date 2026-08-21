@@ -1,8 +1,13 @@
 import type { Metadata } from 'next'
 
 import { ContributionsTable } from '@/components/contributions/contributions-table'
-import type { ContributionSort } from '@/components/contributions/contributions-table'
 import { getVisibleContributions } from '@/lib/contribution-data'
+import {
+  contributionSorts,
+  normalizeRange,
+  type ContributionSort,
+  type DateRangePreset,
+} from '@/lib/contribution-filter'
 import { absoluteURL, nonIndexableRobots, serializeJsonLd, siteName } from '@/lib/seo'
 
 export const revalidate = 300
@@ -10,26 +15,18 @@ export const revalidate = 300
 const pageTitle = 'Open Source Contributions'
 const pageDescription =
   'Open source pull requests by Soumajit Ghosh across developer tools, applications, and infrastructure projects.'
-const contributionSorts = new Set<ContributionSort>([
-  'changes-asc',
-  'changes-desc',
-  'newest',
-  'oldest',
-  'portfolio',
-  'repo-asc',
-  'repo-desc',
-  'stars-asc',
-  'stars-desc',
-])
 
 type ContributionsSearchParams = {
   filter?: string | string[]
+  from?: string | string[]
   page?: string | string[]
   q?: string | string[]
+  range?: string | string[]
   repo?: string | string[]
   sort?: string | string[]
   status?: string | string[]
   tag?: string | string[]
+  to?: string | string[]
 }
 
 export async function generateMetadata({
@@ -72,6 +69,11 @@ export default async function ContributionsPage({
   const requestedTag = firstValue(params.tag).trim().toLowerCase()
   const requestedSort = firstValue(params.sort).trim().toLowerCase()
   const requestedPage = Number.parseInt(firstValue(params.page), 10)
+  const requestedQuery = firstValue(params.q).trim()
+  const requestedRange = normalizeRange(firstValue(params.range))
+  const requestedFrom = firstValue(params.from).trim()
+  const requestedTo = firstValue(params.to).trim()
+
   const knownRepositories = new Set(
     contributions.map((item) => `${item.organization}/${item.repository}`.toLowerCase()),
   )
@@ -80,6 +82,7 @@ export default async function ContributionsPage({
       (contribution.tags || []).map((tag) => tag.slug.toLowerCase()),
     ),
   )
+
   const status = ['merged', 'open'].includes(requestedStatus)
     ? requestedStatus
     : ['merged', 'open'].includes(legacyFilter)
@@ -93,6 +96,9 @@ export default async function ContributionsPage({
   const sort: ContributionSort = contributionSorts.has(requestedSort as ContributionSort)
     ? (requestedSort as ContributionSort)
     : 'newest'
+  const range: DateRangePreset =
+    requestedRange || (requestedFrom || requestedTo ? 'custom' : '')
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -136,12 +142,15 @@ export default async function ContributionsPage({
           <ContributionsTable
             contributions={contributions}
             initialFilters={{
+              from: requestedFrom,
               page: Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1,
-              query: firstValue(params.q).trim(),
+              query: requestedQuery,
+              range,
               repository: knownRepositories.has(requestedRepository) ? requestedRepository : '',
               sort,
               status,
               tag,
+              to: requestedTo,
             }}
           />
         </section>

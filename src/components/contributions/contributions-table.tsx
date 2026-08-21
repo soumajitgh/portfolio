@@ -4,6 +4,7 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  Calendar,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -12,9 +13,11 @@ import {
   GitPullRequest,
   RotateCcw,
   Search,
+  SlidersHorizontal,
   Star,
+  X,
 } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -28,26 +31,31 @@ import {
 } from '@/components/ui/table'
 import { captureEvent } from '@/lib/analytics'
 import type { ContributionCardData } from '@/lib/contribution-data'
+import {
+  dateRangePresets,
+  matchesDateRange,
+  matchesSearchQuery,
+  normalizeRange,
+  repositoryValue,
+  sortContributions,
+  sortOptions,
+  type ContributionSort,
+  type DateRangePreset,
+} from '@/lib/contribution-filter'
 import { cn } from '@/lib/utils'
 
-export type ContributionSort =
-  | 'changes-asc'
-  | 'changes-desc'
-  | 'newest'
-  | 'oldest'
-  | 'portfolio'
-  | 'repo-asc'
-  | 'repo-desc'
-  | 'stars-asc'
-  | 'stars-desc'
+export type { ContributionSort, DateRangePreset }
 
-type InitialFilters = {
+export type InitialFilters = {
+  from?: string
   page: number
   query: string
+  range?: DateRangePreset
   repository: string
   sort: ContributionSort
   status: string
   tag: string
+  to?: string
 }
 
 const statusStyles = {
@@ -68,18 +76,6 @@ const statusIconStyles = {
   open: 'text-terminal-green',
 } as const
 
-const sortOptions: { label: string; value: ContributionSort }[] = [
-  { label: 'Newest activity', value: 'newest' },
-  { label: 'Oldest activity', value: 'oldest' },
-  { label: 'Portfolio order', value: 'portfolio' },
-  { label: 'Repository A–Z', value: 'repo-asc' },
-  { label: 'Repository Z–A', value: 'repo-desc' },
-  { label: 'Most changes', value: 'changes-desc' },
-  { label: 'Fewest changes', value: 'changes-asc' },
-  { label: 'Most stars', value: 'stars-desc' },
-  { label: 'Fewest stars', value: 'stars-asc' },
-]
-
 const pageSize = 10
 
 export function ContributionsTable({
@@ -94,8 +90,144 @@ export function ContributionsTable({
   const [status, setStatus] = useState(initialFilters.status)
   const [tag, setTag] = useState(initialFilters.tag)
   const [sort, setSort] = useState<ContributionSort>(initialFilters.sort)
+  const [range, setRange] = useState<DateRangePreset>(
+    initialFilters.range || (initialFilters.from || initialFilters.to ? 'custom' : ''),
+  )
+  const [fromDate, setFromDate] = useState(initialFilters.from || '')
+  const [toDate, setToDate] = useState(initialFilters.to || '')
   const [page, setPage] = useState(initialFilters.page)
+
   const tableRef = useRef<HTMLDivElement>(null)
+  const isInitialMount = useRef(true)
+
+  const stateRef = useRef({
+    fromDate,
+    page,
+    query,
+    range,
+    repository,
+    sort,
+    status,
+    tag,
+    toDate,
+  })
+
+  useEffect(() => {
+    stateRef.current = {
+      fromDate,
+      page,
+      query,
+      range,
+      repository,
+      sort,
+      status,
+      tag,
+      toDate,
+    }
+  })
+
+  const updateURL = useCallback(
+    (
+      next: Partial<{
+        from?: string
+        page: number
+        query: string
+        range?: DateRangePreset
+        repository: string
+        sort: ContributionSort
+        status: string
+        tag: string
+        to?: string
+      }> = {},
+    ) => {
+      const current = stateRef.current
+      const values = {
+        from: next.from !== undefined ? next.from : current.fromDate,
+        page: next.page !== undefined ? next.page : current.page,
+        query: next.query !== undefined ? next.query : current.query,
+        range: next.range !== undefined ? next.range : current.range,
+        repository: next.repository !== undefined ? next.repository : current.repository,
+        sort: next.sort !== undefined ? next.sort : current.sort,
+        status: next.status !== undefined ? next.status : current.status,
+        tag: next.tag !== undefined ? next.tag : current.tag,
+        to: next.to !== undefined ? next.to : current.toDate,
+      }
+
+      const params = new URLSearchParams()
+      if (values.query.trim()) params.set('q', values.query.trim())
+      if (values.repository) params.set('repo', values.repository)
+      if (values.status) params.set('status', values.status)
+      if (values.tag) params.set('tag', values.tag)
+      if (values.sort && values.sort !== 'newest') params.set('sort', values.sort)
+      if (values.range && values.range !== 'custom') {
+        params.set('range', values.range)
+      } else if (values.range === 'custom') {
+        params.set('range', 'custom')
+      }
+      if (values.from) params.set('from', values.from)
+      if (values.to) params.set('to', values.to)
+      if (values.page > 1) params.set('page', String(values.page))
+
+      const queryString = params.toString()
+      const nextUrl = queryString ? `/contributions?${queryString}` : '/contributions'
+      const currentUrl = window.location.pathname + window.location.search
+
+      if (nextUrl !== currentUrl) {
+        window.history.replaceState(null, '', nextUrl)
+      }
+    },
+    [],
+  )
+
+  // Listen to browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const search = new URLSearchParams(window.location.search)
+      const q = search.get('q') || ''
+      const repo = search.get('repo') || ''
+      const st = search.get('status') || ''
+      const tg = search.get('tag') || ''
+      const srt = (search.get('sort') as ContributionSort) || 'newest'
+      const rng = normalizeRange(search.get('range'))
+      const fr = search.get('from') || ''
+      const t = search.get('to') || ''
+      const pg = Number.parseInt(search.get('page') || '1', 10)
+
+      setQuery(q)
+      setRepository(repo)
+      setStatus(st)
+      setTag(tg)
+      setSort(sortOptions.some((item) => item.value === srt) ? srt : 'newest')
+      setRange(rng || (fr || t ? 'custom' : ''))
+      setFromDate(fr)
+      setToDate(t)
+      setPage(Number.isFinite(pg) && pg > 0 ? pg : 1)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  // Debounced search query URL update
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+
+    const timer = setTimeout(() => {
+      updateURL({ page: 1, query })
+      if (query.trim()) {
+        captureEvent('content_search_performed', {
+          content_type: 'oss_contribution',
+          query: query.trim().slice(0, 100),
+          query_length: query.trim().length,
+        })
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [query, updateURL])
 
   const repositoryOptions = useMemo(() => {
     const counts = new Map<string, { count: number; label: string }>()
@@ -126,28 +258,17 @@ export function ContributionsTable({
   }, [contributions])
 
   const visibleContributions = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
     const filtered = contributions.filter((contribution) => {
       if (repository && repositoryValue(contribution) !== repository) return false
       if (status && contribution.status !== status) return false
       if (tag && !contribution.tags?.some((item) => item.slug === tag)) return false
-      if (!normalizedQuery) return true
-
-      return [
-        contribution.title,
-        contribution.portfolioSummary,
-        contribution.organization,
-        contribution.repository,
-        contribution.author,
-        `#${contribution.prNumber}`,
-        ...(contribution.tags || []).flatMap((item) => [item.name, item.slug]),
-      ]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(normalizedQuery))
+      if (!matchesDateRange(contribution, range, fromDate, toDate)) return false
+      if (!matchesSearchQuery(contribution, query)) return false
+      return true
     })
 
     return sortContributions(filtered, sort)
-  }, [contributions, query, repository, sort, status, tag])
+  }, [contributions, fromDate, query, range, repository, sort, status, tag, toDate])
 
   const pageCount = Math.max(1, Math.ceil(visibleContributions.length / pageSize))
   const currentPage = Math.min(page, pageCount)
@@ -156,27 +277,10 @@ export function ContributionsTable({
     currentPage * pageSize,
   )
 
-  function updateURL(next: Partial<InitialFilters>) {
-    const values = { page, query, repository, sort, status, tag, ...next }
-    const params = new URLSearchParams()
-    if (values.query.trim()) params.set('q', values.query.trim())
-    if (values.repository) params.set('repo', values.repository)
-    if (values.status) params.set('status', values.status)
-    if (values.tag) params.set('tag', values.tag)
-    if (values.sort !== 'newest') params.set('sort', values.sort)
-    if (values.page > 1) params.set('page', String(values.page))
-    const queryString = params.toString()
-    window.history.replaceState(
-      null,
-      '',
-      queryString ? `/contributions?${queryString}` : '/contributions',
-    )
-  }
-
-  function trackFilter(name: string, value: string) {
+  function trackFilter(name: string, value: string | Record<string, unknown>) {
     captureEvent('content_filter_changed', {
       filter_name: name,
-      filter_value: value || 'all',
+      filter_value: typeof value === 'string' ? value || 'all' : JSON.stringify(value),
       page_type: 'contributions',
     })
   }
@@ -188,11 +292,28 @@ export function ContributionsTable({
     trackFilter('sort', nextSort)
   }
 
+  function changeDateRange(nextRange: DateRangePreset) {
+    setRange(nextRange)
+    setPage(1)
+
+    if (nextRange === 'custom') {
+      updateURL({ page: 1, range: 'custom' })
+    } else {
+      setFromDate('')
+      setToDate('')
+      updateURL({ from: '', page: 1, range: nextRange, to: '' })
+    }
+    trackFilter('date_range', nextRange || 'all')
+  }
+
   function clearFilters() {
     setQuery('')
     setRepository('')
     setStatus('')
     setTag('')
+    setRange('')
+    setFromDate('')
+    setToDate('')
     setSort('newest')
     setPage(1)
     window.history.replaceState(null, '', '/contributions')
@@ -208,33 +329,80 @@ export function ContributionsTable({
     })
   }
 
+  const hasActiveFilters = Boolean(
+    query.trim() ||
+      repository ||
+      status ||
+      tag ||
+      range ||
+      fromDate ||
+      toDate ||
+      sort !== 'newest',
+  )
+
+  const activeRangePreset = dateRangePresets.find((item) => item.value === range)
+  const selectedRepoLabel = repositoryOptions.find((item) => item.value === repository)?.label
+  const selectedTagLabel = tagOptions.find((item) => item.value === tag)?.label
+  const selectedSortLabel = sortOptions.find((item) => item.value === sort)?.label
+
   return (
     <div
       className="scroll-mt-20 overflow-hidden rounded-lg border border-border/80 bg-card/45"
       ref={tableRef}
     >
       <div className="border-b border-border/80 bg-card/70 p-3 sm:p-4">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,1fr)_minmax(12rem,auto)_auto_auto_auto]">
-          <label className="relative min-w-0 sm:col-span-2 lg:col-span-1">
+        <div className="grid gap-2.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[minmax(13rem,1.4fr)_repeat(auto-fit,minmax(9.5rem,1fr))]">
+          {/* Search Input */}
+          <div className="relative min-w-0 sm:col-span-2 md:col-span-3 lg:col-span-1">
             <span className="sr-only">Search contributions</span>
             <Search
               aria-hidden="true"
               className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
             />
             <input
-              className="terminal-input h-11 w-full rounded-md border border-input bg-background/35 pl-9 pr-3 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 md:h-9"
+              aria-label="Search contributions"
+              className="terminal-input h-11 w-full rounded-md border border-input bg-background/35 pl-9 pr-8 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 md:h-9"
               onChange={(event) => {
                 setQuery(event.target.value)
                 setPage(1)
-                updateURL({ page: 1, query: event.target.value })
               }}
               placeholder="Search PRs, summaries, authors…"
               type="search"
               value={query}
             />
-          </label>
+            {query ? (
+              <button
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={() => {
+                  setQuery('')
+                  setPage(1)
+                  updateURL({ page: 1, query: '' })
+                }}
+                type="button"
+              >
+                <X aria-hidden="true" className="size-3.5" />
+              </button>
+            ) : null}
+          </div>
 
+          {/* Date Range Select */}
           <ToolbarSelect
+            allLabel="All time"
+            label="Date"
+            onChange={(value) => changeDateRange(value as DateRangePreset)}
+            options={dateRangePresets
+              .filter((preset) => preset.value !== '')
+              .map((preset) => ({
+                label: preset.label,
+                value: preset.value,
+              }))}
+            value={range}
+          />
+
+          {/* Repository Select */}
+          <ToolbarSelect
+            allLabel="All repositories"
             label="Repository"
             onChange={(value) => {
               setRepository(value)
@@ -249,7 +417,9 @@ export function ContributionsTable({
             value={repository}
           />
 
+          {/* Status Select */}
           <ToolbarSelect
+            allLabel="All status"
             label="Status"
             onChange={(value) => {
               setStatus(value)
@@ -266,8 +436,10 @@ export function ContributionsTable({
             value={status}
           />
 
+          {/* Technology Select */}
           {tagOptions.length ? (
             <ToolbarSelect
+              allLabel="All technologies"
               label="Technology"
               onChange={(value) => {
                 setTag(value)
@@ -283,13 +455,189 @@ export function ContributionsTable({
             />
           ) : null}
 
+          {/* Sort Select */}
           <ToolbarSelect
+            allLabel="Newest activity"
             label="Sort"
-            onChange={(value) => changeSort(value as ContributionSort)}
-            options={sortOptions}
+            onChange={(value) => changeSort((value || 'newest') as ContributionSort)}
+            options={sortOptions.map((item) => ({
+              label: item.label,
+              value: item.value,
+            }))}
             value={sort}
           />
         </div>
+
+        {/* Custom Date Range Picker Bar */}
+        {range === 'custom' || fromDate || toDate ? (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-border/70 bg-background/50 p-2.5 sm:px-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-1.5 font-mono text-xs font-medium text-terminal-cyan">
+                <Calendar aria-hidden="true" className="size-3.5" />
+                <span>Custom date range:</span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                  <span>From</span>
+                  <input
+                    aria-label="Start date"
+                    className="terminal-input h-8 rounded border border-input bg-card px-2 font-mono text-xs text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 [color-scheme:dark]"
+                    max={toDate || undefined}
+                    onChange={(event) => {
+                      const nextFrom = event.target.value
+                      setFromDate(nextFrom)
+                      setRange('custom')
+                      setPage(1)
+                      updateURL({ from: nextFrom, page: 1, range: 'custom' })
+                      trackFilter('custom_date_from', nextFrom)
+                    }}
+                    type="date"
+                    value={fromDate}
+                  />
+                </label>
+
+                <label className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                  <span>To</span>
+                  <input
+                    aria-label="End date"
+                    className="terminal-input h-8 rounded border border-input bg-card px-2 font-mono text-xs text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 [color-scheme:dark]"
+                    min={fromDate || undefined}
+                    onChange={(event) => {
+                      const nextTo = event.target.value
+                      setToDate(nextTo)
+                      setRange('custom')
+                      setPage(1)
+                      updateURL({ page: 1, range: 'custom', to: nextTo })
+                      trackFilter('custom_date_to', nextTo)
+                    }}
+                    type="date"
+                    value={toDate}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {fromDate || toDate ? (
+                <button
+                  className="inline-flex h-7 items-center gap-1 rounded px-2 font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={() => {
+                    setFromDate('')
+                    setToDate('')
+                    setPage(1)
+                    updateURL({ from: '', page: 1, range: 'custom', to: '' })
+                    trackFilter('custom_date_clear', 'cleared')
+                  }}
+                  type="button"
+                >
+                  <X aria-hidden="true" className="size-3" />
+                  Clear dates
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
+        {/* Active Filter Chips / Status Bar */}
+        {hasActiveFilters ? (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/40 pt-2.5 font-mono text-[0.6875rem]">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-muted-foreground">
+                Showing {visibleContributions.length} of {contributions.length}:
+              </span>
+
+              {query.trim() ? (
+                <FilterChip
+                  label={`q: "${query.trim()}"`}
+                  onRemove={() => {
+                    setQuery('')
+                    setPage(1)
+                    updateURL({ page: 1, query: '' })
+                  }}
+                />
+              ) : null}
+
+              {range ? (
+                <FilterChip
+                  label={
+                    range === 'custom'
+                      ? fromDate || toDate
+                        ? `date: ${fromDate || '…'} → ${toDate || '…'}`
+                        : 'date: custom'
+                      : `date: ${activeRangePreset?.label || range}`
+                  }
+                  onRemove={() => {
+                    setRange('')
+                    setFromDate('')
+                    setToDate('')
+                    setPage(1)
+                    updateURL({ from: '', page: 1, range: '', to: '' })
+                  }}
+                />
+              ) : fromDate || toDate ? (
+                <FilterChip
+                  label={`date: ${fromDate || '…'} → ${toDate || '…'}`}
+                  onRemove={() => {
+                    setFromDate('')
+                    setToDate('')
+                    setPage(1)
+                    updateURL({ from: '', page: 1, to: '' })
+                  }}
+                />
+              ) : null}
+
+              {repository ? (
+                <FilterChip
+                  label={`repo: ${selectedRepoLabel || repository}`}
+                  onRemove={() => {
+                    setRepository('')
+                    setPage(1)
+                    updateURL({ page: 1, repository: '' })
+                  }}
+                />
+              ) : null}
+
+              {status ? (
+                <FilterChip
+                  label={`status: ${statusLabels[status as keyof typeof statusLabels] || status}`}
+                  onRemove={() => {
+                    setStatus('')
+                    setPage(1)
+                    updateURL({ page: 1, status: '' })
+                  }}
+                />
+              ) : null}
+
+              {tag ? (
+                <FilterChip
+                  label={`tech: ${selectedTagLabel || tag}`}
+                  onRemove={() => {
+                    setTag('')
+                    setPage(1)
+                    updateURL({ page: 1, tag: '' })
+                  }}
+                />
+              ) : null}
+
+              {sort !== 'newest' ? (
+                <FilterChip
+                  label={`sort: ${selectedSortLabel || sort}`}
+                  onRemove={() => changeSort('newest')}
+                />
+              ) : null}
+            </div>
+
+            <button
+              className="inline-flex items-center gap-1 text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onClick={clearFilters}
+              type="button"
+            >
+              <RotateCcw aria-hidden="true" className="size-3" />
+              Reset all
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <Table>
@@ -338,13 +686,20 @@ export function ContributionsTable({
           ) : (
             <TableRow className="hover:bg-transparent">
               <TableCell className="py-12 text-center" colSpan={5}>
-                <p className="font-mono text-sm text-muted-foreground">
-                  No pull requests match these filters.
-                </p>
-                <Button className="mt-3" onClick={clearFilters} size="sm" variant="outline">
-                  <RotateCcw aria-hidden="true" />
-                  Clear filters
-                </Button>
+                <div className="mx-auto max-w-sm space-y-3">
+                  <div className="mx-auto flex size-10 items-center justify-center rounded-full border border-border/80 bg-background/50 text-muted-foreground">
+                    <SlidersHorizontal aria-hidden="true" className="size-4" />
+                  </div>
+                  <p className="font-mono text-sm text-muted-foreground">
+                    No pull requests match these filters.
+                  </p>
+                  {hasActiveFilters ? (
+                    <Button className="mt-1" onClick={clearFilters} size="sm" variant="outline">
+                      <RotateCcw aria-hidden="true" className="size-3.5" />
+                      Clear filters
+                    </Button>
+                  ) : null}
+                </div>
               </TableCell>
             </TableRow>
           )}
@@ -489,11 +844,13 @@ function StatusBadge({ contribution }: { contribution: ContributionCardData }) {
 }
 
 function ToolbarSelect({
+  allLabel,
   label,
   onChange,
   options,
   value,
 }: {
+  allLabel: string
   label: string
   onChange: (value: string) => void
   options: { label: string; value: string }[]
@@ -507,7 +864,7 @@ function ToolbarSelect({
         onChange={(event) => onChange(event.target.value)}
         value={value}
       >
-        <option value="">All {label.toLowerCase()}</option>
+        <option value="">{allLabel}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -519,6 +876,22 @@ function ToolbarSelect({
         className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
       />
     </label>
+  )
+}
+
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded border border-border/80 bg-background/60 px-1.5 py-0.5 text-foreground">
+      <span>{label}</span>
+      <button
+        aria-label={`Remove filter ${label}`}
+        className="rounded text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        onClick={onRemove}
+        type="button"
+      >
+        <X aria-hidden="true" className="size-3" />
+      </button>
+    </span>
   )
 }
 
@@ -547,30 +920,6 @@ function SortButton({
       <Icon aria-hidden="true" className="size-3" />
     </button>
   )
-}
-
-function repositoryValue(contribution: ContributionCardData) {
-  return `${contribution.organization}/${contribution.repository}`.toLowerCase()
-}
-
-function contributionTimestamp(contribution: ContributionCardData) {
-  return new Date(contribution.mergedAt || contribution.prCreatedAt).getTime()
-}
-
-function sortContributions(contributions: ContributionCardData[], sort: ContributionSort) {
-  if (sort === 'portfolio') return contributions
-
-  return [...contributions].sort((a, b) => {
-    if (sort === 'newest') return contributionTimestamp(b) - contributionTimestamp(a)
-    if (sort === 'oldest') return contributionTimestamp(a) - contributionTimestamp(b)
-    if (sort === 'changes-desc') return b.additions + b.deletions - (a.additions + a.deletions)
-    if (sort === 'changes-asc') return a.additions + a.deletions - (b.additions + b.deletions)
-    if (sort === 'stars-desc') return b.stars - a.stars
-    if (sort === 'stars-asc') return a.stars - b.stars
-
-    const comparison = repositoryValue(a).localeCompare(repositoryValue(b))
-    return sort === 'repo-desc' ? -comparison : comparison
-  })
 }
 
 function formatContributionDate(value: string) {
