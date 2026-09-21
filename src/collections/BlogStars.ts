@@ -1,9 +1,16 @@
 import type { CollectionConfig } from 'payload'
 
+import { adminGroups } from '@/lib/admin'
+
 export const BlogStars: CollectionConfig = {
   slug: 'blog-stars',
+  labels: {
+    plural: 'Blog stars',
+    singular: 'Blog star',
+  },
   admin: {
-    group: 'Portfolio',
+    description: 'Anonymous appreciation events recorded for blog posts.',
+    group: adminGroups.engagement,
     useAsTitle: 'visitorHash',
     defaultColumns: ['blogPost', 'createdAt'],
   },
@@ -22,6 +29,7 @@ export const BlogStars: CollectionConfig = {
       relationTo: 'blog-posts',
       required: true,
       index: true,
+      admin: { readOnly: true },
     },
     {
       name: 'visitorHash',

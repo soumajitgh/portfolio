@@ -1,6 +1,7 @@
 import { APIError, type CollectionConfig } from 'payload'
 
 import { getExpectedGitHubUsername, parseGitHubRepositoryURL } from '@/lib/github-contributions'
+import { adminGroups } from '@/lib/admin'
 
 export const TrackedRepositories: CollectionConfig = {
   slug: 'tracked-repositories',
@@ -12,7 +13,7 @@ export const TrackedRepositories: CollectionConfig = {
     interface: 'TrackedRepository',
   },
   admin: {
-    group: 'Portfolio',
+    group: adminGroups.github,
     useAsTitle: 'repoKey',
     defaultColumns: [
       'repoKey',
@@ -24,6 +25,7 @@ export const TrackedRepositories: CollectionConfig = {
     ],
     description:
       'Add a GitHub repository once. Pull requests opened by the configured username are discovered and refreshed automatically.',
+    listSearchableFields: ['repoKey', 'organization', 'repository', 'githubUsername'],
   },
   access: {
     create: ({ req }) => Boolean(req.user),

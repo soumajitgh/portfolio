@@ -8,6 +8,7 @@ import {
 } from '@/lib/github-contributions'
 import { scheduleRevalidation } from '@/lib/revalidation'
 import { slugify } from '@/lib/content'
+import { adminGroups } from '@/lib/admin'
 
 const githubMetadataFields = [
   'title',
@@ -45,11 +46,12 @@ export const OSSContributions: CollectionConfig = {
     interface: 'OSSContribution',
   },
   admin: {
-    group: 'Portfolio',
+    group: adminGroups.github,
     useAsTitle: 'title',
     defaultColumns: ['title', 'repository', 'status', 'featured', 'hidden', 'githubSyncedAt'],
     description:
       'Pull requests are discovered from Tracked Repositories. GitHub facts stay synchronized while portfolio fields remain under your control.',
+    listSearchableFields: ['title', 'repository', 'organization', 'author', 'prUrl'],
   },
   access: {
     create: ({ req }) => Boolean(req.user),
