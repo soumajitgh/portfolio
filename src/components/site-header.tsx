@@ -9,7 +9,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 shrink-0 border-b border-border/60 bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-background/75">
       <nav
         aria-label="Primary navigation"
-        className="page-container flex h-16 items-center justify-between"
+        className="page-container flex h-16 items-center justify-between font-mono"
       >
         <Link className="flex min-h-11 items-center gap-2 text-sm text-foreground" href="/">
           <Terminal className="size-4 text-terminal-cyan" aria-hidden="true" />

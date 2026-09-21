@@ -68,14 +68,14 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
-    media: Media;
     projects: Project;
+    'blog-posts': BlogPost;
+    media: Media;
     'tracked-repositories': TrackedRepository;
     'oss-contributions': OSSContribution;
-    'blog-posts': BlogPost;
     'project-stars': ProjectStar;
     'blog-stars': BlogStar;
+    users: User;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -85,14 +85,14 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     'tracked-repositories': TrackedRepositoriesSelect<false> | TrackedRepositoriesSelect<true>;
     'oss-contributions': OssContributionsSelect<false> | OssContributionsSelect<true>;
-    'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     'project-stars': ProjectStarsSelect<false> | ProjectStarsSelect<true>;
     'blog-stars': BlogStarsSelect<false> | BlogStarsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -165,70 +165,8 @@ export interface PayloadMcpApiKeyAuthOperations {
   };
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  caption?: string | null;
-  prefix?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    small?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    large?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
+ * Create and curate the projects shown across the portfolio.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "projects".
  */
@@ -286,7 +224,7 @@ export interface Project {
   repositoryOwner?: string | null;
   repositoryName?: string | null;
   /**
-   * Optional search and social overrides. The project title, description, and cover image are used as fallbacks.
+   * The project title, description, and cover image are used as fallbacks.
    */
   seo?: {
     /**
@@ -295,6 +233,120 @@ export interface Project {
     title?: string | null;
     /**
      * Aim for 140–160 characters with the main technology or outcome.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Images and PDF documents used throughout the portfolio.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Describe the media for screen readers and image fallbacks.
+   */
+  alt: string;
+  /**
+   * Optional supporting text displayed with the media.
+   */
+  caption?: string | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    small?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    large?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * Write, publish, and feature long-form articles for the portfolio.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-posts".
+ */
+export interface BlogPost {
+  id: number;
+  title: string;
+  /**
+   * Generated from the title. Once published, changing it requires redirect support.
+   */
+  slug: string;
+  /**
+   * Permanently assigned from the atomic blog counter.
+   */
+  issueNumber: number;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Optional. When empty, a summary is generated from the article body.
+   */
+  excerpt?: string | null;
+  labels?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  searchText?: string | null;
+  readingMinutes: number;
+  publishedAt?: string | null;
+  /**
+   * Show this post in the home page Blog tab.
+   */
+  featured?: boolean | null;
+  /**
+   * The article title and excerpt are used as fallbacks.
+   */
+  seo?: {
+    /**
+     * Aim for 50–60 characters and lead with the article topic.
+     */
+    title?: string | null;
+    /**
+     * Aim for 140–160 characters and summarize the practical value.
      */
     description?: string | null;
     image?: (number | null) | Media;
@@ -407,71 +459,8 @@ export interface OSSContribution {
   createdAt: string;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-posts".
- */
-export interface BlogPost {
-  id: number;
-  title: string;
-  /**
-   * Generated from the title. Once published, changing it requires redirect support.
-   */
-  slug: string;
-  /**
-   * Permanently assigned from the atomic blog counter.
-   */
-  issueNumber: number;
-  body: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  /**
-   * Optional. When empty, a summary is generated from the article body.
-   */
-  excerpt?: string | null;
-  labels?:
-    | {
-        name: string;
-        id?: string | null;
-      }[]
-    | null;
-  searchText?: string | null;
-  readingMinutes: number;
-  publishedAt?: string | null;
-  /**
-   * Show this post in the home page Blog tab.
-   */
-  featured?: boolean | null;
-  /**
-   * Optional search and social overrides. The article title and excerpt are used as fallbacks.
-   */
-  seo?: {
-    /**
-     * Aim for 50–60 characters and lead with the article topic.
-     */
-    title?: string | null;
-    /**
-     * Aim for 140–160 characters and summarize the practical value.
-     */
-    description?: string | null;
-    image?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
+ * Anonymous appreciation events recorded for portfolio projects.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "project-stars".
  */
@@ -483,6 +472,8 @@ export interface ProjectStar {
   createdAt: string;
 }
 /**
+ * Anonymous appreciation events recorded for blog posts.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "blog-stars".
  */
@@ -492,6 +483,33 @@ export interface BlogStar {
   visitorHash: string;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * People who can sign in to and manage this portfolio.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * API keys control which collections, resources, tools, and prompts MCP clients can access
@@ -732,16 +750,16 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'projects';
+        value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'blog-posts';
+        value: number | BlogPost;
       } | null)
     | ({
         relationTo: 'media';
         value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'projects';
-        value: number | Project;
       } | null)
     | ({
         relationTo: 'tracked-repositories';
@@ -752,16 +770,16 @@ export interface PayloadLockedDocument {
         value: number | OSSContribution;
       } | null)
     | ({
-        relationTo: 'blog-posts';
-        value: number | BlogPost;
-      } | null)
-    | ({
         relationTo: 'project-stars';
         value: number | ProjectStar;
       } | null)
     | ({
         relationTo: 'blog-stars';
         value: number | BlogStar;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
       } | null)
     | ({
         relationTo: 'payload-mcp-api-keys';
@@ -821,72 +839,6 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  caption?: T;
-  prefix?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        small?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        large?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "projects_select".
  */
 export interface ProjectsSelect<T extends boolean = true> {
@@ -937,6 +889,81 @@ export interface ProjectsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-posts_select".
+ */
+export interface BlogPostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  issueNumber?: T;
+  body?: T;
+  excerpt?: T;
+  labels?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  searchText?: T;
+  readingMinutes?: T;
+  publishedAt?: T;
+  featured?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        small?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1010,37 +1037,6 @@ export interface OssContributionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-posts_select".
- */
-export interface BlogPostsSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  issueNumber?: T;
-  body?: T;
-  excerpt?: T;
-  labels?:
-    | T
-    | {
-        name?: T;
-        id?: T;
-      };
-  searchText?: T;
-  readingMinutes?: T;
-  publishedAt?: T;
-  featured?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "project-stars_select".
  */
 export interface ProjectStarsSelect<T extends boolean = true> {
@@ -1058,6 +1054,28 @@ export interface BlogStarsSelect<T extends boolean = true> {
   visitorHash?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1185,6 +1203,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Manage shared home page, contact, profile, and display settings.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "portfolio-settings".
  */

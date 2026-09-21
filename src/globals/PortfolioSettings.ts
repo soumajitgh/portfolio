@@ -2,11 +2,15 @@ import type { GlobalConfig } from 'payload'
 
 import { skillCategories, validateWebURL } from '@/lib/content'
 import { scheduleRevalidation } from '@/lib/revalidation'
+import { adminGroups } from '@/lib/admin'
 
 export const PortfolioSettings: GlobalConfig = {
   slug: 'portfolio-settings',
   label: 'Portfolio settings',
-  admin: { group: 'Portfolio' },
+  admin: {
+    description: 'Manage shared home page, contact, profile, and display settings.',
+    group: adminGroups.settings,
+  },
   access: {
     read: () => true,
     update: ({ req }) => Boolean(req.user),
@@ -22,118 +26,154 @@ export const PortfolioSettings: GlobalConfig = {
   },
   fields: [
     {
-      name: 'heroCommand',
-      type: 'text',
-      required: true,
-      defaultValue: 'soumajit@portfolio:~$ whoami',
-    },
-    {
-      name: 'heroHeadline',
-      type: 'textarea',
-      required: true,
-      maxLength: 120,
-      defaultValue: 'Your request\nhas been handled.',
-    },
-    {
-      name: 'heroDescription',
-      type: 'textarea',
-      required: true,
-      maxLength: 320,
-      defaultValue:
-        'Building AI-powered web and desktop products with React, Next.js, NestJS, Python, and production-grade infrastructure.',
-    },
-    {
-      name: 'resumeFile',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: 'PDF downloaded by the Resume button on the home page.',
-      },
-      filterOptions: { mimeType: { equals: 'application/pdf' } },
-    },
-    {
-      name: 'contact',
-      type: 'group',
-      fields: [
+      type: 'tabs',
+      tabs: [
         {
-          name: 'email',
-          type: 'email',
-          required: true,
-          defaultValue: 'soumojitghosh02@gmail.com',
-          admin: {
-            description:
-              'Public contact address and fallback form recipient. CONTACT_TO_EMAIL overrides delivery.',
-          },
-        },
-        {
-          name: 'intro',
-          type: 'textarea',
-          required: true,
-          maxLength: 320,
-          defaultValue:
-            'Have an AI-powered web or desktop product, fullstack application, API, or infrastructure problem worth solving? Send the context and I will get back to you.',
-        },
-        {
-          name: 'socials',
-          type: 'array',
+          label: 'Home',
+          admin: { description: 'Hero messaging and the downloadable resume.' },
           fields: [
-            { name: 'label', type: 'text', required: true },
             {
-              name: 'url',
+              name: 'heroCommand',
               type: 'text',
               required: true,
-              validate: (value: null | string | undefined) => validateWebURL(value),
+              defaultValue: 'soumajit@portfolio:~$ whoami',
             },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'interests',
-      type: 'array',
-      fields: [
-        { name: 'name', type: 'text', required: true },
-        { name: 'description', type: 'text' },
-      ],
-    },
-    {
-      name: 'skills',
-      type: 'array',
-      fields: [
-        { name: 'category', type: 'select', required: true, options: [...skillCategories] },
-        {
-          name: 'items',
-          type: 'array',
-          required: true,
-          fields: [
-            { name: 'name', type: 'text', required: true },
-            { name: 'proficiency', type: 'text' },
-            { name: 'icon', type: 'text' },
             {
-              name: 'link',
-              type: 'text',
-              validate: (value: null | string | undefined) => validateWebURL(value),
+              name: 'heroHeadline',
+              type: 'textarea',
+              required: true,
+              maxLength: 120,
+              defaultValue: 'Your request\nhas been handled.',
+            },
+            {
+              name: 'heroDescription',
+              type: 'textarea',
+              required: true,
+              maxLength: 320,
+              defaultValue:
+                'Building AI-powered web and desktop products with React, Next.js, NestJS, Python, and production-grade infrastructure.',
+            },
+            {
+              name: 'resumeFile',
+              type: 'upload',
+              relationTo: 'media',
+              admin: {
+                description: 'PDF downloaded by the Resume button on the home page.',
+              },
+              filterOptions: { mimeType: { equals: 'application/pdf' } },
+            },
+          ],
+        },
+        {
+          label: 'Contact',
+          admin: { description: 'Public contact details, introduction, and social profiles.' },
+          fields: [
+            {
+              name: 'contact',
+              type: 'group',
+              fields: [
+                {
+                  name: 'email',
+                  type: 'email',
+                  required: true,
+                  defaultValue: 'soumojitghosh02@gmail.com',
+                  admin: {
+                    description:
+                      'Public contact address and fallback form recipient. CONTACT_TO_EMAIL overrides delivery.',
+                  },
+                },
+                {
+                  name: 'intro',
+                  type: 'textarea',
+                  required: true,
+                  maxLength: 320,
+                  defaultValue:
+                    'Have an AI-powered web or desktop product, fullstack application, API, or infrastructure problem worth solving? Send the context and I will get back to you.',
+                },
+                {
+                  name: 'socials',
+                  type: 'array',
+                  fields: [
+                    { name: 'label', type: 'text', required: true },
+                    {
+                      name: 'url',
+                      type: 'text',
+                      required: true,
+                      validate: (value: null | string | undefined) => validateWebURL(value),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Profile',
+          admin: { description: 'Interests and the grouped skills shown on the home page.' },
+          fields: [
+            {
+              name: 'interests',
+              type: 'array',
+              fields: [
+                { name: 'name', type: 'text', required: true },
+                { name: 'description', type: 'text' },
+              ],
+            },
+            {
+              name: 'skills',
+              type: 'array',
+              fields: [
+                {
+                  name: 'category',
+                  type: 'select',
+                  required: true,
+                  options: [...skillCategories],
+                },
+                {
+                  name: 'items',
+                  type: 'array',
+                  required: true,
+                  fields: [
+                    { name: 'name', type: 'text', required: true },
+                    { name: 'proficiency', type: 'text' },
+                    { name: 'icon', type: 'text' },
+                    {
+                      name: 'link',
+                      type: 'text',
+                      validate: (value: null | string | undefined) => validateWebURL(value),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Display',
+          admin: { description: 'Home page rotation timing and featured project overrides.' },
+          fields: [
+            {
+              name: 'carouselRotationInterval',
+              type: 'number',
+              required: true,
+              defaultValue: 7000,
+              min: 3000,
+              max: 30000,
+              admin: { description: 'Milliseconds between automatic panel changes.' },
+            },
+            {
+              name: 'featuredProjectOverride',
+              type: 'relationship',
+              relationTo: 'projects',
+              hasMany: true,
+              admin: {
+                description: 'Optional ordered override. Leave empty to use featured projects.',
+              },
+              filterOptions: { _status: { equals: 'published' } },
             },
           ],
         },
       ],
-    },
-    {
-      name: 'carouselRotationInterval',
-      type: 'number',
-      required: true,
-      defaultValue: 7000,
-      min: 3000,
-      max: 30000,
-      admin: { description: 'Milliseconds between automatic panel changes.' },
-    },
-    {
-      name: 'featuredProjectOverride',
-      type: 'relationship',
-      relationTo: 'projects',
-      hasMany: true,
-      admin: { description: 'Optional ordered override. Leave empty to use featured projects.' },
-      filterOptions: { _status: { equals: 'published' } },
     },
   ],
 }

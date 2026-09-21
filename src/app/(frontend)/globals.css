@@ -122,7 +122,9 @@
   h1,
   h2,
   h3,
-  nav,
+  h4,
+  h5,
+  h6,
   button,
   .terminal-text {
     @apply font-mono;
@@ -130,7 +132,10 @@
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4,
+  h5,
+  h6 {
     letter-spacing: -0.04em;
   }
 
@@ -154,6 +159,7 @@
   }
 
   .page-lede {
+    font-family: var(--font-sans);
     font-size: 0.875rem;
     line-height: 1.6;
   }
@@ -164,6 +170,7 @@
   }
 
   .detail-lede {
+    font-family: var(--font-sans);
     font-size: 0.875rem;
     line-height: 1.6;
   }
@@ -218,6 +225,7 @@
 
   .readme {
     color: var(--foreground);
+    font-family: var(--font-sans);
     font-size: 0.9375rem;
     line-height: 1.75;
     overflow-wrap: anywhere;
@@ -369,6 +377,7 @@
   }
 
   .article-prose {
+    font-family: var(--font-sans);
     line-height: 1.75;
   }
 

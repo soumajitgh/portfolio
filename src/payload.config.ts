@@ -33,6 +33,13 @@ const r2Enabled = Boolean(
 
 export default buildConfig({
   admin: {
+    components: {
+      views: {
+        dashboard: {
+          Component: '@/components/admin/AdminDashboard',
+        },
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -42,14 +49,14 @@ export default buildConfig({
     user: Users.slug,
   },
   collections: [
-    Users,
-    Media,
     Projects,
+    BlogPosts,
+    Media,
     TrackedRepositories,
     OSSContributions,
-    BlogPosts,
     ProjectStars,
     BlogStars,
+    Users,
   ],
   email: resendAdapter({
     apiKey: process.env.RESEND_API_KEY || '',

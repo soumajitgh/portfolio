@@ -26,13 +26,25 @@ test.describe('Admin Panel', () => {
     await expect(page).toHaveURL(`${baseURL}/admin`)
     const dashboardArtifact = page.locator('span[title="Dashboard"]').first()
     await expect(dashboardArtifact).toBeVisible()
+    await expect(page.getByText('Portfolio operations')).toBeVisible()
+    await expect(page.getByText('Published projects')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'GitHub sync' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Quick actions' })).toBeVisible()
   })
 
   test('can navigate to list view', async () => {
     await page.goto('/admin/collections/users')
     await expect(page).toHaveURL(`${baseURL}/admin/collections/users`)
-    const listViewArtifact = page.locator('h1', { hasText: 'Users' }).first()
+    const listViewArtifact = page.locator('h1', { hasText: 'Admin users' }).first()
     await expect(listViewArtifact).toBeVisible()
+  })
+
+  test('organizes project editing into focused tabs', async () => {
+    await page.goto('/admin/collections/projects/create')
+    await expect(page.getByRole('button', { name: 'Overview' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Media & links' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Publishing' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'SEO' })).toBeVisible()
   })
 
   test('can navigate to edit view', async () => {
