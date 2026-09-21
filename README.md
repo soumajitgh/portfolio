@@ -78,6 +78,13 @@ repository names.
 `WAKATIME_API_KEY` is required for private WakaTime activity and is only read on the server; never
 expose either token through a `NEXT_PUBLIC_` variable.
 
+The GitHub README widget is served as SVG from `/api/wakatime.svg` and refreshes its public cache
+every six hours. After deployment, embed it with your site URL:
+
+```md
+![WakaTime stats](https://your-domain.com/api/wakatime.svg)
+```
+
 Add repositories once in the Tracked Repositories collection. Payload searches each enabled
 repository for pull requests opened by its configured GitHub username, creates missing OSS
 Contributions, and refreshes existing GitHub facts every two hours. The persisted `nextSyncAt`
