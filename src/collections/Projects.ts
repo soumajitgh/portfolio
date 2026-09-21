@@ -8,13 +8,16 @@ import {
   validateWebURL,
 } from '@/lib/content'
 import { scheduleRevalidation } from '@/lib/revalidation'
+import { adminGroups } from '@/lib/admin'
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
   admin: {
-    group: 'Portfolio',
+    group: adminGroups.content,
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'status', 'featured', 'pinned', 'publishedAt'],
+    description: 'Create and curate the projects shown across the portfolio.',
+    listSearchableFields: ['title', 'slug', 'shortDescription'],
   },
   access: {
     create: ({ req }) => Boolean(req.user),
@@ -101,126 +104,164 @@ export const Projects: CollectionConfig = {
     maxPerDoc: 30,
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
     {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-      index: true,
-      hooks: {
-        beforeValidate: [({ value }) => (typeof value === 'string' ? slugify(value) : value)],
-      },
-    },
-    { name: 'shortDescription', type: 'textarea', required: true, maxLength: 260 },
-    { name: 'category', type: 'select', required: true, options: [...projectCategories] },
-    { name: 'overview', type: 'richText', required: true },
-    { name: 'coverImage', type: 'upload', relationTo: 'media' },
-    {
-      name: 'gallery',
-      type: 'array',
-      fields: [
-        { name: 'media', type: 'upload', relationTo: 'media', required: true },
-        { name: 'caption', type: 'text' },
-      ],
-    },
-    {
-      name: 'links',
-      type: 'array',
-      fields: [
-        { name: 'label', type: 'text', required: true },
+      type: 'tabs',
+      tabs: [
         {
-          name: 'url',
-          type: 'text',
-          required: true,
-          validate: (value: null | string | undefined) => validateWebURL(value),
+          label: 'Overview',
+          admin: { description: 'Core project information and the long-form case study.' },
+          fields: [
+            { name: 'title', type: 'text', required: true },
+            {
+              name: 'slug',
+              type: 'text',
+              required: true,
+              unique: true,
+              index: true,
+              hooks: {
+                beforeValidate: [
+                  ({ value }) => (typeof value === 'string' ? slugify(value) : value),
+                ],
+              },
+            },
+            { name: 'shortDescription', type: 'textarea', required: true, maxLength: 260 },
+            { name: 'category', type: 'select', required: true, options: [...projectCategories] },
+            { name: 'overview', type: 'richText', required: true },
+          ],
         },
         {
-          name: 'type',
-          type: 'select',
-          required: true,
-          options: ['github', 'demo', 'documentation', 'package', 'article', 'custom'],
-        },
-      ],
-    },
-    {
-      name: 'topics',
-      type: 'array',
-      fields: [
-        { name: 'name', type: 'text', required: true },
-        { name: 'slug', type: 'text', required: true, index: true },
-      ],
-    },
-    {
-      type: 'row',
-      fields: [
-        {
-          name: 'status',
-          type: 'select',
-          enumName: 'enum_projects_lifecycle_status',
-          required: true,
-          options: [...projectStatuses],
-        },
-        { name: 'accent', type: 'select', defaultValue: 'blue', options: [...accentOptions] },
-      ],
-    },
-    {
-      type: 'row',
-      fields: [
-        { name: 'featured', type: 'checkbox', defaultValue: false },
-        { name: 'pinned', type: 'checkbox', defaultValue: false },
-        { name: 'displayOrder', type: 'number', defaultValue: 100, min: 0 },
-      ],
-    },
-    {
-      type: 'row',
-      fields: [
-        { name: 'projectYear', type: 'number', min: 1990, max: 2100 },
-        {
-          name: 'publishedAt',
-          type: 'date',
-          admin: { date: { pickerAppearance: 'dayAndTime' } },
-        },
-      ],
-    },
-    {
-      type: 'row',
-      fields: [
-        { name: 'repositoryOwner', type: 'text' },
-        { name: 'repositoryName', type: 'text' },
-      ],
-    },
-    {
-      name: 'seo',
-      type: 'group',
-      admin: {
-        description:
-          'Optional search and social overrides. The project title, description, and cover image are used as fallbacks.',
-      },
-      fields: [
-        {
-          name: 'title',
-          type: 'text',
-          maxLength: 70,
+          label: 'Media & links',
           admin: {
-            description: 'Aim for 50–60 characters and describe what the project does.',
+            description: 'Cover art, gallery assets, external destinations, and topic tags.',
           },
+          fields: [
+            { name: 'coverImage', type: 'upload', relationTo: 'media' },
+            {
+              name: 'gallery',
+              type: 'array',
+              fields: [
+                { name: 'media', type: 'upload', relationTo: 'media', required: true },
+                { name: 'caption', type: 'text' },
+              ],
+            },
+            {
+              name: 'links',
+              type: 'array',
+              fields: [
+                { name: 'label', type: 'text', required: true },
+                {
+                  name: 'url',
+                  type: 'text',
+                  required: true,
+                  validate: (value: null | string | undefined) => validateWebURL(value),
+                },
+                {
+                  name: 'type',
+                  type: 'select',
+                  required: true,
+                  options: ['github', 'demo', 'documentation', 'package', 'article', 'custom'],
+                },
+              ],
+            },
+            {
+              name: 'topics',
+              type: 'array',
+              fields: [
+                { name: 'name', type: 'text', required: true },
+                { name: 'slug', type: 'text', required: true, index: true },
+              ],
+            },
+          ],
         },
         {
-          name: 'description',
-          type: 'textarea',
-          maxLength: 180,
-          admin: {
-            description: 'Aim for 140–160 characters with the main technology or outcome.',
-          },
+          label: 'Publishing',
+          admin: { description: 'Visibility, display order, dates, and repository metadata.' },
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'status',
+                  type: 'select',
+                  enumName: 'enum_projects_lifecycle_status',
+                  required: true,
+                  options: [...projectStatuses],
+                },
+                {
+                  name: 'accent',
+                  type: 'select',
+                  defaultValue: 'blue',
+                  options: [...accentOptions],
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                { name: 'featured', type: 'checkbox', defaultValue: false },
+                { name: 'pinned', type: 'checkbox', defaultValue: false },
+                { name: 'displayOrder', type: 'number', defaultValue: 100, min: 0 },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                { name: 'projectYear', type: 'number', min: 1990, max: 2100 },
+                {
+                  name: 'publishedAt',
+                  type: 'date',
+                  admin: { date: { pickerAppearance: 'dayAndTime' } },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                { name: 'repositoryOwner', type: 'text' },
+                { name: 'repositoryName', type: 'text' },
+              ],
+            },
+          ],
         },
         {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          filterOptions: {
-            mimeType: { contains: 'image' },
-          },
+          label: 'SEO',
+          admin: { description: 'Optional search and social sharing overrides.' },
+          fields: [
+            {
+              name: 'seo',
+              type: 'group',
+              admin: {
+                description:
+                  'The project title, description, and cover image are used as fallbacks.',
+              },
+              fields: [
+                {
+                  name: 'title',
+                  type: 'text',
+                  maxLength: 70,
+                  admin: {
+                    description: 'Aim for 50–60 characters and describe what the project does.',
+                  },
+                },
+                {
+                  name: 'description',
+                  type: 'textarea',
+                  maxLength: 180,
+                  admin: {
+                    description: 'Aim for 140–160 characters with the main technology or outcome.',
+                  },
+                },
+                {
+                  name: 'image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  filterOptions: {
+                    mimeType: { contains: 'image' },
+                  },
+                },
+              ],
+            },
+          ],
         },
       ],
     },
