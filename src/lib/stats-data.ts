@@ -134,6 +134,7 @@ export type WakaTimeStats = {
   bestDay?: { date: string; seconds: number; text: string }
   daily: DailyActivity[]
   dailyAverage: string
+  dailyAverageSeconds?: number
   editors: Metric[]
   end?: string
   error?: string
@@ -143,7 +144,9 @@ export type WakaTimeStats = {
   range: string
   start?: string
   totalAllTime: string
+  totalAllTimeSeconds?: number
   totalThisWeek: string
+  totalThisWeekSeconds?: number
 }
 
 const asRecord = (value: unknown): JsonRecord =>
@@ -704,6 +707,7 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
         }
       }),
       dailyAverage: text(stats.human_readable_daily_average, '—'),
+      dailyAverageSeconds: number(stats.daily_average),
       editors: asArray(stats.editors).map(normalizeMetric),
       end: text(stats.end) || end,
       languages: asArray(stats.languages).map(normalizeMetric),
@@ -712,7 +716,9 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
       range: text(stats.human_readable_range, 'Last 7 days'),
       start: text(stats.start) || start,
       totalAllTime: text(first(allTime.text, allTime.human_readable_total), '—'),
+      totalAllTimeSeconds: number(allTime.total_seconds),
       totalThisWeek: text(stats.human_readable_total, '—'),
+      totalThisWeekSeconds: number(stats.total_seconds),
     }
   } catch (error) {
     return {
