@@ -568,6 +568,9 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
   }
 
   if (!process.env.WAKATIME_API_KEY) {
+    console.error(
+      '[WakaTime] Configuration error: WAKATIME_API_KEY is missing; coding stats are unavailable.',
+    )
     return { ...empty, error: 'WAKATIME_API_KEY is not configured' }
   }
 
@@ -721,6 +724,7 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
       totalThisWeekSeconds: number(stats.total_seconds),
     }
   } catch (error) {
+    console.error('[WakaTime] Failed to load coding stats from the WakaTime API.', error)
     return {
       ...empty,
       error: error instanceof Error ? error.message : 'Unable to load WakaTime stats',
