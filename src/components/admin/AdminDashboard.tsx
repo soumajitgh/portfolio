@@ -39,6 +39,10 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
     trackedRepositories,
     repositorySyncErrors,
     contributionSyncErrors,
+    issueTrackers,
+    trackedIssues,
+    newTrackedIssues,
+    issueTrackerErrors,
     recentProjects,
     recentPosts,
   ] = await Promise.all([
@@ -82,6 +86,18 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
       collection: 'oss-contributions',
       where: { githubSyncStatus: { equals: 'unavailable' } },
     }),
+    payload.count({ ...access, collection: 'issue-trackers' }),
+    payload.count({ ...access, collection: 'tracked-issues' }),
+    payload.count({
+      ...access,
+      collection: 'tracked-issues',
+      where: { status: { equals: 'new' } },
+    }),
+    payload.count({
+      ...access,
+      collection: 'issue-trackers',
+      where: { syncStatus: { equals: 'error' } },
+    }),
     payload.find({
       ...access,
       collection: 'projects',
@@ -104,7 +120,8 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
 
   const draftCount = draftProjects.totalDocs + draftPosts.totalDocs
   const starCount = projectStars.totalDocs + blogStars.totalDocs
-  const syncIssueCount = repositorySyncErrors.totalDocs + contributionSyncErrors.totalDocs
+  const syncIssueCount =
+    repositorySyncErrors.totalDocs + contributionSyncErrors.totalDocs + issueTrackerErrors.totalDocs
   const recentContent = [
     ...recentProjects.docs.map((doc) => ({ ...doc, kind: 'Project', slug: 'projects' })),
     ...recentPosts.docs.map((doc) => ({ ...doc, kind: 'Blog post', slug: 'blog-posts' })),
@@ -169,6 +186,12 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
             label="OSS contributions"
             value={contributions.totalDocs}
           />
+          <Metric
+            detail={`${newTrackedIssues.totalDocs} unreviewed`}
+            href="/admin/collections/tracked-issues"
+            label="Tracked issues"
+            value={trackedIssues.totalDocs}
+          />
         </div>
       </section>
 
@@ -222,7 +245,10 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
                     ? `${syncIssueCount} sync issue${syncIssueCount === 1 ? '' : 's'}`
                     : 'All systems healthy'}
                 </strong>
-                <p>{trackedRepositories.totalDocs} tracked repositories</p>
+                <p>
+                  {trackedRepositories.totalDocs} PR repositories · {issueTrackers.totalDocs} issue
+                  trackers
+                </p>
               </div>
             </div>
           </section>
@@ -235,6 +261,12 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
               </Link>
               <Link href="/admin/collections/oss-contributions/create">
                 Import a contribution <span>→</span>
+              </Link>
+              <Link href="/admin/collections/issue-trackers/create">
+                Track repository issues <span>→</span>
+              </Link>
+              <Link href="/admin/collections/tracked-issues">
+                Review new issues <span>{newTrackedIssues.totalDocs}</span>
               </Link>
               <Link href="/admin/collections/media">
                 Manage media <span>{media.totalDocs}</span>

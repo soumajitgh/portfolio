@@ -5,6 +5,7 @@ import * as migration_20260723_115619_seo_fields from './20260723_115619_seo_fie
 import * as migration_20260814_075947_oss_contributions from './20260814_075947_oss_contributions'
 import * as migration_20260814_092312_tracked_repository_sync from './20260814_092312_tracked_repository_sync'
 import * as migration_20260814_100155_oss_contributions_mcp from './20260814_100155_oss_contributions_mcp'
+import * as migration_20260927_112214_github_issue_tracking from './20260927_112214_github_issue_tracking'
 
 export const migrations = [
   {
@@ -41,5 +42,10 @@ export const migrations = [
     up: migration_20260814_100155_oss_contributions_mcp.up,
     down: migration_20260814_100155_oss_contributions_mcp.down,
     name: '20260814_100155_oss_contributions_mcp',
+  },
+  {
+    up: migration_20260927_112214_github_issue_tracking.up,
+    down: migration_20260927_112214_github_issue_tracking.down,
+    name: '20260927_112214_github_issue_tracking',
   },
 ]

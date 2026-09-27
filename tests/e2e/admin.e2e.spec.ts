@@ -28,8 +28,19 @@ test.describe('Admin Panel', () => {
     await expect(dashboardArtifact).toBeVisible()
     await expect(page.getByText('Portfolio operations')).toBeVisible()
     await expect(page.getByText('Published projects')).toBeVisible()
+    await expect(
+      page.locator('.portfolio-dashboard__metric-label', { hasText: 'Tracked issues' }),
+    ).toBeVisible()
     await expect(page.getByRole('heading', { name: 'GitHub sync' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Quick actions' })).toBeVisible()
+  })
+
+  test('shows the admin-only issue tracking collections', async () => {
+    await page.goto('/admin/collections/issue-trackers')
+    await expect(page.getByRole('heading', { name: 'Issue Trackers' })).toBeVisible()
+
+    await page.goto('/admin/collections/tracked-issues')
+    await expect(page.getByRole('heading', { name: 'Tracked Issues' })).toBeVisible()
   })
 
   test('can navigate to list view', async () => {
