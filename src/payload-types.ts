@@ -73,6 +73,8 @@ export interface Config {
     media: Media;
     'tracked-repositories': TrackedRepository;
     'oss-contributions': OSSContribution;
+    'issue-trackers': IssueTracker;
+    'tracked-issues': TrackedIssue;
     'project-stars': ProjectStar;
     'blog-stars': BlogStar;
     users: User;
@@ -90,6 +92,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'tracked-repositories': TrackedRepositoriesSelect<false> | TrackedRepositoriesSelect<true>;
     'oss-contributions': OssContributionsSelect<false> | OssContributionsSelect<true>;
+    'issue-trackers': IssueTrackersSelect<false> | IssueTrackersSelect<true>;
+    'tracked-issues': TrackedIssuesSelect<false> | TrackedIssuesSelect<true>;
     'project-stars': ProjectStarsSelect<false> | ProjectStarsSelect<true>;
     'blog-stars': BlogStarsSelect<false> | BlogStarsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -120,6 +124,7 @@ export interface Config {
   jobs: {
     tasks: {
       syncTrackedRepositories: TaskSyncTrackedRepositories;
+      syncIssueTrackers: TaskSyncIssueTrackers;
       inline: {
         input: unknown;
         output: unknown;
@@ -459,6 +464,101 @@ export interface OSSContribution {
   createdAt: string;
 }
 /**
+ * Discover issues opened after tracking begins and keep their GitHub metadata synchronized.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "issue-trackers".
+ */
+export interface IssueTracker {
+  id: number;
+  /**
+   * Paste a repository URL like https://github.com/payloadcms/payload.
+   */
+  repositoryUrl: string;
+  /**
+   * Matches GitHub author_association exactly. All also includes owners and unaffiliated users.
+   */
+  authorFilter: 'member' | 'collaborator' | 'contributor' | 'all';
+  /**
+   * Each tracker is checked when this interval expires.
+   */
+  syncIntervalHours: number;
+  enabled?: boolean | null;
+  /**
+   * Queues one immediate sync when this document is saved.
+   */
+  refreshNow?: boolean | null;
+  organization: string;
+  repository: string;
+  /**
+   * Issues created before this timestamp are never imported.
+   */
+  trackingStartedAt: string;
+  discoveredIssues?: number | null;
+  syncStatus: 'pending' | 'syncing' | 'synced' | 'error';
+  nextSyncAt: string;
+  lastSyncAttemptAt?: string | null;
+  lastSyncedAt?: string | null;
+  syncError?: string | null;
+  githubRequestsLastSync?: number | null;
+  githubRateLimitRemaining?: number | null;
+  githubRateLimitResetAt?: string | null;
+  repoKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * GitHub issue facts are synchronized automatically. Triage status and private notes stay local.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tracked-issues".
+ */
+export interface TrackedIssue {
+  id: number;
+  issueTracker: number | IssueTracker;
+  status: 'new' | 'saved' | 'ignored';
+  githubState: 'open' | 'closed';
+  githubStateReason?: string | null;
+  /**
+   * Local admin-only notes; never sent to or overwritten by GitHub.
+   */
+  notes?: string | null;
+  title: string;
+  body?: string | null;
+  organization: string;
+  repository: string;
+  issueNumber: number;
+  author: string;
+  authorAssociation: string;
+  commentCount: number;
+  labels?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  assignees?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  issueUrl: string;
+  githubCreatedAt: string;
+  githubUpdatedAt: string;
+  closedAt?: string | null;
+  githubNodeId: string;
+  issueKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Anonymous appreciation events recorded for portfolio projects.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -689,7 +789,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'syncTrackedRepositories';
+        taskSlug: 'inline' | 'syncTrackedRepositories' | 'syncIssueTrackers';
         taskID: string;
         input?:
           | {
@@ -722,7 +822,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'syncTrackedRepositories') | null;
+  taskSlug?: ('inline' | 'syncTrackedRepositories' | 'syncIssueTrackers') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -768,6 +868,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'oss-contributions';
         value: number | OSSContribution;
+      } | null)
+    | ({
+        relationTo: 'issue-trackers';
+        value: number | IssueTracker;
+      } | null)
+    | ({
+        relationTo: 'tracked-issues';
+        value: number | TrackedIssue;
       } | null)
     | ({
         relationTo: 'project-stars';
@@ -1032,6 +1140,61 @@ export interface OssContributionsSelect<T extends boolean = true> {
   githubSyncError?: T;
   prKey?: T;
   githubNodeId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "issue-trackers_select".
+ */
+export interface IssueTrackersSelect<T extends boolean = true> {
+  repositoryUrl?: T;
+  authorFilter?: T;
+  syncIntervalHours?: T;
+  enabled?: T;
+  refreshNow?: T;
+  organization?: T;
+  repository?: T;
+  trackingStartedAt?: T;
+  discoveredIssues?: T;
+  syncStatus?: T;
+  nextSyncAt?: T;
+  lastSyncAttemptAt?: T;
+  lastSyncedAt?: T;
+  syncError?: T;
+  githubRequestsLastSync?: T;
+  githubRateLimitRemaining?: T;
+  githubRateLimitResetAt?: T;
+  repoKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tracked-issues_select".
+ */
+export interface TrackedIssuesSelect<T extends boolean = true> {
+  issueTracker?: T;
+  status?: T;
+  githubState?: T;
+  githubStateReason?: T;
+  notes?: T;
+  title?: T;
+  body?: T;
+  organization?: T;
+  repository?: T;
+  issueNumber?: T;
+  author?: T;
+  authorAssociation?: T;
+  commentCount?: T;
+  labels?: T;
+  assignees?: T;
+  issueUrl?: T;
+  githubCreatedAt?: T;
+  githubUpdatedAt?: T;
+  closedAt?: T;
+  githubNodeId?: T;
+  issueKey?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1365,6 +1528,23 @@ export interface TaskSyncTrackedRepositories {
     contributionsUpdated: number;
     failed: number;
     repositoriesSynced: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSyncIssueTrackers".
+ */
+export interface TaskSyncIssueTrackers {
+  input: {
+    trackerId?: number | null;
+    force?: boolean | null;
+  };
+  output: {
+    cached: number;
+    failed: number;
+    issuesCreated: number;
+    issuesUpdated: number;
+    trackersSynced: number;
   };
 }
 /**

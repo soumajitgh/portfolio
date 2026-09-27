@@ -93,11 +93,27 @@ is the only cache bypass. Syncs are sequential and use one GitHub GraphQL reques
 per repository page. Portfolio summaries, tags, ordering, featured state, and visibility are never
 overwritten.
 
-`GITHUB_TOKEN` is required for tracked-repository GraphQL sync. Use a read-only token with access to
-any private repositories you want to track. `GITHUB_USERNAME` defaults new trackers to `soumajitgh`.
+Issue Trackers are a separate, admin-only workflow. Add a GitHub repository URL, select an exact
+GitHub `author_association` filter (`member`, `collaborator`, `contributor`, or `all`), and choose a
+1–24 hour interval (six hours by default). The worker polls GitHub's REST issues endpoint every 15
+minutes and only contacts trackers whose interval has expired. GitHub also returns pull requests
+from that endpoint, so the worker explicitly excludes them. `all` includes every association,
+including repository owners and users with no prior association.
+
+Tracking is deliberately future-only: creating or re-enabling a tracker, or changing its repository
+or author filter, starts a new window at that moment. Existing issues and issues opened while a
+tracker was disabled are not backfilled. Already tracked entries continue receiving GitHub title,
+body, label, assignee, comment, and state updates, while the local triage status and private notes
+are never overwritten. Issue Trackers and Tracked Issues require an authenticated Payload admin and
+are not exposed through the public site or Payload MCP.
+
+`GITHUB_TOKEN` is required for tracked-repository GraphQL sync and issue-tracker REST sync. Use a
+read-only token with access to any private repositories you want to track. `GITHUB_USERNAME`
+defaults new PR trackers to `soumajitgh`.
 `ENABLE_GITHUB_SYNC_WORKER=true` runs Payload's persistent job worker in the Next.js process, which
 fits the documented Docker/Dokploy deployment. Set it to `false` only if a separate process runs
-`pnpm payload jobs:run --cron "* * * * *" --queue github-contributions --handle-schedules`.
+`pnpm payload jobs:run --cron "* * * * *" --queue github-contributions --handle-schedules` and a
+second worker for `--queue github-issues`.
 When WakaTime reports AI activity, the stats dashboard and `/stats/ai` detail page show AI-vs-human
 line changes, adoption percentage, prompts, sessions, tokens, per-model and per-project usage, and
 estimated cost. The section remains behind an informative empty state until an AI-enabled WakaTime
@@ -171,6 +187,8 @@ operations.
 - `projects`: draft-enabled project content, topics, media, links, and display metadata
 - `tracked-repositories`: repository-level GitHub discovery, cache, rate-limit, and sync state
 - `oss-contributions`: GitHub PR facts plus manually controlled portfolio summaries and visibility
+- `issue-trackers`: admin-only, future-only GitHub issue discovery settings and sync health
+- `tracked-issues`: synchronized GitHub issue facts with local triage status and private notes
 - `blog-posts`: draft-enabled engineering articles with labels and issue numbers
 - `media`: optimized uploads with alt text, captions, focal points, and optional R2 storage
 - `project-stars` and `blog-stars`: private anonymous star records
