@@ -36,11 +36,11 @@ export default async function HomePage() {
 
   if (!data) {
     return (
-      <main className="grid min-h-[calc(100dvh-4rem)] place-items-center px-4 sm:px-6">
-        <div className="max-w-lg rounded-lg border border-destructive/40 bg-card p-6 font-mono">
-          <p className="text-terminal-red">error: unable to load portfolio index</p>
-          <p className="mt-2 text-sm text-muted-foreground">Retry with ./reload in a moment.</p>
-        </div>
+      <main className="landing-shell">
+        <HomeHero />
+        <PageContainer className="landing-main" id="portfolio">
+          <p>Portfolio content is temporarily unavailable. Please try again shortly.</p>
+        </PageContainer>
       </main>
     )
   }
@@ -105,9 +105,9 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="landing-shell">
+    <main className="landing-shell">
+      <HomeHero />
       <PageContainer className="landing-main">
-        <HomeHero settings={data.settings} />
         <PortfolioShowcase
           {...data}
           statsPanel={
@@ -121,6 +121,6 @@ export default async function HomePage() {
           type="application/ld+json"
         />
       </PageContainer>
-    </div>
+    </main>
   )
 }

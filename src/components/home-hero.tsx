@@ -1,45 +1,99 @@
-import { ArrowUpRight, Download } from 'lucide-react'
+'use client'
+
+import { useRef } from 'react'
 import Link from 'next/link'
+import { ArrowDown, ArrowUpRight } from 'lucide-react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 
-import { Button } from '@/components/ui/button'
-import type { PortfolioHomeData } from '@/lib/portfolio-data'
+gsap.registerPlugin(useGSAP)
 
-function PrimaryAction() {
-  return (
-    <Button
-      asChild
-      className="h-auto min-h-11 w-full max-w-full whitespace-normal py-2 sm:w-auto md:min-h-9"
-      variant="default"
-    >
-      <Link href="/work">
-        ./view-work <ArrowUpRight aria-hidden="true" />
-      </Link>
-    </Button>
+export function HomeHero() {
+  const root = useRef<HTMLElement>(null)
+
+  useGSAP(
+    () => {
+      // Content is visible in CSS and server-rendered HTML. Only enhance it when
+      // motion is welcome; matchMedia also reverts if the preference changes.
+      const styles = getComputedStyle(root.current!)
+      const preciseDuration = parseFloat(styles.getPropertyValue('--motion-precise'))
+      const softDuration = parseFloat(styles.getPropertyValue('--motion-soft'))
+      const media = gsap.matchMedia()
+      media.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap
+          .timeline()
+          .from('[data-hero-name]', { y: 10, opacity: 0, duration: 0.4, ease: 'power2.out' })
+          .from(
+            '[data-technical-reveal]',
+            {
+              y: 18,
+              opacity: 0,
+              duration: preciseDuration,
+              stagger: 0.09,
+              ease: 'power2.out',
+            },
+            0.12,
+          )
+          .from(
+            '[data-creative-reveal]',
+            {
+              y: 22,
+              opacity: 0,
+              duration: softDuration,
+              stagger: 0.1,
+              ease: 'sine.out',
+            },
+            0.16,
+          )
+      })
+      return () => media.revert()
+    },
+    { scope: root },
   )
-}
 
-export function HomeHero({ settings }: Pick<PortfolioHomeData, 'settings'>) {
   return (
-    <section className="flex min-h-0 w-full max-w-full items-center overflow-x-clip py-4 sm:py-[clamp(1.5rem,4dvh,3rem)]">
-      <div className="min-w-0 max-w-full sm:max-w-4xl">
-        <p className="mb-2 max-w-full break-words font-mono text-xs text-terminal-green [overflow-wrap:anywhere] sm:mb-[clamp(.75rem,2dvh,1.25rem)] sm:text-sm">
-          {settings.heroCommand}
-        </p>
-        <h1 className="max-w-full whitespace-normal font-mono text-[clamp(1.9rem,8.5vw,2.75rem)] font-semibold leading-[1.08] tracking-[-0.04em] text-balance [overflow-wrap:anywhere] sm:max-w-4xl sm:whitespace-pre-line sm:text-[clamp(3rem,6.5dvh,4rem)] sm:leading-[1.03]">
-          {settings.heroHeadline}
-        </h1>
-        <p className="mt-3 max-w-full break-words text-[0.8125rem] leading-6 text-muted-foreground [overflow-wrap:anywhere] sm:mt-[clamp(.75rem,2.2dvh,1.5rem)] sm:max-w-2xl sm:text-base sm:leading-7 lg:text-lg">
-          {settings.heroDescription}
-        </p>
-        <div className="mt-4 flex w-full min-w-0 max-w-full flex-col gap-2 sm:mt-[clamp(1rem,2.5dvh,2rem)] sm:flex-row sm:flex-wrap sm:gap-3">
-          <PrimaryAction />
-          <Button asChild className="w-full max-w-full sm:w-auto" variant="outline">
-            <a href="/resume">
-              ./resume <Download aria-hidden="true" />
-            </a>
-          </Button>
+    <section aria-label="Technical and Creative portfolio" className="split-hero" ref={root}>
+      <div className="identity-panel identity-technical" data-identity="technical">
+        <div className="identity-masthead">
+          <h1 className="identity-name" data-hero-name>
+            Soumajit Ghosh
+          </h1>
+          <span aria-hidden="true" className="identity-index">
+            01
+          </span>
+        </div>
+        <div className="identity-copy">
+          <h2 data-technical-reveal>Technical</h2>
+          <p data-technical-reveal>Systems. Software. Engineering.</p>
+        </div>
+        <nav aria-label="Technical work" className="identity-footer">
+          <Link className="identity-link" href="/projects">
+            Projects <ArrowUpRight aria-hidden="true" />
+          </Link>
+          <Link className="identity-link" href="/work">
+            Experience <ArrowUpRight aria-hidden="true" />
+          </Link>
+        </nav>
+      </div>
+      <div className="identity-panel identity-creative" data-identity="creative">
+        <div className="identity-masthead identity-masthead-creative">
+          <span className="identity-note">One person. Two perspectives.</span>
+          <span aria-hidden="true" className="identity-index">
+            02
+          </span>
+        </div>
+        <div className="identity-copy">
+          <h2 data-creative-reveal>Creative</h2>
+          <p data-creative-reveal>Images. Stories. Exploration.</p>
+        </div>
+        <div aria-label="Creative disciplines" className="identity-footer">
+          <span className="identity-discipline">Photography</span>
+          <span className="identity-discipline">Visual stories</span>
         </div>
       </div>
+      <a aria-label="Explore portfolio overview" className="hero-scroll" href="#portfolio">
+        <ArrowDown aria-hidden="true" />
+      </a>
     </section>
   )
 }

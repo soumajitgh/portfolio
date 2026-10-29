@@ -14,7 +14,7 @@ const links = [
   { href: '/contact', label: './contact' },
 ]
 
-export function MobileNavigation() {
+export function MobileNavigation({ plain = false }: { plain?: boolean }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -83,7 +83,9 @@ export function MobileNavigation() {
                 onClick={close}
                 ref={index === 0 ? firstLinkRef : undefined}
               >
-                {link.label}
+                {plain
+                  ? link.label.replace('./', '').replace(/^./, (letter) => letter.toUpperCase())
+                  : link.label}
               </Link>
             ))}
           </div>
