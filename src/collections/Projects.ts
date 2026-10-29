@@ -75,13 +75,19 @@ export const Projects: CollectionConfig = {
 
         const paths: string[] = []
         if (doc._status === 'published') {
-          paths.push('/', '/projects', '/sitemap.xml', `/projects/${doc.slug}`)
+          paths.push('/', '/projects', '/technical', '/sitemap.xml', `/projects/${doc.slug}`)
         }
         if (
           previousDoc?._status === 'published' &&
           (doc._status !== 'published' || previousDoc.slug !== doc.slug)
         ) {
-          paths.push('/', '/projects', '/sitemap.xml', `/projects/${previousDoc.slug}`)
+          paths.push(
+            '/',
+            '/projects',
+            '/technical',
+            '/sitemap.xml',
+            `/projects/${previousDoc.slug}`,
+          )
         }
         scheduleRevalidation(paths)
 
@@ -91,7 +97,13 @@ export const Projects: CollectionConfig = {
     afterDelete: [
       ({ context, doc }) => {
         if (context.disableRevalidate || doc._status !== 'published') return doc
-        scheduleRevalidation(['/', '/projects', '/sitemap.xml', `/projects/${doc.slug}`])
+        scheduleRevalidation([
+          '/',
+          '/projects',
+          '/technical',
+          '/sitemap.xml',
+          `/projects/${doc.slug}`,
+        ])
         return doc
       },
     ],

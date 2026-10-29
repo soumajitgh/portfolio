@@ -5,13 +5,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
+import { isPortfolioRouteActive, portfolioNavigation } from '@/lib/portfolio-navigation'
+
 import { Button } from '@/components/ui/button'
 
 const links = [
-  { href: '/blogs', label: './blog' },
-  { href: '/work', label: './work' },
-  { href: '/stats', label: './stats' },
-  { href: '/contact', label: './contact' },
+  ...portfolioNavigation,
+  { href: '/work', label: 'Work' },
+  { href: '/stats', label: 'Stats' },
 ]
 
 export function MobileNavigation({ plain = false }: { plain?: boolean }) {
@@ -54,7 +55,7 @@ export function MobileNavigation({ plain = false }: { plain?: boolean }) {
   }
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <Button
         aria-controls="mobile-navigation"
         aria-expanded={open}
@@ -76,7 +77,7 @@ export function MobileNavigation({ plain = false }: { plain?: boolean }) {
           <div className="mx-auto grid max-w-6xl gap-1">
             {links.map((link, index) => (
               <Link
-                aria-current={pathname.startsWith(link.href) ? 'page' : undefined}
+                aria-current={isPortfolioRouteActive(pathname, link.href) ? 'page' : undefined}
                 className="flex min-h-11 items-center rounded-md px-3 font-mono text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-accent aria-[current=page]:text-terminal-cyan"
                 href={link.href}
                 key={link.href}

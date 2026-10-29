@@ -2,16 +2,28 @@ import type { MetadataRoute } from 'next'
 
 import { getPublishedBlogSlugs } from '@/lib/blog-data'
 import { getPublishedProjectSlugs } from '@/lib/portfolio-data'
+import { creativeCollectionRecords } from '@/lib/creative-content'
 import { absoluteURL } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 300
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [projects, posts] = await Promise.all([getPublishedProjectSlugs(), getPublishedBlogSlugs()])
+  const [projects, posts] = await Promise.all([
+    getPublishedProjectSlugs().catch(() => []),
+    getPublishedBlogSlugs().catch(() => []),
+  ])
 
   return [
     { changeFrequency: 'monthly', priority: 1, url: absoluteURL('/') },
+    { changeFrequency: 'weekly', priority: 0.9, url: absoluteURL('/technical') },
+    { changeFrequency: 'monthly', priority: 0.9, url: absoluteURL('/creative') },
+    ...creativeCollectionRecords
+      .filter((c) => c.images.length)
+      .map((c) => ({
+        url: absoluteURL(`/creative/${c.slug}`),
+        changeFrequency: 'monthly' as const,
+      })),
     { changeFrequency: 'weekly', priority: 0.9, url: absoluteURL('/work') },
     { changeFrequency: 'weekly', priority: 0.9, url: absoluteURL('/projects') },
     { changeFrequency: 'weekly', priority: 0.9, url: absoluteURL('/blogs') },
