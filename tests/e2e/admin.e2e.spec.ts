@@ -30,17 +30,11 @@ test.describe('Admin Panel', () => {
     await expect(page.getByText('Published projects')).toBeVisible()
     await expect(
       page.locator('.portfolio-dashboard__metric-label', { hasText: 'Tracked issues' }),
-    ).toBeVisible()
+    ).toHaveCount(0)
+    await expect(page.locator('a[href*="/collections/issue-trackers"]')).toHaveCount(0)
+    await expect(page.locator('a[href*="/collections/tracked-issues"]')).toHaveCount(0)
     await expect(page.getByRole('heading', { name: 'GitHub sync' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Quick actions' })).toBeVisible()
-  })
-
-  test('shows the admin-only issue tracking collections', async () => {
-    await page.goto('/admin/collections/issue-trackers')
-    await expect(page.getByRole('heading', { name: 'Issue Trackers' })).toBeVisible()
-
-    await page.goto('/admin/collections/tracked-issues')
-    await expect(page.getByRole('heading', { name: 'Tracked Issues' })).toBeVisible()
   })
 
   test('can navigate to list view', async () => {

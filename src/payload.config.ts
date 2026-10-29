@@ -12,14 +12,11 @@ import { Users } from './collections/Users'
 import { BlogPosts } from './collections/BlogPosts'
 import { BlogStars } from './collections/BlogStars'
 import { Media } from './collections/Media'
-import { IssueTrackers } from './collections/IssueTrackers'
 import { OSSContributions } from './collections/OSSContributions'
 import { Projects } from './collections/Projects'
 import { ProjectStars } from './collections/ProjectStars'
 import { TrackedRepositories } from './collections/TrackedRepositories'
-import { TrackedIssues } from './collections/TrackedIssues'
 import { PortfolioSettings } from './globals/PortfolioSettings'
-import { SyncIssueTrackers } from './jobs/SyncIssueTrackers'
 import { SyncTrackedRepositories } from './jobs/SyncTrackedRepositories'
 import { migrations } from './migrations'
 
@@ -57,8 +54,6 @@ export default buildConfig({
     Media,
     TrackedRepositories,
     OSSContributions,
-    IssueTrackers,
-    TrackedIssues,
     ProjectStars,
     BlogStars,
     Users,
@@ -76,17 +71,12 @@ export default buildConfig({
         limit: 1,
         queue: 'github-contributions',
       },
-      {
-        cron: '* * * * *',
-        limit: 1,
-        queue: 'github-issues',
-      },
     ],
     deleteJobOnComplete: true,
     enableConcurrencyControl: true,
     shouldAutoRun: () =>
       process.env.NODE_ENV !== 'test' && process.env.ENABLE_GITHUB_SYNC_WORKER !== 'false',
-    tasks: [SyncTrackedRepositories, SyncIssueTrackers],
+    tasks: [SyncTrackedRepositories],
   },
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
