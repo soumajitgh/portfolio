@@ -169,13 +169,15 @@ export const OSSContributions: CollectionConfig = {
     ],
     afterChange: [
       ({ context, doc }) => {
-        if (!context.disableRevalidate) scheduleRevalidation(['/contributions', '/sitemap.xml'])
+        if (!context.disableRevalidate)
+          scheduleRevalidation(['/contributions', '/technical', '/sitemap.xml'])
         return doc
       },
     ],
     afterDelete: [
       ({ context, doc }) => {
-        if (!context.disableRevalidate) scheduleRevalidation(['/contributions', '/sitemap.xml'])
+        if (!context.disableRevalidate)
+          scheduleRevalidation(['/contributions', '/technical', '/sitemap.xml'])
         return doc
       },
     ],

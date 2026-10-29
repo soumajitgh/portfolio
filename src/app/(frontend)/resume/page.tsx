@@ -30,7 +30,7 @@ async function getResume() {
 }
 
 export default async function ResumePage() {
-  const resume = await getResume()
+  const resume = await getResume().catch(() => undefined)
 
   return (
     <main className="page-container flex min-h-[calc(100dvh-4rem)] flex-col py-10 sm:py-12 md:py-16">
@@ -54,7 +54,11 @@ export default async function ResumePage() {
         {resume?.url ? (
           <ResumePreview url={resume.url} />
         ) : (
-          <p className="page-lede text-muted-foreground">Resume is not configured yet.</p>
+          <p className="page-lede text-muted-foreground">
+            {resume === undefined
+              ? 'Resume is temporarily unavailable. Please try again shortly.'
+              : 'Resume is not configured yet.'}
+          </p>
         )}
       </div>
     </main>

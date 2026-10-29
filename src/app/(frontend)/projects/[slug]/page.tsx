@@ -1,17 +1,11 @@
-import { CalendarDays } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { ProjectCard } from '@/components/project-card'
-import { ProjectDetailSidebar } from '@/components/projects/project-detail-sidebar'
+import { PortfolioEntrance } from '@/components/portfolio/entrance'
 import { ProjectMedia } from '@/components/projects/project-media'
 import { ProjectOverview } from '@/components/rich-text'
-import { ShareButton } from '@/components/share-button'
-import { StarButton } from '@/components/star-button'
-import { Badge } from '@/components/ui/badge'
-import { formatLabel } from '@/lib/content'
-import { getPublishedProject, getRelatedProjects } from '@/lib/portfolio-data'
+import { getPublishedProject } from '@/lib/portfolio-data'
 import {
   absoluteURL,
   getMediaURL,
@@ -29,10 +23,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const project = await getPublishedProject(slug)
-  if (!project) return { title: 'soumajit in ~/404' }
+  const project = await getPublishedProject(slug).catch(() => undefined)
+  if (project === undefined) return { title: 'Project unavailable', robots: { index: false } }
+  if (!project) return { title: 'Project not found', robots: { index: false } }
 
-  const title = project.seo?.title || `${project.title} – Fullstack Project`
+  const title = project.seo?.title || `${project.title} – Technical`
   const description = project.seo?.description || project.shortDescription
   const socialImage = getMediaURL(project.seo?.image || project.coverImage)
 
@@ -61,10 +56,19 @@ export async function generateMetadata({
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const project = await getPublishedProject(slug)
+  const project = await getPublishedProject(slug).catch(() => undefined)
+  if (project === undefined)
+    return (
+      <main className="portfolio-area" data-identity="technical">
+        <div className="portfolio-container portfolio-intro">
+          <Link href="/technical">← Technical</Link>
+          <h1>Project unavailable</h1>
+          <p>The project records could not be loaded. Please try again shortly.</p>
+        </div>
+      </main>
+    )
   if (!project) notFound()
 
-  const related = await getRelatedProjects(project)
   const cover =
     project.coverImage && typeof project.coverImage === 'object' ? project.coverImage : null
   const canonicalURL = absoluteURL(`/projects/${project.slug}`)
@@ -111,8 +115,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           },
           {
             '@type': 'ListItem',
-            item: absoluteURL('/projects'),
-            name: 'Fullstack Projects',
+            item: absoluteURL('/technical'),
+            name: 'Technical',
             position: 2,
           },
           {
@@ -127,94 +131,78 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   }
 
   return (
-    <div className="min-h-[calc(100dvh-4rem)]">
-      <main className="page-container py-8 sm:py-10 md:py-14">
-        <nav
-          aria-label="Breadcrumb"
-          className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1 font-mono text-[0.6875rem] leading-5 text-muted-foreground sm:text-sm"
-        >
-          <Link className="hover:text-primary" href="/projects">
-            ~/projects
-          </Link>
-          <span>/</span>
-          <span className="min-w-0 break-all text-terminal-cyan">{project.slug}</span>
+    <main className="portfolio-area project-story" data-identity="technical">
+      <div className="portfolio-container">
+        <nav aria-label="Breadcrumb" className="portfolio-breadcrumb">
+          <Link href="/technical">Technical</Link>
+          <span aria-hidden="true">/</span>
+          <Link href="/projects">Projects</Link>
+          <span aria-hidden="true">/</span>
+          <span>{project.title}</span>
         </nav>
-        <p className="mt-6 font-mono text-xs text-terminal-green sm:text-sm">$ cat README.md</p>
-
-        <header className="mt-5 border-b border-border pb-8">
-          <div className="max-w-4xl">
-            <h1 className="detail-title break-words font-semibold">{project.title}</h1>
-            <p className="detail-lede mt-4 text-muted-foreground lg:text-lg">
-              {project.shortDescription}
+        <PortfolioEntrance>
+          <header className="portfolio-intro" data-portfolio-intro>
+            <p className="portfolio-eyebrow">
+              Project {project.projectYear ? ` / ${project.projectYear}` : ''}
             </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Badge variant="secondary">{formatLabel(project.category)}</Badge>
-              <Badge className="text-terminal-green" variant="outline">
-                {formatLabel(project.status)}
-              </Badge>
-            </div>
-          </div>
-
-          <div className="mt-7 flex flex-wrap items-start justify-between gap-4">
-            {(project.projectYear || project.publishedAt) && (
-              <span className="flex items-center gap-2 pt-2 font-mono text-xs text-terminal-yellow">
-                <CalendarDays className="size-4" aria-hidden="true" />
-                {project.projectYear || new Date(project.publishedAt as string).getFullYear()}
-              </span>
-            )}
-            <div className="ml-auto flex flex-wrap items-center justify-end gap-3">
-              <ShareButton text={project.shortDescription} title={project.title} />
-              <StarButton slug={project.slug} />
-            </div>
-          </div>
-        </header>
-
-        <div className="mt-8 grid items-start gap-8 sm:mt-10 lg:grid-cols-[minmax(0,3fr)_minmax(15rem,1fr)] lg:gap-10 xl:gap-14">
-          <div className="min-w-0">
-            {cover?.url && <ProjectMedia className="mt-0 max-w-none" media={cover} priority />}
-
-            <article className={cover?.url ? 'mt-10' : undefined}>
-              <ProjectOverview data={project.overview} />
-            </article>
-          </div>
-
-          <ProjectDetailSidebar links={project.links} topics={project.topics} />
+            <h1>{project.title}</h1>
+            <p>{project.shortDescription}</p>
+          </header>
+        </PortfolioEntrance>
+        {cover?.url ? <ProjectMedia media={cover} priority className="story-cover" /> : null}
+        <div className="story-body">
+          <article className="story-prose">
+            <ProjectOverview data={project.overview} />
+          </article>
+          <aside aria-label="Project resources">
+            {project.links?.length ? (
+              <section>
+                <h2>Explore the project</h2>
+                <ul>
+                  {project.links.map((link) => (
+                    <li key={link.id || link.url}>
+                      <a href={link.url}>{link.label} ↗</a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+            {project.topics?.length ? (
+              <section>
+                <h2>Built with</h2>
+                <ul>
+                  {project.topics.map((topic) => (
+                    <li key={topic.slug}>
+                      <Link href={`/projects?topic=${topic.slug}`}>{topic.name}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+          </aside>
         </div>
-
         {project.gallery?.length ? (
-          <section aria-labelledby="gallery-heading" className="mt-16 border-t border-border pt-10">
-            <h2 id="gallery-heading" className="section-title font-semibold">
-              ./media
-            </h2>
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <section className="portfolio-section" aria-labelledby="gallery-heading">
+            <h2 id="gallery-heading">A closer look</h2>
+            <div className="story-gallery">
               {project.gallery.map((item) => {
                 const media = typeof item.media === 'object' ? item.media : null
-                if (!media?.url) return null
-                return (
-                  <ProjectMedia caption={item.caption} key={item.id || media.id} media={media} />
-                )
+                return media?.url ? (
+                  <ProjectMedia key={item.id || media.id} caption={item.caption} media={media} />
+                ) : null
               })}
             </div>
           </section>
         ) : null}
-
-        {related.length ? (
-          <section aria-labelledby="related-heading" className="mt-16 border-t border-border pt-10">
-            <h2 id="related-heading" className="section-title font-semibold">
-              ./related-projects
-            </h2>
-            <div className="mt-6 grid gap-5 md:grid-cols-3">
-              {related.map((item, index) => (
-                <ProjectCard index={index} key={item.id} project={item} />
-              ))}
-            </div>
-          </section>
-        ) : null}
+        <footer className="portfolio-footer">
+          <Link href="/technical">← All Technical work</Link>
+          <Link href="/creative">Explore Creative ↗</Link>
+        </footer>
         <script
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
           type="application/ld+json"
         />
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }
