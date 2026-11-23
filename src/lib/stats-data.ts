@@ -568,9 +568,6 @@ export async function getWakaTimeStats(): Promise<WakaTimeStats> {
   }
 
   if (!process.env.WAKATIME_API_KEY) {
-    console.error(
-      '[WakaTime] Configuration error: WAKATIME_API_KEY is missing; coding stats are unavailable.',
-    )
     return { ...empty, error: 'WAKATIME_API_KEY is not configured' }
   }
 
