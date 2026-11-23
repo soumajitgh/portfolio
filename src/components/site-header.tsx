@@ -21,6 +21,9 @@ export function SiteHeader() {
             <Link href="/work">Work</Link>
           </Button>
           <Button asChild className="px-3 text-sm" size="sm" variant="ghost">
+            <Link href="/photography">Photography</Link>
+          </Button>
+          <Button asChild className="px-3 text-sm" size="sm" variant="ghost">
             <Link href="/stats">Stats</Link>
           </Button>
           <Button asChild className="px-3 text-sm" size="sm" variant="ghost">
