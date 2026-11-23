@@ -11,20 +11,13 @@ import { cn } from '@/lib/utils'
 type StarState = { count: number; starred: boolean }
 const turnstileConfigured = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
 
-export function StarButton({
-  resource = 'projects',
-  slug,
-}: {
-  resource?: 'blog' | 'projects'
-  slug: string
-}) {
+export function StarButton({ slug }: { slug: string }) {
   const [state, setState] = useState<StarState>({ count: 0, starred: false })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [turnstileToken, setTurnstileToken] = useState('')
   const [turnstileResetKey, setTurnstileResetKey] = useState(0)
-  const endpoint = `/api/${resource}/${slug}/star`
-  const subject = resource === 'blog' ? 'blog post' : 'project'
+  const endpoint = `/api/projects/${slug}/star`
 
   useEffect(() => {
     let active = true
@@ -77,7 +70,7 @@ export function StarButton({
       setState(result)
       captureEvent('content_star_updated', {
         action: result.starred ? 'added' : 'removed',
-        resource_type: resource === 'blog' ? 'blog_post' : 'project',
+        resource_type: 'project',
         slug,
         star_count: result.count,
       })
@@ -86,7 +79,7 @@ export function StarButton({
       setError('request failed — retry')
       captureEvent('content_star_failed', {
         attempted_action: optimistic.starred ? 'add' : 'remove',
-        resource_type: resource === 'blog' ? 'blog_post' : 'project',
+        resource_type: 'project',
         slug,
       })
     } finally {
@@ -99,7 +92,7 @@ export function StarButton({
   return (
     <div className="relative inline-flex max-w-full flex-col items-end">
       <Button
-        aria-label={`${state.starred ? 'Remove star from' : 'Star'} ${subject}. ${state.count} stars`}
+        aria-label={`${state.starred ? 'Remove star from' : 'Star'} project. ${state.count} stars`}
         aria-pressed={state.starred}
         disabled={loading || !turnstileConfigured}
         onClick={toggle}

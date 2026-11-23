@@ -12,7 +12,6 @@ function pageContext(pathname: string) {
   const [section, slug] = segments
 
   if (!section) return { page_type: 'home' }
-  if (section === 'blogs' && slug) return { content_slug: slug, page_type: 'blog_post' }
   if (section === 'projects' && slug) return { content_slug: slug, page_type: 'project_detail' }
 
   return { page_type: section.replaceAll('-', '_') }
@@ -107,11 +106,11 @@ export function SiteAnalytics() {
           destination_path: destination.pathname,
           link_label: label,
         })
-      } else if (/^\/(blogs|projects)\/[^/]+/.test(destination.pathname)) {
+      } else if (/^\/projects\/[^/]+/.test(destination.pathname)) {
         captureEvent('content_selected', {
           ...context,
           destination_path: destination.pathname,
-          destination_type: destination.pathname.startsWith('/blogs/') ? 'blog_post' : 'project',
+          destination_type: 'project',
           link_label: label,
         })
       }

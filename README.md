@@ -1,8 +1,8 @@
 # Terminal Backend Portfolio
 
 A production-oriented fullstack developer portfolio built with Next.js 16, Payload CMS 3,
-Tailwind CSS, and PostgreSQL. It includes a Payload Admin workspace, draft-enabled projects and blog
-posts, search and topic filtering, anonymous star counters, Resend contact delivery, Cloudflare
+Tailwind CSS, and PostgreSQL. It includes a Payload Admin workspace, draft-enabled projects,
+search and topic filtering, anonymous star counters, Resend contact delivery, Cloudflare
 Turnstile protection, optional R2 media storage, and an authenticated Payload MCP endpoint.
 
 ## Local development
@@ -20,7 +20,7 @@ pnpm dev
 
 Open `http://localhost:3000` for the portfolio and `http://localhost:3000/admin` for Payload
 Admin. The seed command is idempotent: it updates portfolio settings and creates missing sample
-projects, tracked repositories, OSS contributions, and blog content without duplicating existing
+projects, tracked repositories, and OSS contributions without duplicating existing
 records. It is intended for local development and refuses to run when `NODE_ENV=production`.
 Contribution fixtures bypass live GitHub requests so local setup is deterministic and does not
 consume API rate limits.
@@ -123,8 +123,8 @@ the following decision-oriented custom events:
   `content_filter_changed`, and `in_page_navigation_clicked`
 - Conversion and intent: `contact_form_submitted`, `contact_form_succeeded`,
   `contact_form_failed`, `resume_download_requested`, and `contact_link_clicked`
-- Advocacy: `content_star_updated`, `content_star_failed`, `content_shared`,
-  `content_share_failed`, `content_link_copied`, and `content_link_copy_failed`
+- Advocacy: `content_star_updated`, `content_star_failed`, `content_shared`, and
+  `content_share_failed`
 - Navigation: `external_link_clicked`, `portfolio_panel_selected`, and
   `portfolio_panel_pin_changed`
 
@@ -136,7 +136,6 @@ browser's Do Not Track signal. No contact-form values are sent in custom events.
 
 The MCP endpoint is `POST /api/mcp`. It exposes:
 
-- `blog-posts`: find, create, update, and delete
 - `oss-contributions`: find, create, update, and delete
 - `projects`: find, create, update, and delete
 - `tracked-repositories`: find, create, update, and delete
@@ -172,14 +171,12 @@ operations.
 - `projects`: draft-enabled project content, topics, media, links, and display metadata
 - `tracked-repositories`: repository-level GitHub discovery, cache, rate-limit, and sync state
 - `oss-contributions`: GitHub PR facts plus manually controlled portfolio summaries and visibility
-- `blog-posts`: draft-enabled engineering articles with labels and issue numbers
 - `media`: optimized uploads with alt text, captions, focal points, and optional R2 storage
-- `project-stars` and `blog-stars`: private anonymous star records
+- `project-stars`: private anonymous star records
 - `portfolio-settings`: hero, contact, social, resume, and home-page display settings
 - `payload-mcp-api-keys`: authenticated MCP client keys and per-capability permissions
 
-Public queries enforce published status. Draft content is excluded from pages, related content,
-feeds, and the sitemap.
+Public queries enforce published status. Draft content is excluded from pages, related content, and the sitemap.
 
 ## Commands
 

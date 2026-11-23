@@ -1,18 +1,13 @@
 import { cache } from 'react'
 import { getPayload } from 'payload'
 
-import type { BlogPost, Project } from '@/payload-types'
+import type { Project } from '@/payload-types'
 import config from '@/payload.config'
 
 import type { SocialPreviewIdentity } from './social-preview'
 import { getMediaURL, siteName, siteRole } from './seo'
 
 const skipDatabaseDuringBuild = process.env.SKIP_DATABASE_DURING_BUILD === 'true'
-
-export type BlogSocialPreviewData = Pick<
-  BlogPost,
-  'excerpt' | 'issueNumber' | 'labels' | 'publishedAt' | 'slug' | 'title'
-> & { socialImage?: string }
 
 export type ProjectSocialPreviewData = Pick<
   Project,
@@ -90,41 +85,6 @@ export const getProjectSocialPreview = cache(
       ...preview,
       socialImage: getMediaURL(seo?.image),
       starCount: stars.totalDocs,
-    }
-  },
-)
-
-export const getBlogSocialPreview = cache(
-  async (slug: string): Promise<BlogSocialPreviewData | null> => {
-    if (skipDatabaseDuringBuild) return null
-
-    const payload = await getPayload({ config })
-    const result = await payload.find({
-      collection: 'blog-posts',
-      depth: 1,
-      limit: 1,
-      overrideAccess: false,
-      select: {
-        excerpt: true,
-        issueNumber: true,
-        labels: true,
-        publishedAt: true,
-        seo: true,
-        slug: true,
-        title: true,
-      },
-      where: {
-        and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }],
-      },
-    })
-
-    const post = result.docs[0]
-    if (!post) return null
-    const { seo, ...preview } = post
-
-    return {
-      ...preview,
-      socialImage: getMediaURL(seo?.image),
     }
   },
 )

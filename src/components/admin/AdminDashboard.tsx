@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { AdminViewProps } from 'payload'
 
 type MetricProps = {
-  detail: string
+  detail?: string
   href: string
   label: string
   value: number
@@ -13,7 +13,7 @@ const Metric = ({ detail, href, label, value }: MetricProps) => (
   <Link className="portfolio-dashboard__metric" href={href}>
     <span className="portfolio-dashboard__metric-label">{label}</span>
     <strong>{value.toLocaleString()}</strong>
-    <span className="portfolio-dashboard__metric-detail">{detail}</span>
+    {detail && <span className="portfolio-dashboard__metric-detail">{detail}</span>}
   </Link>
 )
 
@@ -29,18 +29,14 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
   const [
     publishedProjects,
     draftProjects,
-    publishedPosts,
-    draftPosts,
     media,
     projectStars,
-    blogStars,
     contributions,
     mergedContributions,
     trackedRepositories,
     repositorySyncErrors,
     contributionSyncErrors,
     recentProjects,
-    recentPosts,
   ] = await Promise.all([
     payload.count({
       ...access,
@@ -52,19 +48,8 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
       collection: 'projects',
       where: { _status: { equals: 'draft' } },
     }),
-    payload.count({
-      ...access,
-      collection: 'blog-posts',
-      where: { _status: { equals: 'published' } },
-    }),
-    payload.count({
-      ...access,
-      collection: 'blog-posts',
-      where: { _status: { equals: 'draft' } },
-    }),
     payload.count({ ...access, collection: 'media' }),
     payload.count({ ...access, collection: 'project-stars' }),
-    payload.count({ ...access, collection: 'blog-stars' }),
     payload.count({ ...access, collection: 'oss-contributions' }),
     payload.count({
       ...access,
@@ -91,26 +76,9 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
       select: { title: true, updatedAt: true, _status: true },
       sort: '-updatedAt',
     }),
-    payload.find({
-      ...access,
-      collection: 'blog-posts',
-      depth: 0,
-      limit: 4,
-      pagination: false,
-      select: { title: true, updatedAt: true, _status: true },
-      sort: '-updatedAt',
-    }),
   ])
 
-  const draftCount = draftProjects.totalDocs + draftPosts.totalDocs
-  const starCount = projectStars.totalDocs + blogStars.totalDocs
   const syncIssueCount = repositorySyncErrors.totalDocs + contributionSyncErrors.totalDocs
-  const recentContent = [
-    ...recentProjects.docs.map((doc) => ({ ...doc, kind: 'Project', slug: 'projects' })),
-    ...recentPosts.docs.map((doc) => ({ ...doc, kind: 'Blog post', slug: 'blog-posts' })),
-  ]
-    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-    .slice(0, 6)
 
   const dateFormatter = new Intl.DateTimeFormat('en', {
     day: 'numeric',
@@ -128,16 +96,10 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
         </div>
         <div className="portfolio-dashboard__primary-actions">
           <Link
-            className="btn btn--style-secondary btn--size-medium"
+            className="btn btn--style-primary btn--size-medium"
             href="/admin/collections/projects/create"
           >
             New project
-          </Link>
-          <Link
-            className="btn btn--style-primary btn--size-medium"
-            href="/admin/collections/blog-posts/create"
-          >
-            New blog post
           </Link>
         </div>
       </header>
@@ -152,16 +114,9 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
             value={publishedProjects.totalDocs}
           />
           <Metric
-            detail={`${draftPosts.totalDocs} post drafts`}
-            href="/admin/collections/blog-posts"
-            label="Published posts"
-            value={publishedPosts.totalDocs}
-          />
-          <Metric
-            detail={`${projectStars.totalDocs} project · ${blogStars.totalDocs} blog`}
             href="/admin/collections/project-stars"
-            label="Total stars"
-            value={starCount}
+            label="Project stars"
+            value={projectStars.totalDocs}
           />
           <Metric
             detail={`${mergedContributions.totalDocs} merged`}
@@ -175,17 +130,16 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
       <div className="portfolio-dashboard__columns">
         <section className="portfolio-dashboard__panel">
           <SectionHeading href="/admin/collections/projects">Recently updated</SectionHeading>
-          {recentContent.length ? (
+          {recentProjects.docs.length ? (
             <div className="portfolio-dashboard__recent-list">
-              {recentContent.map((item) => (
+              {recentProjects.docs.map((item) => (
                 <Link
                   className="portfolio-dashboard__recent-item"
-                  href={`/admin/collections/${item.slug}/${item.id}`}
-                  key={`${item.slug}-${item.id}`}
+                  href={`/admin/collections/projects/${item.id}`}
+                  key={item.id}
                 >
                   <span>
                     <strong>{item.title}</strong>
-                    <small>{item.kind}</small>
                   </span>
                   <span className="portfolio-dashboard__recent-meta">
                     <span
@@ -202,7 +156,7 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
             </div>
           ) : (
             <p className="portfolio-dashboard__empty">
-              No content yet. Create your first project or blog post.
+              No projects yet. Create your first project.
             </p>
           )}
         </section>
@@ -242,11 +196,6 @@ export default async function AdminDashboard({ payload, user }: AdminViewProps) 
               <Link href="/admin/globals/portfolio-settings">
                 Portfolio settings <span>→</span>
               </Link>
-              {draftCount ? (
-                <Link href="/admin/collections/blog-posts">
-                  Review drafts <span>{draftCount}</span>
-                </Link>
-              ) : null}
             </nav>
           </section>
         </aside>

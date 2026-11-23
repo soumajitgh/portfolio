@@ -7,6 +7,7 @@ import * as migration_20260814_092312_tracked_repository_sync from './20260814_0
 import * as migration_20260814_100155_oss_contributions_mcp from './20260814_100155_oss_contributions_mcp'
 import * as migration_20260927_112214_github_issue_tracking from './20260927_112214_github_issue_tracking'
 import * as migration_20261029_172020_remove_issue_tracking from './20261029_172020_remove_issue_tracking'
+import * as migration_20261123_025315_remove_blog from './20261123_025315_remove_blog'
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20261029_172020_remove_issue_tracking.up,
     down: migration_20261029_172020_remove_issue_tracking.down,
     name: '20261029_172020_remove_issue_tracking',
+  },
+  {
+    up: migration_20261123_025315_remove_blog.up,
+    down: migration_20261123_025315_remove_blog.down,
+    name: '20261123_025315_remove_blog',
   },
 ]
