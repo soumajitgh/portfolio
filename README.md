@@ -99,10 +99,6 @@ defaults new PR trackers to `soumajitgh`.
 `ENABLE_GITHUB_SYNC_WORKER=true` runs Payload's persistent job worker in the Next.js process, which
 fits the documented Docker/Dokploy deployment. Set it to `false` only if a separate process runs
 `pnpm payload jobs:run --cron "* * * * *" --queue github-contributions --handle-schedules`.
-When WakaTime reports AI activity, the stats dashboard and `/stats/ai` detail page show AI-vs-human
-line changes, adoption percentage, prompts, sessions, tokens, per-model and per-project usage, and
-estimated cost. The section remains behind an informative empty state until an AI-enabled WakaTime
-plugin or agent reports data.
 
 Cloudflare R2 is enabled only when all five `R2_*` values are present. Otherwise Payload uses local
 uploads, which are suitable for development but not an ephemeral production container.

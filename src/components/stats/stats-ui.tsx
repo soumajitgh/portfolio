@@ -1,43 +1,60 @@
-import { AlertCircle, ArrowUpRight } from 'lucide-react'
-import Link from 'next/link'
+import { AlertCircle, ExternalLink } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
+export function StatsSection({
+  children,
+  id,
+  profileURL,
+  title,
+  username,
+}: {
+  children: ReactNode
+  id: string
+  profileURL: string
+  title: string
+  username: string
+}) {
+  return (
+    <section aria-labelledby={`${id}-heading`} className="scroll-mt-24" id={id}>
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
+        <div>
+          <h2 className="text-2xl font-semibold sm:text-3xl" id={`${id}-heading`}>
+            {title}
+          </h2>
+          <p className="mt-1 font-mono text-xs text-muted-foreground">@{username}</p>
+        </div>
+        <a
+          aria-label={`View ${title} profile`}
+          className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border px-3 font-mono text-xs text-primary transition-colors hover:bg-accent"
+          href={profileURL}
+          rel="noreferrer"
+          target="_blank"
+        >
+          View profile
+          <ExternalLink aria-hidden="true" className="size-3.5" />
+        </a>
+      </header>
+      {children}
+    </section>
+  )
+}
+
 export function StatsPanel({
   children,
   className,
-  eyebrow,
-  href,
   title,
 }: {
   children: ReactNode
   className?: string
-  eyebrow: string
-  href?: string
   title: string
 }) {
   return (
-    <section className={cn('rounded-lg border border-border bg-card/45 p-4 sm:p-6', className)}>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-terminal-green">
-            {eyebrow}
-          </p>
-          <h2 className="mt-2 text-lg font-semibold">{title}</h2>
-        </div>
-        {href ? (
-          <Link
-            className="flex min-h-11 shrink-0 items-center gap-1 rounded-md px-2 font-mono text-xs text-primary transition-colors hover:bg-accent hover:text-accent-foreground"
-            href={href}
-          >
-            inspect
-            <ArrowUpRight aria-hidden="true" className="size-3.5" />
-          </Link>
-        ) : null}
-      </div>
+    <div className={cn('min-w-0 rounded-lg border border-border bg-card/45 p-4 sm:p-6', className)}>
+      <h3 className="text-lg font-semibold">{title}</h3>
       {children}
-    </section>
+    </div>
   )
 }
 
@@ -61,18 +78,12 @@ export function StatValue({
   return (
     <div className="min-w-0">
       <p className={cn('font-mono text-xl font-semibold sm:text-2xl', tones[tone])}>{value}</p>
-      <p className="mt-1 truncate font-mono text-[0.6875rem] text-muted-foreground">{label}</p>
+      <p className="mt-1 font-mono text-[0.6875rem] text-muted-foreground">{label}</p>
     </div>
   )
 }
 
-export function StatsUnavailable({
-  detail,
-  label,
-}: {
-  detail?: string
-  label: string
-}) {
+export function StatsUnavailable({ detail, label }: { detail?: string; label: string }) {
   return (
     <div className="mt-6 flex min-h-40 items-center justify-center rounded-lg border border-dashed border-border bg-background/30 p-5 text-center">
       <div>
@@ -90,11 +101,7 @@ export function Rank({ value }: { value: number }) {
   return value ? `#${new Intl.NumberFormat('en').format(Math.round(value))}` : '—'
 }
 
-export function ContributionDots({
-  days,
-}: {
-  days: { count: number; date: string }[]
-}) {
+export function ContributionDots({ days }: { days: { count: number; date: string }[] }) {
   const today = new Date()
   today.setUTCHours(0, 0, 0, 0)
   const counts = new Map(days.map((day) => [day.date, day.count]))
@@ -117,7 +124,7 @@ export function ContributionDots({
   }
 
   return (
-    <div className="mt-6 flex min-h-0 flex-1 flex-col border-t border-border/70 pt-5">
+    <div className="mt-5">
       <div className="flex items-center justify-between gap-4">
         <p className="font-mono text-xs text-muted-foreground">Last 12 months</p>
         <p className="font-mono text-[0.6875rem] text-terminal-green">
@@ -126,16 +133,16 @@ export function ContributionDots({
       </div>
       <div
         aria-label="GitHub contribution activity for the last 12 months"
-        className="scrollbar-thin mt-3 flex flex-1 items-center overflow-x-auto pb-1"
+        className="scrollbar-thin mt-3 overflow-x-auto pb-1"
         role="img"
       >
-        <div className="grid w-max grid-flow-col grid-rows-7 gap-1">
+        <div className="grid w-max min-w-full grid-flow-col grid-rows-7 gap-1">
           {cells.map((cell) => (
             <span
               aria-hidden={cell.future || undefined}
               aria-label={cell.future ? undefined : `${cell.count} contributions on ${cell.date}`}
               className={cn(
-                'size-3 rounded-[2px] border',
+                'h-3 min-w-3 rounded-[2px] border',
                 cell.future ? 'border-transparent bg-transparent' : intensity(cell.count),
               )}
               key={cell.date}
@@ -148,9 +155,9 @@ export function ContributionDots({
   )
 }
 
-export function formatDate(value?: string) {
+export function formatDate(value?: Date | string) {
   if (!value) return '—'
-  const date = new Date(value)
+  const date = typeof value === 'string' ? new Date(value) : value
   if (Number.isNaN(date.getTime())) return '—'
   return new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric' }).format(
     date,
