@@ -8,6 +8,7 @@ import * as migration_20260814_100155_oss_contributions_mcp from './20260814_100
 import * as migration_20260927_112214_github_issue_tracking from './20260927_112214_github_issue_tracking'
 import * as migration_20261029_172020_remove_issue_tracking from './20261029_172020_remove_issue_tracking'
 import * as migration_20261123_025315_remove_blog from './20261123_025315_remove_blog'
+import * as migration_20261123_041204_maintenance_mode from './20261123_041204_maintenance_mode'
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261123_025315_remove_blog.up,
     down: migration_20261123_025315_remove_blog.down,
     name: '20261123_025315_remove_blog',
+  },
+  {
+    up: migration_20261123_041204_maintenance_mode.up,
+    down: migration_20261123_041204_maintenance_mode.down,
+    name: '20261123_041204_maintenance_mode',
   },
 ]

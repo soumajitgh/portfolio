@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
   experimental: { globalNotFound: true },
   output: 'standalone',
+  outputFileTracingExcludes: {
+    // Keep build artifacts out of the Payload-backed proxy trace. Next renames the
+    // proxy manifest before it copies the runtime files into the standalone output.
+    'next-server': ['**/cache/webpack/**', '**/server/proxy.js.nft.json'],
+  },
   outputFileTracingIncludes: {
     '/*': [
       './node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.ttf',
