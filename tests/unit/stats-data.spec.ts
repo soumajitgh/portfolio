@@ -8,7 +8,7 @@ describe('getWakaTimeStats', () => {
     vi.unstubAllEnvs()
   })
 
-  it('logs a clear configuration error when WAKATIME_API_KEY is missing', async () => {
+  it('returns unavailable stats without logging when WAKATIME_API_KEY is missing', async () => {
     vi.stubEnv('WAKATIME_API_KEY', '')
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
@@ -16,9 +16,6 @@ describe('getWakaTimeStats', () => {
 
     expect(stats.available).toBe(false)
     expect(stats.error).toBe('WAKATIME_API_KEY is not configured')
-    expect(error).toHaveBeenCalledOnce()
-    expect(error).toHaveBeenCalledWith(
-      '[WakaTime] Configuration error: WAKATIME_API_KEY is missing; coding stats are unavailable.',
-    )
+    expect(error).not.toHaveBeenCalled()
   })
 })
