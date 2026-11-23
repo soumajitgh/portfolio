@@ -1,92 +1,201 @@
+import { ArrowRight, ArrowUpRight, ImageIcon } from 'lucide-react'
 import type { Metadata } from 'next'
-import { ArrowUpRight, Camera, Images } from 'lucide-react'
+import { DM_Sans, Outfit } from 'next/font/google'
+import Image from 'next/image'
 import Link from 'next/link'
 
-import { photographyCollections } from '@/lib/photography'
+import { PageContainer } from '@/components/page-container'
+import {
+  photographyCollections,
+  photographyLandingContent,
+  storyLayoutPreviewSlug,
+} from '@/lib/photography'
+import { siteName } from '@/lib/seo'
+
+import { PhotographyGrid } from './photography-grid'
+import styles from './photography.module.css'
+
+const outfit = Outfit({ subsets: ['latin'], variable: '--photography-display', display: 'swap' })
+const dmSans = DM_Sans({ subsets: ['latin'], variable: '--photography-body', display: 'swap' })
+
+const description = 'Wildlife, nature, and countryside photography by Soumajit Ghosh.'
+const socialTitle = `Photography | ${siteName}`
+const wideImageSizes =
+  '(min-width: 1232px) 1152px, (min-width: 640px) calc(100vw - 5rem), calc(100vw - 2.5rem)'
+const coverImageSizes =
+  '(min-width: 1232px) 560px, (min-width: 768px) calc(50vw - 3.5rem), (min-width: 640px) calc(100vw - 5rem), calc(100vw - 2.5rem)'
 
 export const metadata: Metadata = {
   alternates: { canonical: '/photography' },
-  description: 'Explore the photography portfolio of Soumajit Ghosh, featuring wildlife, nature, and countryside photographs.',
+  description,
+  openGraph: {
+    description,
+    locale: 'en_IN',
+    siteName: 'soumajit.dev',
+    title: socialTitle,
+    type: 'website',
+    url: '/photography',
+  },
   title: 'Photography',
+  twitter: { card: 'summary_large_image', description, title: socialTitle },
+}
+
+function ImagePlaceholder({ label }: { label: string }) {
+  return (
+    <div className={styles.placeholder}>
+      <span>
+        <ImageIcon aria-hidden="true" size={24} strokeWidth={1.3} />
+        {label}
+      </span>
+    </div>
+  )
+}
+
+function PhotographyHero({ hero }: Pick<typeof photographyLandingContent, 'hero'>) {
+  return (
+    <header className={styles.hero}>
+      <PageContainer className={styles.container}>
+        <div className={styles.heroIntro}>
+          <div>
+            <p className={styles.overline}>SOUMAJIT GHOSH / PHOTOGRAPHY</p>
+            <h1>Through my lens.</h1>
+          </div>
+          <p className={styles.subtitle}>Wildlife, nature, and moments worth remembering.</p>
+        </div>
+
+        {hero ? (
+          <Image
+            alt={hero.alt}
+            className={styles.heroImage}
+            height={hero.height}
+            preload
+            sizes={wideImageSizes}
+            src={hero.src}
+            width={hero.width}
+          />
+        ) : (
+          <div className={styles.heroPlaceholder}>
+            <ImagePlaceholder label="No featured photograph yet" />
+          </div>
+        )}
+      </PageContainer>
+    </header>
+  )
+}
+
+function SelectedPhotographs({ selected }: Pick<typeof photographyLandingContent, 'selected'>) {
+  return (
+    <section aria-labelledby="selected-photographs" className={`${styles.section} ${styles.dark}`}>
+      <PageContainer className={styles.container}>
+        <h2 className={styles.sectionHeading} id="selected-photographs">A few favourite frames.</h2>
+        {selected.length ? (
+          <PhotographyGrid photos={selected} />
+        ) : (
+          <div className={styles.empty}>
+            <p>No selected photographs have been published yet.</p>
+          </div>
+        )}
+      </PageContainer>
+    </section>
+  )
+}
+
+function FeaturedCollections({
+  collectionCovers,
+}: Pick<typeof photographyLandingContent, 'collectionCovers'>) {
+  return (
+    <section
+      aria-labelledby="photography-collections"
+      className={`${styles.section} ${styles.collections}`}
+    >
+      <PageContainer className={styles.container}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionHeading} id="photography-collections">Explore by subject.</h2>
+          <Link className={styles.textLink} href="/photography/collections">
+            View all collections <ArrowRight aria-hidden="true" size={17} />
+          </Link>
+        </div>
+        <ul className={styles.collectionGrid}>
+          {photographyCollections.map(({ description, slug, title }) => {
+            const cover = collectionCovers[slug]
+
+            return (
+              <li key={slug}>
+                <Link className={styles.collectionCard} href={`/photography/collections/${slug}`}>
+                  <div className={styles.collectionCover}>
+                    {cover ? (
+                      <Image alt={cover.alt} fill sizes={coverImageSizes} src={cover.src} />
+                    ) : (
+                      <ImagePlaceholder label="Cover not yet published" />
+                    )}
+                  </div>
+                  <div className={styles.collectionCopy}>
+                    <div>
+                      <h3>{title}</h3>
+                      <p>{description}</p>
+                    </div>
+                    <span className={styles.cardArrow}>
+                      <ArrowUpRight aria-hidden="true" size={20} strokeWidth={1.6} />
+                    </span>
+                  </div>
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </PageContainer>
+    </section>
+  )
+}
+
+function PhotoStoriesPreview({
+  featuredStory,
+}: Pick<typeof photographyLandingContent, 'featuredStory'>) {
+  const story = featuredStory?.slug === storyLayoutPreviewSlug ? undefined : featuredStory
+
+  return (
+    <section aria-labelledby="photo-stories" className={`${styles.section} ${styles.dark}`}>
+      <PageContainer className={styles.container}>
+        <h2 className={styles.sectionHeading} id="photo-stories">Stories in frames.</h2>
+        {story ? (
+          <article className={styles.story}>
+            <Link className={styles.storyLink} href={`/photography/stories/${story.slug}`}>
+              <div className={styles.storyCover}>
+                <Image alt={story.cover.alt} fill sizes={wideImageSizes} src={story.cover.src} />
+              </div>
+              <div className={styles.storyCopy}>
+                <div>
+                  <h3>{story.title}</h3>
+                  <p>{story.summary}</p>
+                </div>
+                <span className={styles.cardArrow}>
+                  <ArrowUpRight aria-hidden="true" size={20} strokeWidth={1.6} />
+                </span>
+              </div>
+            </Link>
+          </article>
+        ) : (
+          <div className={styles.empty}>
+            <p>No photo stories have been published yet.</p>
+            <Link className={styles.textLink} href="/photography/stories">
+              View photo stories <ArrowRight aria-hidden="true" size={17} />
+            </Link>
+          </div>
+        )}
+      </PageContainer>
+    </section>
+  )
 }
 
 export default function PhotographyPage() {
+  const { collectionCovers, featuredStory, hero, selected } = photographyLandingContent
+
   return (
-    <main className="page-container py-12 sm:py-16 lg:py-24">
-      <header className="max-w-4xl">
-        <p className="text-sm font-medium tracking-wide text-muted-foreground">SOUMAJIT GHOSH / PHOTOGRAPHY</p>
-        <h1 className="mt-5 text-[clamp(3rem,9vw,6rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
-          Through my lens.
-        </h1>
-        <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-          Wildlife, nature, and moments from everyday life. A home for the photographs and stories I choose to share.
-        </p>
-      </header>
-
-      <section aria-labelledby="selected-photographs" className="mt-16 border-t border-border pt-8 sm:mt-24">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs text-muted-foreground">01 / PORTFOLIO</p>
-            <h2 id="selected-photographs" className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Selected photographs
-            </h2>
-          </div>
-          <Camera aria-hidden="true" className="size-6 text-muted-foreground" />
-        </div>
-        <div className="mt-7 flex min-h-52 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/40 p-8 text-center">
-          <Images aria-hidden="true" className="size-7 text-muted-foreground" />
-          <p className="mt-4 font-medium">Photographs coming soon</p>
-          <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            This gallery is ready for a curated selection of original photographs. No sample images have been published.
-          </p>
-        </div>
-      </section>
-
-      <section aria-labelledby="photography-collections" className="mt-16 border-t border-border pt-8 sm:mt-24">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs text-muted-foreground">02 / EXPLORE</p>
-            <h2 id="photography-collections" className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Collections
-            </h2>
-          </div>
-          <Link className="inline-flex items-center gap-2 text-sm font-medium text-foreground underline-offset-4 hover:underline" href="/photography/collections">
-            All collections <ArrowUpRight aria-hidden="true" className="size-4" />
-          </Link>
-        </div>
-        <div className="mt-7 grid gap-4 md:grid-cols-2">
-          {photographyCollections.map((collection, index) => (
-            <Link
-              className="group flex min-h-60 flex-col justify-between rounded-xl border border-border bg-card/40 p-6 transition-colors hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:p-8"
-              href={`/photography/collections/${collection.slug}`}
-              key={collection.slug}
-            >
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{String(index + 1).padStart(2, '0')} / COLLECTION</span>
-                <ArrowUpRight aria-hidden="true" className="size-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-semibold tracking-tight sm:text-3xl">{collection.title}</h3>
-                <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">{collection.description}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section aria-labelledby="photo-stories" className="mt-16 border-t border-border pt-8 sm:mt-24">
-        <p className="text-xs text-muted-foreground">03 / NARRATIVES</p>
-        <h2 id="photo-stories" className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Photo stories
-        </h2>
-        <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
-          Connected series of photographs, organized into a narrative rather than a single gallery.
-          The first story is still being prepared.
-        </p>
-        <Link className="mt-6 inline-flex items-center gap-2 font-medium underline-offset-4 hover:underline" href="/photography/stories">
-          Explore photo stories <ArrowUpRight aria-hidden="true" className="size-4" />
-        </Link>
-      </section>
+    <main className={`${styles.page} ${outfit.variable} ${dmSans.variable}`}>
+      <PhotographyHero hero={hero} />
+      <SelectedPhotographs selected={selected} />
+      <FeaturedCollections collectionCovers={collectionCovers} />
+      <PhotoStoriesPreview featuredStory={featuredStory} />
     </main>
   )
 }
