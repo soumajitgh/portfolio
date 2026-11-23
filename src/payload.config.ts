@@ -14,6 +14,7 @@ import { OSSContributions } from './collections/OSSContributions'
 import { Projects } from './collections/Projects'
 import { ProjectStars } from './collections/ProjectStars'
 import { TrackedRepositories } from './collections/TrackedRepositories'
+import { MaintenanceSettings } from './globals/MaintenanceSettings'
 import { PortfolioSettings } from './globals/PortfolioSettings'
 import { SyncTrackedRepositories } from './jobs/SyncTrackedRepositories'
 import { migrations } from './migrations'
@@ -59,7 +60,7 @@ export default buildConfig({
     defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev',
     defaultFromName: process.env.EMAIL_FROM_NAME || 'soumajit.dev',
   }),
-  globals: [PortfolioSettings],
+  globals: [PortfolioSettings, MaintenanceSettings],
   jobs: {
     autoRun: [
       {

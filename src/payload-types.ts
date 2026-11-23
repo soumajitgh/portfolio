@@ -102,10 +102,12 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'portfolio-settings': PortfolioSetting;
+    'maintenance-settings': MaintenanceSetting;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     'portfolio-settings': PortfolioSettingsSelect<false> | PortfolioSettingsSelect<true>;
+    'maintenance-settings': MaintenanceSettingsSelect<false> | MaintenanceSettingsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -1105,6 +1107,19 @@ export interface PortfolioSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "maintenance-settings".
+ */
+export interface MaintenanceSetting {
+  id: number;
+  /**
+   * Show an under-maintenance page across the public site. The admin panel stays available.
+   */
+  enabled?: boolean | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -1167,6 +1182,16 @@ export interface PortfolioSettingsSelect<T extends boolean = true> {
       };
   carouselRotationInterval?: T;
   featuredProjectOverride?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "maintenance-settings_select".
+ */
+export interface MaintenanceSettingsSelect<T extends boolean = true> {
+  enabled?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
