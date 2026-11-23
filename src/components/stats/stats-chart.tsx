@@ -1,46 +1,34 @@
 'use client'
 
 import { BarChart, LineChart, PieChart } from 'echarts/charts'
-import {
-  DatasetComponent,
-  GridComponent,
-  LegendComponent,
-  TitleComponent,
-  TooltipComponent,
-} from 'echarts/components'
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
 import * as echarts from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { useEffect, useRef } from 'react'
 import type { ComposeOption } from 'echarts/core'
 import type { BarSeriesOption, LineSeriesOption, PieSeriesOption } from 'echarts/charts'
 import type {
-  DatasetComponentOption,
   GridComponentOption,
   LegendComponentOption,
-  TitleComponentOption,
   TooltipComponentOption,
 } from 'echarts/components'
 
 echarts.use([
   BarChart,
   CanvasRenderer,
-  DatasetComponent,
   GridComponent,
   LegendComponent,
   LineChart,
   PieChart,
-  TitleComponent,
   TooltipComponent,
 ])
 
 export type StatsChartOption = ComposeOption<
   | BarSeriesOption
-  | DatasetComponentOption
   | GridComponentOption
   | LegendComponentOption
   | LineSeriesOption
   | PieSeriesOption
-  | TitleComponentOption
   | TooltipComponentOption
 >
 
@@ -69,12 +57,5 @@ export function StatsChart({
     }
   }, [option])
 
-  return (
-    <div
-      aria-label={description}
-      className={className}
-      ref={chartElement}
-      role="img"
-    />
-  )
+  return <div aria-label={description} className={className} ref={chartElement} role="img" />
 }
