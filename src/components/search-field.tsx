@@ -57,7 +57,7 @@ export function SearchField({
       if (next !== current) {
         if (userEdited.current) {
           captureEvent(query.trim() ? 'content_search_performed' : 'content_search_cleared', {
-            content_type: pathname.includes('/blogs') ? 'blog_post' : 'project',
+            content_type: 'project',
             query: query.trim().slice(0, 100) || undefined,
             query_length: query.trim().length,
           })

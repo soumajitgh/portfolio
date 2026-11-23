@@ -19,9 +19,6 @@ export function SiteHeader() {
         </Link>
         <div className="hidden items-center gap-2 md:flex">
           <Button asChild className="px-2 sm:px-3" size="sm" variant="ghost">
-            <Link href="/blogs">./blog</Link>
-          </Button>
-          <Button asChild className="px-2 sm:px-3" size="sm" variant="ghost">
             <Link href="/work">./work</Link>
           </Button>
           <Button asChild className="px-2 sm:px-3" size="sm" variant="ghost">

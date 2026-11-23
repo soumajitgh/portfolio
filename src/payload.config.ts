@@ -9,8 +9,6 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
-import { BlogPosts } from './collections/BlogPosts'
-import { BlogStars } from './collections/BlogStars'
 import { Media } from './collections/Media'
 import { OSSContributions } from './collections/OSSContributions'
 import { Projects } from './collections/Projects'
@@ -50,12 +48,10 @@ export default buildConfig({
   },
   collections: [
     Projects,
-    BlogPosts,
     Media,
     TrackedRepositories,
     OSSContributions,
     ProjectStars,
-    BlogStars,
     Users,
   ],
   email: resendAdapter({
@@ -92,8 +88,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
-    // Migrations include database-level constraints and the atomic blog counter,
-    // so automatic development pushes must not compete with them at startup.
+    // Keep development and production on the checked-in migration history.
     prodMigrations: migrations,
     push: false,
   }),
@@ -101,10 +96,6 @@ export default buildConfig({
   plugins: [
     mcpPlugin({
       collections: {
-        'blog-posts': {
-          description: 'Published portfolio blog posts and their display metadata.',
-          enabled: true,
-        },
         'oss-contributions': {
           description:
             'Open-source pull requests with GitHub facts and manually curated portfolio metadata.',

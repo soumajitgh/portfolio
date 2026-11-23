@@ -69,12 +69,10 @@ export interface Config {
   blocks: {};
   collections: {
     projects: Project;
-    'blog-posts': BlogPost;
     media: Media;
     'tracked-repositories': TrackedRepository;
     'oss-contributions': OSSContribution;
     'project-stars': ProjectStar;
-    'blog-stars': BlogStar;
     users: User;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
@@ -86,12 +84,10 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
-    'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'tracked-repositories': TrackedRepositoriesSelect<false> | TrackedRepositoriesSelect<true>;
     'oss-contributions': OssContributionsSelect<false> | OssContributionsSelect<true>;
     'project-stars': ProjectStarsSelect<false> | ProjectStarsSelect<true>;
-    'blog-stars': BlogStarsSelect<false> | BlogStarsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -289,73 +285,6 @@ export interface Media {
   };
 }
 /**
- * Write, publish, and feature long-form articles for the portfolio.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-posts".
- */
-export interface BlogPost {
-  id: number;
-  title: string;
-  /**
-   * Generated from the title. Once published, changing it requires redirect support.
-   */
-  slug: string;
-  /**
-   * Permanently assigned from the atomic blog counter.
-   */
-  issueNumber: number;
-  body: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  /**
-   * Optional. When empty, a summary is generated from the article body.
-   */
-  excerpt?: string | null;
-  labels?:
-    | {
-        name: string;
-        id?: string | null;
-      }[]
-    | null;
-  searchText?: string | null;
-  readingMinutes: number;
-  publishedAt?: string | null;
-  /**
-   * Show this post in the home page Blog tab.
-   */
-  featured?: boolean | null;
-  /**
-   * The article title and excerpt are used as fallbacks.
-   */
-  seo?: {
-    /**
-     * Aim for 50–60 characters and lead with the article topic.
-     */
-    title?: string | null;
-    /**
-     * Aim for 140–160 characters and summarize the practical value.
-     */
-    description?: string | null;
-    image?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
  * Add a GitHub repository once. Pull requests opened by the configured username are discovered and refreshed automatically.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -472,19 +401,6 @@ export interface ProjectStar {
   createdAt: string;
 }
 /**
- * Anonymous appreciation events recorded for blog posts.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-stars".
- */
-export interface BlogStar {
-  id: number;
-  blogPost: number | BlogPost;
-  visitorHash: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * People who can sign in to and manage this portfolio.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -531,24 +447,6 @@ export interface PayloadMcpApiKey {
    * The purpose of the API key.
    */
   description?: string | null;
-  blogPosts?: {
-    /**
-     * Allow clients to find blog-posts.
-     */
-    find?: boolean | null;
-    /**
-     * Allow clients to create blog-posts.
-     */
-    create?: boolean | null;
-    /**
-     * Allow clients to update blog-posts.
-     */
-    update?: boolean | null;
-    /**
-     * Allow clients to delete blog-posts.
-     */
-    delete?: boolean | null;
-  };
   ossContributions?: {
     /**
      * Allow clients to find oss-contributions.
@@ -754,10 +652,6 @@ export interface PayloadLockedDocument {
         value: number | Project;
       } | null)
     | ({
-        relationTo: 'blog-posts';
-        value: number | BlogPost;
-      } | null)
-    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -772,10 +666,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'project-stars';
         value: number | ProjectStar;
-      } | null)
-    | ({
-        relationTo: 'blog-stars';
-        value: number | BlogStar;
       } | null)
     | ({
         relationTo: 'users';
@@ -879,37 +769,6 @@ export interface ProjectsSelect<T extends boolean = true> {
   publishedAt?: T;
   repositoryOwner?: T;
   repositoryName?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-posts_select".
- */
-export interface BlogPostsSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  issueNumber?: T;
-  body?: T;
-  excerpt?: T;
-  labels?:
-    | T
-    | {
-        name?: T;
-        id?: T;
-      };
-  searchText?: T;
-  readingMinutes?: T;
-  publishedAt?: T;
-  featured?: T;
   seo?:
     | T
     | {
@@ -1047,16 +906,6 @@ export interface ProjectStarsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-stars_select".
- */
-export interface BlogStarsSelect<T extends boolean = true> {
-  blogPost?: T;
-  visitorHash?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -1085,14 +934,6 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
   user?: T;
   label?: T;
   description?: T;
-  blogPosts?:
-    | T
-    | {
-        find?: T;
-        create?: T;
-        update?: T;
-        delete?: T;
-      };
   ossContributions?:
     | T
     | {

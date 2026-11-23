@@ -9,19 +9,8 @@ const r2PublicURL = process.env.R2_PUBLIC_URL
 
 const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
+  experimental: { globalNotFound: true },
   output: 'standalone',
-  redirects: async () => [
-    {
-      destination: '/blogs',
-      permanent: true,
-      source: '/blog',
-    },
-    {
-      destination: '/blogs/:slug',
-      permanent: true,
-      source: '/blog/:slug',
-    },
-  ],
   outputFileTracingIncludes: {
     '/*': [
       './node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.ttf',

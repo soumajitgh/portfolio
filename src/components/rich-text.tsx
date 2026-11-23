@@ -17,7 +17,7 @@ import React from 'react'
 
 import { CodeBlockWithCopy } from '@/components/code-block'
 import { slugify } from '@/lib/content'
-import type { BlogPost, Media, Project } from '@/payload-types'
+import type { Media, Project } from '@/payload-types'
 
 function nodeText(node: unknown): string {
   if (!node || typeof node !== 'object') return ''
@@ -94,8 +94,4 @@ const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
 
 export function ProjectOverview({ data }: { data: Project['overview'] }) {
   return <RichText className="readme" converters={converters} data={data} />
-}
-
-export function BlogPostBody({ data }: { data: BlogPost['body'] }) {
-  return <RichText className="readme article-prose" converters={converters} data={data} />
 }

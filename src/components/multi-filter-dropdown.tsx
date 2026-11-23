@@ -4,9 +4,13 @@ import { Check, ChevronDown } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState, useTransition } from 'react'
 
-import type { FilterOption } from '@/components/filter-select'
 import { captureEvent } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
+
+type FilterOption = {
+  label: string
+  value: string
+}
 
 export function MultiFilterDropdown({
   accessibleLabel,

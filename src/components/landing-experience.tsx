@@ -4,7 +4,6 @@ import { Pin, PinOff } from 'lucide-react'
 import Link from 'next/link'
 import { type KeyboardEvent, type ReactNode, useCallback, useEffect, useState } from 'react'
 
-import { HomeBlogPosts } from '@/components/home-blog-posts'
 import { ProjectRail } from '@/components/project-rail'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -14,7 +13,6 @@ import { cn } from '@/lib/utils'
 
 const panels = [
   { id: 'projects', label: 'Projects' },
-  { id: 'blog', label: 'Posts' },
   { id: 'stack', label: 'Stack' },
   { id: 'stats', label: 'Stats' },
 ] as const
@@ -24,7 +22,6 @@ type PanelID = (typeof panels)[number]['id']
 const pinnedPanelKey = 'portfolio:pinned-panel'
 
 export function PortfolioShowcase({
-  blogPosts,
   projects,
   settings,
   stack,
@@ -55,7 +52,7 @@ export function PortfolioShowcase({
 
   useEffect(() => {
     const stored = window.localStorage.getItem(pinnedPanelKey)
-    if (stored !== 'projects' && stored !== 'blog' && stored !== 'stack' && stored !== 'stats') {
+    if (stored !== 'projects' && stored !== 'stack' && stored !== 'stats') {
       return
     }
 
@@ -134,7 +131,7 @@ export function PortfolioShowcase({
       <div className="mb-3 flex min-w-0 items-end justify-between gap-4">
         <div className="scrollbar-thin mobile-scrollbar-hidden min-w-0 flex-1 overflow-visible sm:overflow-x-auto sm:overscroll-x-contain">
           <div
-            className="grid w-full grid-cols-2 items-center gap-1 font-mono text-xs sm:flex sm:min-w-max"
+            className="grid w-full grid-cols-3 items-center gap-1 font-mono text-xs sm:flex sm:min-w-max"
             role="tablist"
           >
             <span className="mr-1 hidden text-terminal-purple sm:inline">portfolio = [</span>
@@ -198,7 +195,6 @@ export function PortfolioShowcase({
             role="tabpanel"
           >
             {panel.id === 'projects' && <ProjectRail projects={projects} />}
-            {panel.id === 'blog' && <HomeBlogPosts posts={blogPosts} />}
             {panel.id === 'stats' && statsPanel}
             {panel.id === 'stack' && (
               <Card className="h-full max-w-full gap-4 overflow-y-auto overflow-x-hidden px-4 py-5 sm:px-6">
