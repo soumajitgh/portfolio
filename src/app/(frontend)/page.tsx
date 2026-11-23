@@ -37,7 +37,7 @@ export default async function HomePage() {
   if (!data) {
     return (
       <main className="grid min-h-[calc(100dvh-4rem)] place-items-center px-4 sm:px-6">
-        <div className="max-w-lg rounded-lg border border-destructive/40 bg-card p-6 font-mono">
+        <div className="max-w-lg rounded-lg border border-destructive/40 bg-card p-6">
           <p className="text-terminal-red">error: unable to load portfolio index</p>
           <p className="mt-2 text-sm text-muted-foreground">Retry with ./reload in a moment.</p>
         </div>

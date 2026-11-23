@@ -20,14 +20,14 @@ export function StatsSection({
     <section aria-labelledby={`${id}-heading`} className="scroll-mt-24" id={id}>
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
         <div>
-          <h2 className="text-2xl font-semibold sm:text-3xl" id={`${id}-heading`}>
+          <h2 className="text-2xl font-bold sm:text-3xl" id={`${id}-heading`}>
             {title}
           </h2>
           <p className="mt-1 font-mono text-xs text-muted-foreground">@{username}</p>
         </div>
         <a
           aria-label={`View ${title} profile`}
-          className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border px-3 font-mono text-xs text-primary transition-colors hover:bg-accent"
+          className="inline-flex min-h-11 items-center gap-2 rounded-md border border-input px-3 text-xs font-medium text-primary transition-colors hover:bg-accent"
           href={profileURL}
           rel="noreferrer"
           target="_blank"
@@ -52,7 +52,7 @@ export function StatsPanel({
 }) {
   return (
     <div className={cn('min-w-0 rounded-lg border border-border bg-card/45 p-4 sm:p-6', className)}>
-      <h3 className="text-lg font-semibold">{title}</h3>
+      <h3 className="text-lg font-bold">{title}</h3>
       {children}
     </div>
   )
@@ -78,7 +78,7 @@ export function StatValue({
   return (
     <div className="min-w-0">
       <p className={cn('font-mono text-xl font-semibold sm:text-2xl', tones[tone])}>{value}</p>
-      <p className="mt-1 font-mono text-[0.6875rem] text-muted-foreground">{label}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{label}</p>
     </div>
   )
 }
@@ -88,7 +88,7 @@ export function StatsUnavailable({ detail, label }: { detail?: string; label: st
     <div className="mt-6 flex min-h-40 items-center justify-center rounded-lg border border-dashed border-border bg-background/30 p-5 text-center">
       <div>
         <AlertCircle aria-hidden="true" className="mx-auto size-5 text-terminal-yellow" />
-        <p className="mt-3 font-mono text-sm text-foreground">{label} unavailable</p>
+        <p className="mt-3 text-sm text-foreground">{label} unavailable</p>
         <p className="mt-1 max-w-sm text-xs text-muted-foreground">
           {detail || 'The upstream service did not return data. Try again shortly.'}
         </p>
@@ -126,7 +126,7 @@ export function ContributionDots({ days }: { days: { count: number; date: string
   return (
     <div className="mt-5">
       <div className="flex items-center justify-between gap-4">
-        <p className="font-mono text-xs text-muted-foreground">Last 12 months</p>
+        <p className="text-xs text-muted-foreground">Last 12 months</p>
         <p className="font-mono text-[0.6875rem] text-terminal-green">
           {visibleCells.reduce((total, cell) => total + cell.count, 0)} contributions
         </p>

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <main className="grid min-h-[calc(100dvh-4rem)] place-items-center px-4 sm:px-6">
-      <div className="max-w-lg rounded-lg border border-border bg-card p-8 font-mono">
+      <div className="max-w-lg rounded-lg border border-border bg-card p-8">
         <p className="text-terminal-red">HTTP 404</p>
         <h1 className="mt-3 text-xl font-semibold sm:text-2xl">Page not found</h1>
         <Button asChild className="mt-6" variant="outline">

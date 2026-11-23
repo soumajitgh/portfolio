@@ -25,7 +25,7 @@ export function HomeHero({ settings }: Pick<PortfolioHomeData, 'settings'>) {
         <p className="mb-2 max-w-full break-words font-mono text-xs text-terminal-green [overflow-wrap:anywhere] sm:mb-[clamp(.75rem,2dvh,1.25rem)] sm:text-sm">
           {settings.heroCommand}
         </p>
-        <h1 className="max-w-full whitespace-normal font-mono text-[clamp(1.9rem,8.5vw,2.75rem)] font-semibold leading-[1.08] tracking-[-0.04em] text-balance [overflow-wrap:anywhere] sm:max-w-4xl sm:whitespace-pre-line sm:text-[clamp(3rem,6.5dvh,4rem)] sm:leading-[1.03]">
+        <h1 className="max-w-full whitespace-normal text-[clamp(1.9rem,8.5vw,2.75rem)] font-extrabold leading-[1.08] tracking-[-0.04em] text-balance [overflow-wrap:anywhere] sm:max-w-4xl sm:whitespace-pre-line sm:text-[clamp(3rem,6.5dvh,4rem)] sm:leading-[1.03]">
           {settings.heroHeadline}
         </h1>
         <p className="mt-3 max-w-full break-words text-[0.8125rem] leading-6 text-muted-foreground [overflow-wrap:anywhere] sm:mt-[clamp(.75rem,2.2dvh,1.5rem)] sm:max-w-2xl sm:text-base sm:leading-7 lg:text-lg">

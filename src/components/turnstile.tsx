@@ -15,7 +15,7 @@ type TurnstileOptions = {
   'response-field': false
   sitekey: string
   size: 'flexible'
-  theme: 'dark'
+  theme: 'light'
   'timeout-callback': () => void
 }
 
@@ -73,7 +73,7 @@ export function Turnstile({
       'response-field': false,
       sitekey: siteKey,
       size: 'flexible',
-      theme: 'dark',
+      theme: 'light',
       'timeout-callback': () => clearToken('verification timed out — retry'),
     })
   }, [action, clearToken])
@@ -93,7 +93,7 @@ export function Turnstile({
 
   if (!siteKey) {
     return (
-      <p className={cn('font-mono text-xs text-terminal-red', className)}>
+      <p className={cn('text-xs text-destructive', className)}>
         error: bot protection is not configured
       </p>
     )
@@ -108,7 +108,7 @@ export function Turnstile({
         strategy="afterInteractive"
       />
       <div ref={containerRef} />
-      <p aria-live="polite" className="mt-1 min-h-4 font-mono text-[11px] text-terminal-red">
+      <p aria-live="polite" className="mt-1 min-h-4 text-[11px] text-destructive">
         {error}
       </p>
     </div>

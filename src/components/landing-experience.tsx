@@ -131,10 +131,12 @@ export function PortfolioShowcase({
       <div className="mb-3 flex min-w-0 items-end justify-between gap-4">
         <div className="scrollbar-thin mobile-scrollbar-hidden min-w-0 flex-1 overflow-visible sm:overflow-x-auto sm:overscroll-x-contain">
           <div
-            className="grid w-full grid-cols-3 items-center gap-1 font-mono text-xs sm:flex sm:min-w-max"
+            className="grid w-full grid-cols-3 items-center gap-1 text-xs sm:flex sm:min-w-max"
             role="tablist"
           >
-            <span className="mr-1 hidden text-terminal-purple sm:inline">portfolio = [</span>
+            <span className="mr-1 hidden font-mono text-terminal-purple sm:inline">
+              portfolio = [
+            </span>
             {panels.map((panel, index) => (
               <span className="flex min-w-0 items-center" key={panel.id}>
                 <button
@@ -158,7 +160,7 @@ export function PortfolioShowcase({
                 )}
               </span>
             ))}
-            <span className="ml-1 hidden text-terminal-purple sm:inline">]</span>
+            <span className="ml-1 hidden font-mono text-terminal-purple sm:inline">]</span>
           </div>
         </div>
         <div className="hidden shrink-0 items-center gap-2 sm:flex">
@@ -206,7 +208,7 @@ export function PortfolioShowcase({
                   <div className="flex min-w-0 max-w-full flex-wrap content-start gap-2.5">
                     {stack.map((topic, index) => (
                       <Link
-                        className="group inline-flex min-h-11 min-w-0 max-w-full items-center gap-2 rounded-sm border border-border bg-background/20 px-3 font-mono text-xs whitespace-normal text-foreground transition-colors hover:border-terminal-cyan/60 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="group inline-flex min-h-11 min-w-0 max-w-full items-center gap-2 rounded-sm border border-border bg-background/20 px-3 text-xs whitespace-normal text-foreground transition-colors hover:border-primary/60 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         href={`/projects?topic=${topic.slug}`}
                         key={topic.slug}
                       >

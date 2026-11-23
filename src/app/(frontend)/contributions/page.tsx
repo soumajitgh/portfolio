@@ -96,8 +96,7 @@ export default async function ContributionsPage({
   const sort: ContributionSort = contributionSorts.has(requestedSort as ContributionSort)
     ? (requestedSort as ContributionSort)
     : 'newest'
-  const range: DateRangePreset =
-    requestedRange || (requestedFrom || requestedTo ? 'custom' : '')
+  const range: DateRangePreset = requestedRange || (requestedFrom || requestedTo ? 'custom' : '')
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -128,7 +127,7 @@ export default async function ContributionsPage({
         <p className="font-mono text-xs text-terminal-green sm:text-sm">
           soumajit@portfolio:<span className="text-terminal-blue">~</span>$ gh pr list --author @me
         </p>
-        <h1 className="page-title mt-4 font-semibold">Open source contributions</h1>
+        <h1 className="page-title mt-4 font-bold">Open source contributions</h1>
         <p className="page-lede mt-4 max-w-2xl text-muted-foreground">
           Pull requests shipped across the open source ecosystem, presented around what changed and
           why it mattered.

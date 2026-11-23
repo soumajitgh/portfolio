@@ -8,9 +8,9 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 const links = [
-  { href: '/work', label: './work' },
-  { href: '/stats', label: './stats' },
-  { href: '/contact', label: './contact' },
+  { href: '/work', label: 'Work' },
+  { href: '/stats', label: 'Stats' },
+  { href: '/contact', label: 'Contact' },
 ]
 
 export function MobileNavigation() {
@@ -69,14 +69,14 @@ export function MobileNavigation() {
 
       {open ? (
         <div
-          className="absolute inset-x-0 top-full border-b border-border bg-background/98 px-[max(1rem,env(safe-area-inset-left))] pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 shadow-lg backdrop-blur"
+          className="absolute inset-x-0 top-full border-b border-border bg-background px-[max(1rem,env(safe-area-inset-left))] pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 shadow-sm"
           id="mobile-navigation"
         >
           <div className="mx-auto grid max-w-6xl gap-1">
             {links.map((link, index) => (
               <Link
                 aria-current={pathname.startsWith(link.href) ? 'page' : undefined}
-                className="flex min-h-11 items-center rounded-md px-3 font-mono text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-accent aria-[current=page]:text-terminal-cyan"
+                className="flex min-h-11 items-center rounded-md px-3 font-sans text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-accent aria-[current=page]:text-primary"
                 href={link.href}
                 key={link.href}
                 onClick={close}

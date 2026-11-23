@@ -40,7 +40,7 @@ export function ProjectRail({ projects }: { projects: ProjectCardData[] }) {
 
   if (!projects.length) {
     return (
-      <div className="grid h-full place-items-center rounded-lg border border-dashed border-border px-6 text-center font-mono text-sm text-muted-foreground">
+      <div className="grid h-full place-items-center rounded-lg border border-dashed border-border px-6 text-center text-sm text-muted-foreground">
         <p>
           <span className="text-terminal-yellow">warning:</span> no featured projects yet
         </p>

@@ -63,12 +63,12 @@ export function ContactForm() {
   }
 
   const fieldClassName =
-    'mt-1.5 min-h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm'
+    'mt-1.5 min-h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-base text-foreground transition-colors placeholder:text-muted-foreground focus-visible:border-ring sm:text-sm'
 
   return (
     <form className="space-y-4" data-ph-no-capture="true" onSubmit={submit}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block font-mono text-[0.6875rem] text-terminal-cyan sm:text-xs">
+        <label className="block text-sm font-medium text-foreground">
           name
           <input
             autoComplete="name"
@@ -79,7 +79,7 @@ export function ContactForm() {
             required
           />
         </label>
-        <label className="block font-mono text-[0.6875rem] text-terminal-cyan sm:text-xs">
+        <label className="block text-sm font-medium text-foreground">
           email
           <input
             autoComplete="email"
@@ -92,7 +92,7 @@ export function ContactForm() {
           />
         </label>
       </div>
-      <label className="block font-mono text-[0.6875rem] text-terminal-cyan sm:text-xs">
+      <label className="block text-sm font-medium text-foreground">
         message
         <textarea
           className={`${fieldClassName} min-h-32 resize-y leading-6`}
@@ -115,11 +115,11 @@ export function ContactForm() {
       <div className="flex flex-wrap items-center gap-3">
         <Button disabled={state === 'sending'} type="submit">
           <Send aria-hidden="true" />
-          {state === 'sending' ? './sending...' : './send-message'}
+          {state === 'sending' ? 'Sending…' : 'Send message'}
         </Button>
         <p
           aria-live="polite"
-          className={`font-mono text-[0.6875rem] sm:text-xs ${state === 'error' ? 'text-terminal-red' : 'text-terminal-green'}`}
+          className={`text-sm ${state === 'error' ? 'text-destructive' : 'text-terminal-green'}`}
         >
           {message}
         </p>

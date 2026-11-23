@@ -78,7 +78,7 @@ export function SearchField({
       />
       <input
         aria-busy={isPending}
-        className="terminal-input h-10 w-full rounded-md border border-input bg-card pl-9 pr-12 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 sm:h-11 sm:pl-10 sm:pr-20 sm:text-sm"
+        className="h-10 w-full rounded-md border border-input bg-card pl-9 pr-12 text-base transition-colors placeholder:text-muted-foreground focus-visible:border-ring sm:h-11 sm:pl-10 sm:pr-20 sm:text-sm"
         onChange={(event) => {
           userEdited.current = true
           setQuery(event.target.value)

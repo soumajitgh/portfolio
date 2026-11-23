@@ -118,7 +118,7 @@ export function StarButton({ slug }: { slug: string }) {
           {error ? (
             <span
               aria-live="polite"
-              className="block rounded border border-destructive/30 bg-background/95 px-2 py-1 font-mono text-[11px] text-terminal-red shadow-sm"
+              className="block rounded border border-destructive/30 bg-background/95 px-2 py-1 text-[11px] text-terminal-red shadow-sm"
             >
               {error}
             </span>

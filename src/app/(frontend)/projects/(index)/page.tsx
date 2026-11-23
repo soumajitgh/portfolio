@@ -144,7 +144,7 @@ export default async function ProjectsPage({
         <p className="font-mono text-xs text-terminal-green sm:text-sm">
           soumajit@portfolio:<span className="text-terminal-blue">~</span>$ ls ./projects
         </p>
-        <h1 className="page-title mt-4 font-semibold">Published projects</h1>
+        <h1 className="page-title mt-4 font-bold">Published projects</h1>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="page-lede max-w-2xl text-muted-foreground">
             Fullstack and AI products spanning React interfaces, NestJS and Python APIs, Electron
@@ -178,7 +178,7 @@ export default async function ProjectsPage({
         </section>
 
         {!topicsExist ? (
-          <div className="mt-10 rounded-lg border border-destructive/40 bg-card p-6 font-mono text-sm">
+          <div className="mt-10 rounded-lg border border-destructive/40 bg-card p-6 text-sm">
             <p className="text-terminal-red">
               error: unknown topic &quot;
               {selectedTopics.filter((topic) => !knownTopicSlugs.has(topic)).join(', ')}&quot;
@@ -197,7 +197,7 @@ export default async function ProjectsPage({
             ))}
           </div>
         ) : (
-          <div className="mt-10 rounded-lg border border-dashed border-border px-4 py-10 text-center font-mono text-sm text-muted-foreground sm:p-10">
+          <div className="mt-10 rounded-lg border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground sm:p-10">
             {query ? (
               <>
                 <p>0 projects matched &quot;{query}&quot;</p>

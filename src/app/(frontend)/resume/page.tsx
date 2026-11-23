@@ -39,7 +39,7 @@ export default async function ResumePage() {
           <p className="font-mono text-xs text-terminal-green sm:text-sm">
             soumajit@portfolio:<span className="text-terminal-blue">~</span>$ cat resume.pdf
           </p>
-          <h1 className="page-title mt-4 font-semibold">Resume</h1>
+          <h1 className="page-title mt-4 font-bold">Resume</h1>
         </div>
         {resume?.url ? (
           <Button asChild variant="default">

@@ -131,7 +131,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <main className="page-container py-8 sm:py-10 md:py-14">
         <nav
           aria-label="Breadcrumb"
-          className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1 font-mono text-[0.6875rem] leading-5 text-muted-foreground sm:text-sm"
+          className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1 text-[0.6875rem] leading-5 text-muted-foreground sm:text-sm"
         >
           <Link className="hover:text-primary" href="/projects">
             ~/projects
@@ -143,7 +143,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         <header className="mt-5 border-b border-border pb-8">
           <div className="max-w-4xl">
-            <h1 className="detail-title break-words font-semibold">{project.title}</h1>
+            <h1 className="detail-title break-words font-bold">{project.title}</h1>
             <p className="detail-lede mt-4 text-muted-foreground lg:text-lg">
               {project.shortDescription}
             </p>
@@ -183,7 +183,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         {project.gallery?.length ? (
           <section aria-labelledby="gallery-heading" className="mt-16 border-t border-border pt-10">
-            <h2 id="gallery-heading" className="section-title font-semibold">
+            <h2 id="gallery-heading" className="section-title font-bold">
               ./media
             </h2>
             <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -200,7 +200,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         {related.length ? (
           <section aria-labelledby="related-heading" className="mt-16 border-t border-border pt-10">
-            <h2 id="related-heading" className="section-title font-semibold">
+            <h2 id="related-heading" className="section-title font-bold">
               ./related-projects
             </h2>
             <div className="mt-6 grid gap-5 md:grid-cols-3">
