@@ -1,6 +1,6 @@
 import React from 'react'
-import { GeistSans } from 'geist/font/sans'
 import type { Metadata } from 'next'
+import { DM_Sans, Outfit } from 'next/font/google'
 
 import { AppShell } from '@/components/app-shell'
 import {
@@ -13,6 +13,18 @@ import {
 } from '@/lib/seo'
 
 import './globals.css'
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+})
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+})
 
 // Payload-backed pages need the runtime PostgreSQL connection. Keeping this
 // segment dynamic prevents Docker builds from querying the production database.
@@ -52,8 +64,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html className="dark" lang="en">
-      <body className={GeistSans.variable}>
+    <html className={`${outfit.variable} ${dmSans.variable}`} lang="en">
+      <body>
         <AppShell>{children}</AppShell>
       </body>
     </html>

@@ -2,11 +2,14 @@
 @import 'tw-animate-css';
 @import '@fontsource-variable/jetbrains-mono';
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-muted-text: var(--muted-text);
+  --color-primary-hover: var(--primary-hover);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -44,7 +47,8 @@
   --color-terminal-orange: var(--terminal-orange);
   --color-terminal-purple: var(--terminal-purple);
   --color-terminal-red: var(--terminal-red);
-  --font-sans: var(--font-geist-sans), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-mono:
     'JetBrains Mono Variable', 'SFMono-Regular', 'Cascadia Code', 'Roboto Mono', monospace;
   --radius-sm: calc(var(--radius) - 4px);
@@ -54,80 +58,112 @@
 }
 
 :root {
-  --terminal-blue: #61afef;
-  --terminal-cyan: #56b6c2;
-  --terminal-green: #98c379;
-  --terminal-yellow: #e5c07b;
-  --terminal-orange: #d19a66;
-  --terminal-purple: #c678dd;
-  --terminal-red: #e06c75;
+  --paper: #f7f6f2;
+  --charcoal: #20201e;
+  --stone: #eae8e2;
+  --terracotta: #8c4b32;
+  --warm-gray: #71716b;
+  --divider: #d6d3cb;
   --radius: 0.45rem;
 }
 
+:root,
 .dark {
-  --background: oklch(0.217 0.011 260.7);
-  --foreground: oklch(0.844 0.012 264.5);
-  --card: oklch(0.251 0.016 264.2);
-  --card-foreground: oklch(0.844 0.012 264.5);
-  --popover: oklch(0.263 0.013 258.4);
-  --popover-foreground: oklch(0.844 0.012 264.5);
-  --primary: oklch(0.73 0.121 245.3);
-  --primary-foreground: oklch(0.189 0.012 254.1);
-  --secondary: oklch(0.293 0.016 264.3);
-  --secondary-foreground: oklch(0.844 0.012 264.5);
-  --muted: oklch(0.281 0.018 266.3);
-  --muted-foreground: oklch(0.659 0.024 265.7);
-  --accent: oklch(0.328 0.032 241.9);
-  --accent-foreground: oklch(0.818 0.111 232.3);
-  --destructive: oklch(0.671 0.145 17);
-  --destructive-foreground: oklch(0.97 0.01 17);
-  --border: oklch(0.332 0.023 264.2);
-  --input: oklch(0.355 0.025 262.8);
-  --ring: oklch(0.73 0.121 245.3);
-  --chart-1: oklch(0.73 0.121 245.3);
-  --chart-2: oklch(0.768 0.11 133);
-  --chart-3: oklch(0.694 0.164 318.2);
-  --chart-4: oklch(0.825 0.097 82.3);
-  --chart-5: oklch(0.671 0.145 17);
-  --sidebar: oklch(0.235 0.014 263);
-  --sidebar-foreground: oklch(0.844 0.012 264.5);
-  --sidebar-primary: oklch(0.73 0.121 245.3);
-  --sidebar-primary-foreground: oklch(0.189 0.012 254.1);
-  --sidebar-accent: oklch(0.293 0.016 264.3);
-  --sidebar-accent-foreground: oklch(0.844 0.012 264.5);
-  --sidebar-border: oklch(0.332 0.023 264.2);
-  --sidebar-ring: oklch(0.73 0.121 245.3);
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--surface);
+  --accent: color-mix(in srgb, var(--primary) 9%, var(--surface));
+  --accent-foreground: var(--foreground);
+  --ring: var(--primary);
+  --chart-1: var(--primary);
+  --chart-2: var(--terminal-green);
+  --chart-3: var(--terminal-purple);
+  --chart-4: var(--terminal-yellow);
+  --chart-5: var(--terminal-red);
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+:root {
+  color-scheme: light;
+  --background: var(--paper);
+  --foreground: var(--charcoal);
+  --surface: var(--stone);
+  --primary: var(--terracotta);
+  --primary-foreground: var(--paper);
+  --primary-hover: color-mix(in srgb, var(--primary) 85%, var(--charcoal));
+  --muted-text: var(--warm-gray);
+  /* Keep secondary text readable on surfaces and tinted hover backgrounds. */
+  --muted-foreground: #5e5e59;
+  --border: var(--divider);
+  --input: #8a8176;
+  --destructive: #963d38;
+  --destructive-foreground: var(--paper);
+  --terminal-blue: #34567a;
+  --terminal-cyan: #2e5b60;
+  --terminal-green: #426036;
+  --terminal-yellow: #69511e;
+  --terminal-orange: #794c2b;
+  --terminal-purple: #684673;
+  --terminal-red: var(--destructive);
+}
+
+.dark {
+  color-scheme: dark;
+  background-color: var(--background);
+  color: var(--foreground);
+  --background: var(--charcoal);
+  --foreground: var(--paper);
+  --surface: #2d2c29;
+  --primary: #e5a68e;
+  --primary-foreground: var(--charcoal);
+  --primary-hover: color-mix(in srgb, var(--primary) 85%, var(--paper));
+  --muted-text: #b7b2a8;
+  --muted-foreground: var(--muted-text);
+  --border: #49453e;
+  --input: #847e73;
+  --destructive: #eda49f;
+  --destructive-foreground: var(--charcoal);
+  --terminal-blue: #91b5d5;
+  --terminal-cyan: #8fc0bd;
+  --terminal-green: #adc398;
+  --terminal-yellow: #dbc08a;
+  --terminal-orange: #d7ad87;
+  --terminal-purple: #c8a5d2;
+  --terminal-red: var(--destructive);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
   }
 
   html {
     @apply bg-background;
-    color-scheme: dark;
     scroll-behavior: smooth;
     overflow-x: clip;
   }
 
   body {
-    @apply bg-background font-sans leading-[1.7] text-foreground antialiased;
-    font-size: 0.9375rem;
+    @apply bg-background font-sans leading-[1.65] text-foreground antialiased;
+    font-size: 1rem;
     min-height: 100vh;
-    letter-spacing: -0.01em;
     overflow-x: clip;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  button,
-  .terminal-text {
-    @apply font-mono;
   }
 
   h1,
@@ -136,19 +172,23 @@
   h4,
   h5,
   h6 {
-    letter-spacing: -0.04em;
+    @apply font-display font-bold;
+    letter-spacing: -0.025em;
+  }
+
+  button {
+    @apply font-sans;
   }
 
   code,
-  pre,
-  .terminal-input {
+  pre {
     @apply font-mono;
     font-variant-ligatures: none;
   }
 
   ::selection {
-    background: color-mix(in oklch, var(--terminal-blue) 30%, transparent);
-    color: var(--foreground);
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
 }
 
@@ -158,19 +198,13 @@
     line-height: 1.18;
   }
 
-  .page-lede {
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.6;
-  }
-
   .detail-title {
     font-size: clamp(1.5rem, 7vw, 2rem);
     line-height: 1.15;
   }
 
+  .page-lede,
   .detail-lede {
-    font-family: var(--font-sans);
     font-size: 0.875rem;
     line-height: 1.6;
   }
@@ -192,7 +226,6 @@
     background: var(--primary);
     border-radius: var(--radius);
     color: var(--primary-foreground);
-    font-family: var(--font-mono);
     left: max(1rem, env(safe-area-inset-left));
     padding: 0.65rem 1rem;
     position: fixed;
@@ -279,7 +312,7 @@
     padding-left: 1.5rem;
   }
   .readme blockquote {
-    border-left: 3px solid var(--terminal-purple);
+    border-left: 3px solid var(--primary);
     color: var(--muted-foreground);
     padding-left: 1rem;
   }
@@ -287,7 +320,7 @@
     border: 1px solid var(--border);
     border-radius: 0.25rem;
     background: var(--muted);
-    color: var(--terminal-cyan);
+    color: var(--foreground);
     font-size: 0.875em;
     padding: 0.12rem 0.35rem;
     overflow-wrap: anywhere;
@@ -349,7 +382,7 @@
     color: var(--terminal-yellow);
   }
   .readme a {
-    color: var(--terminal-blue);
+    color: var(--primary);
     text-decoration: underline;
     text-underline-offset: 3px;
   }
@@ -397,6 +430,7 @@
   }
 
   .readme .code-frame button {
+    font-family: var(--font-sans);
     align-items: center;
     border-radius: 0.25rem;
     display: inline-flex;
@@ -428,10 +462,6 @@
 }
 
 @media (min-width: 640px) {
-  body {
-    font-size: 1rem;
-  }
-
   .page-title {
     font-size: 2rem;
   }

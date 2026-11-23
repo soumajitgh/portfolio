@@ -17,7 +17,7 @@ function CompactMetric({
   return (
     <div className="rounded-md border border-border/70 bg-background/25 p-3 sm:p-4">
       <p className={`truncate font-mono text-lg font-semibold sm:text-xl ${tone}`}>{value}</p>
-      <p className="mt-1 truncate font-mono text-[0.6875rem] text-muted-foreground">{label}</p>
+      <p className="mt-1 truncate text-[0.6875rem] text-muted-foreground">{label}</p>
     </div>
   )
 }
@@ -52,7 +52,7 @@ export async function HomeStatsWidget() {
             Problem-solving depth, consistency, and current focus.
           </p>
         </div>
-        <span className="flex items-center gap-1.5 font-mono text-[0.6875rem] text-terminal-green">
+        <span className="flex items-center gap-1.5 text-[0.6875rem] text-terminal-green">
           <span aria-hidden="true" className="size-1.5 rounded-full bg-terminal-green" />
           updated
         </span>

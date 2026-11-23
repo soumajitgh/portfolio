@@ -23,7 +23,7 @@ echarts.use([
   TooltipComponent,
 ])
 
-export type StatsChartOption = ComposeOption<
+type StatsChartOption = ComposeOption<
   | BarSeriesOption
   | GridComponentOption
   | LegendComponentOption
@@ -32,6 +32,39 @@ export type StatsChartOption = ComposeOption<
   | TooltipComponentOption
 >
 
+function getChartTheme(element: HTMLElement) {
+  const style = getComputedStyle(element)
+  const border = style.getPropertyValue('--border')
+  const background = style.getPropertyValue('--popover')
+  const foreground = style.getPropertyValue('--foreground')
+  const muted = style.getPropertyValue('--muted-foreground')
+  const fontFamily = style.fontFamily
+
+  return {
+    border,
+    fontFamily,
+    foreground,
+    muted,
+    primary: style.getPropertyValue('--chart-1'),
+    green: style.getPropertyValue('--chart-2'),
+    yellow: style.getPropertyValue('--chart-4'),
+    red: style.getPropertyValue('--chart-5'),
+    axis: {
+      axisLabel: { color: muted, fontFamily, fontSize: 11 },
+      axisLine: { lineStyle: { color: border } },
+      axisTick: { show: false },
+      splitLine: { lineStyle: { color: border, type: 'dashed' as const } },
+    },
+    tooltip: {
+      backgroundColor: background,
+      borderColor: border,
+      textStyle: { color: foreground, fontFamily, fontSize: 12 },
+    },
+  }
+}
+
+export type BuildStatsChartOption = (theme: ReturnType<typeof getChartTheme>) => StatsChartOption
+
 export function StatsChart({
   className = 'h-64',
   description,
@@ -39,7 +72,7 @@ export function StatsChart({
 }: {
   className?: string
   description: string
-  option: StatsChartOption
+  option: BuildStatsChartOption
 }) {
   const chartElement = useRef<HTMLDivElement>(null)
 
@@ -47,7 +80,7 @@ export function StatsChart({
     if (!chartElement.current) return
 
     const chart = echarts.init(chartElement.current, undefined, { renderer: 'canvas' })
-    chart.setOption(option)
+    chart.setOption(option(getChartTheme(chartElement.current)))
     const resizeObserver = new ResizeObserver(() => chart.resize())
     resizeObserver.observe(chartElement.current)
 

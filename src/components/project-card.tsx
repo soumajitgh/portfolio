@@ -32,7 +32,7 @@ export function ProjectCard({
   return (
     <Card
       className={cn(
-        'group relative h-full overflow-hidden transition-colors hover:border-primary/55 hover:bg-accent/25',
+        'group relative h-full overflow-hidden transition-colors hover:border-primary/55 hover:bg-accent/45',
         compact && 'w-full min-w-0 max-w-none gap-4 py-4',
       )}
     >
@@ -59,7 +59,7 @@ export function ProjectCard({
         </div>
         <CardTitle className="text-sm sm:text-lg">
           <Link
-            className="after:absolute after:inset-0 focus-visible:outline-none"
+            className="after:absolute after:inset-0 focus-visible:outline-none after:rounded-lg focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-ring"
             href={`/projects/${project.slug}`}
           >
             {project.title}

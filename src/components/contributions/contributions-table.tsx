@@ -330,14 +330,7 @@ export function ContributionsTable({
   }
 
   const hasActiveFilters = Boolean(
-    query.trim() ||
-      repository ||
-      status ||
-      tag ||
-      range ||
-      fromDate ||
-      toDate ||
-      sort !== 'newest',
+    query.trim() || repository || status || tag || range || fromDate || toDate || sort !== 'newest',
   )
 
   const activeRangePreset = dateRangePresets.find((item) => item.value === range)
@@ -361,7 +354,7 @@ export function ContributionsTable({
             />
             <input
               aria-label="Search contributions"
-              className="terminal-input h-11 w-full rounded-md border border-input bg-background/35 pl-9 pr-8 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 md:h-9"
+              className="h-11 w-full rounded-md border border-input bg-background/35 pl-9 pr-8 text-xs text-foreground placeholder:text-muted-foreground focus-visible:border-ring md:h-9"
               onChange={(event) => {
                 setQuery(event.target.value)
                 setPage(1)
@@ -472,17 +465,17 @@ export function ContributionsTable({
         {range === 'custom' || fromDate || toDate ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-border/70 bg-background/50 p-2.5 sm:px-3">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <div className="flex items-center gap-1.5 font-mono text-xs font-medium text-terminal-cyan">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-terminal-cyan">
                 <Calendar aria-hidden="true" className="size-3.5" />
                 <span>Custom date range:</span>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <label className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <span>From</span>
                   <input
                     aria-label="Start date"
-                    className="terminal-input h-8 rounded border border-input bg-card px-2 font-mono text-xs text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 [color-scheme:dark]"
+                    className="h-8 rounded border border-input bg-card px-2 text-xs text-foreground transition-colors focus-visible:border-ring"
                     max={toDate || undefined}
                     onChange={(event) => {
                       const nextFrom = event.target.value
@@ -497,11 +490,11 @@ export function ContributionsTable({
                   />
                 </label>
 
-                <label className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <span>To</span>
                   <input
                     aria-label="End date"
-                    className="terminal-input h-8 rounded border border-input bg-card px-2 font-mono text-xs text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 [color-scheme:dark]"
+                    className="h-8 rounded border border-input bg-card px-2 text-xs text-foreground transition-colors focus-visible:border-ring"
                     min={fromDate || undefined}
                     onChange={(event) => {
                       const nextTo = event.target.value
@@ -521,7 +514,7 @@ export function ContributionsTable({
             <div className="flex items-center gap-2">
               {fromDate || toDate ? (
                 <button
-                  className="inline-flex h-7 items-center gap-1 rounded px-2 font-mono text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex h-7 items-center gap-1 rounded px-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => {
                     setFromDate('')
                     setToDate('')
@@ -771,7 +764,7 @@ function ContributionTableRow({ contribution }: { contribution: ContributionCard
               ) : null}
             </div>
             <a
-              className="mt-1 block break-words font-mono text-sm font-semibold leading-5 text-foreground outline-none transition-colors hover:text-primary focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring sm:text-base sm:leading-6"
+              className="mt-1 block break-words font-display text-sm font-bold leading-5 text-foreground transition-colors hover:text-primary focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring sm:text-base sm:leading-6"
               href={contribution.prUrl}
               rel="noreferrer"
               target="_blank"
@@ -781,7 +774,7 @@ function ContributionTableRow({ contribution }: { contribution: ContributionCard
             <p className="mt-1 line-clamp-2 max-w-3xl text-xs leading-5 text-muted-foreground sm:text-[0.8125rem]">
               {summary}
             </p>
-            <p className="mt-1.5 font-mono text-[0.625rem] leading-4 text-muted-foreground sm:text-[0.6875rem]">
+            <p className="mt-1.5 text-[0.625rem] leading-4 text-muted-foreground sm:text-[0.6875rem]">
               @{contribution.author} · {formatContributionDate(activityDate)}
               {contribution.tags?.length
                 ? ` · ${contribution.tags.map((item) => item.name).join(' / ')}`
@@ -860,7 +853,7 @@ function ToolbarSelect({
     <label className="relative min-w-0">
       <span className="sr-only">{label}</span>
       <select
-        className="terminal-input h-11 w-full min-w-0 appearance-none rounded-md border border-input bg-background/35 px-3 pr-8 font-mono text-xs text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 md:h-9"
+        className="h-11 w-full min-w-0 appearance-none rounded-md border border-input bg-background/35 px-3 pr-8 text-xs text-foreground focus-visible:border-ring md:h-9"
         onChange={(event) => onChange(event.target.value)}
         value={value}
       >

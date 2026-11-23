@@ -1,6 +1,5 @@
 import { ArrowRight, ArrowUpRight, ImageIcon } from 'lucide-react'
 import type { Metadata } from 'next'
-import { DM_Sans, Outfit } from 'next/font/google'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -14,9 +13,6 @@ import { siteName } from '@/lib/seo'
 
 import { PhotographyGrid } from './photography-grid'
 import styles from './photography.module.css'
-
-const outfit = Outfit({ subsets: ['latin'], variable: '--photography-display', display: 'swap' })
-const dmSans = DM_Sans({ subsets: ['latin'], variable: '--photography-body', display: 'swap' })
 
 const description = 'Wildlife, nature, and countryside photography by Soumajit Ghosh.'
 const socialTitle = `Photography | ${siteName}`
@@ -191,7 +187,7 @@ export default function PhotographyPage() {
   const { collectionCovers, featuredStory, hero, selected } = photographyLandingContent
 
   return (
-    <main className={`${styles.page} ${outfit.variable} ${dmSans.variable}`}>
+    <main className={styles.page}>
       <PhotographyHero hero={hero} />
       <SelectedPhotographs selected={selected} />
       <FeaturedCollections collectionCovers={collectionCovers} />

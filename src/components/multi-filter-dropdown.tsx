@@ -83,7 +83,7 @@ export function MultiFilterDropdown({
         aria-busy={isPending}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className="terminal-input flex h-10 w-full items-center justify-between gap-3 rounded-md border border-input bg-card px-3 font-mono text-sm text-foreground outline-none transition-colors hover:border-ring focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 sm:h-11"
+        className="flex h-10 w-full items-center justify-between gap-3 rounded-md border border-input bg-card px-3 text-sm text-foreground transition-colors hover:border-ring focus-visible:border-ring sm:h-11"
         onClick={() => setIsOpen((current) => !current)}
         type="button"
       >
@@ -109,7 +109,7 @@ export function MultiFilterDropdown({
             </span>
             {selected.length ? (
               <button
-                className="font-mono text-xs text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="text-xs text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onClick={() => updateSelection([])}
                 type="button"
               >
@@ -124,7 +124,7 @@ export function MultiFilterDropdown({
               return (
                 <label
                   className={cn(
-                    'flex min-h-10 cursor-pointer items-center gap-3 rounded px-2.5 py-2 font-mono text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground',
+                    'flex min-h-10 cursor-pointer items-center gap-3 rounded px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground',
                     isSelected && 'bg-accent/60 text-foreground',
                   )}
                   key={option.value}

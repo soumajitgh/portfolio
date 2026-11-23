@@ -1,9 +1,9 @@
 .page {
-  --photo-paper: var(--paper, #f7f6f2);
-  --photo-ink: var(--charcoal, #20201e);
-  --photo-stone: var(--stone, #eae8e2);
-  --photo-accent: var(--terracotta, #8c4b32);
-  --photo-muted: var(--warm-gray, #71716b);
+  --photo-paper: var(--paper);
+  --photo-ink: var(--charcoal);
+  --photo-stone: var(--stone);
+  --photo-accent: var(--terracotta);
+  --photo-muted: var(--warm-gray);
   --photo-gallery: #191b19;
   --photo-dark-muted: #bebdb4;
   --photo-rule: #d2cec3;
@@ -12,13 +12,13 @@
   background: var(--photo-paper);
   color: var(--photo-ink);
   color-scheme: light;
-  font-family: var(--font-dm-sans, var(--photography-body)), system-ui, sans-serif;
+  font-family: var(--font-sans);
   letter-spacing: normal;
   line-height: 1.55;
 }
 
 .page :is(h1, h2, h3) {
-  font-family: var(--font-outfit, var(--photography-display)), system-ui, sans-serif;
+  font-family: var(--font-display);
   font-weight: 500;
   letter-spacing: -0.045em;
   line-height: 1.06;

@@ -26,7 +26,7 @@ export default async function StatsPage() {
       <p className="font-mono text-xs text-terminal-green sm:text-sm">
         soumajit@portfolio:<span className="text-terminal-blue">~</span>$ watch ./stats
       </p>
-      <h1 className="page-title mt-4 font-semibold">Developer telemetry</h1>
+      <h1 className="page-title mt-4 font-bold">Developer telemetry</h1>
       <p className="page-lede mt-3 max-w-2xl text-muted-foreground">
         Open-source activity on GitHub and problem-solving progress on LeetCode.
       </p>
@@ -37,7 +37,7 @@ export default async function StatsPage() {
           { id: 'leetcode', label: 'LeetCode' },
         ].map(({ id, label }) => (
           <a
-            className="inline-flex min-h-11 items-center rounded-md border border-border bg-card/45 px-4 font-mono text-xs text-primary transition-colors hover:bg-accent"
+            className="inline-flex min-h-11 items-center rounded-md border border-input bg-card/45 px-4 text-xs font-medium text-primary transition-colors hover:bg-accent"
             href={`#${id}`}
             key={id}
           >

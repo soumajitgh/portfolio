@@ -12,7 +12,7 @@ export function ProjectDetailSidebar({ links, topics }: Pick<Project, 'links' | 
       className="order-first border-b border-border pb-8 lg:order-none lg:sticky lg:top-24 lg:border-b-0 lg:border-l lg:pb-0 lg:pl-7"
     >
       <section aria-labelledby="project-stack-heading">
-        <h2 className="font-mono text-sm font-medium text-terminal-cyan" id="project-stack-heading">
+        <h2 className="text-sm font-bold text-primary" id="project-stack-heading">
           const stack = [
         </h2>
         {topics?.length ? (
@@ -31,14 +31,11 @@ export function ProjectDetailSidebar({ links, topics }: Pick<Project, 'links' | 
         ) : (
           <p className="mt-3 font-mono text-xs text-muted-foreground">{'// no topics'}</p>
         )}
-        <p className="mt-3 font-mono text-sm text-terminal-cyan">]</p>
+        <p className="mt-3 font-mono text-sm text-primary">]</p>
       </section>
 
       <section aria-labelledby="project-links-heading" className="mt-7 border-t border-border pt-7">
-        <h2
-          className="font-mono text-sm font-medium text-terminal-green"
-          id="project-links-heading"
-        >
+        <h2 className="text-sm font-bold text-terminal-green" id="project-links-heading">
           ./links
         </h2>
         {links?.length ? (
